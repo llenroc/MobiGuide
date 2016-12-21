@@ -1,1 +1,15 @@
 c:\users\thawa\onedrive\documents\visual studio 2015\Projects\MobiGuide\MobiGuide\bin\Debug\MobiGuide.exe.config
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\bin\Debug\MobiGuide.exe
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\bin\Debug\MobiGuide.pdb
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\MobiGuide.csprojResolveAssemblyReference.cache
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\MainWindow.g.cs
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\App.g.cs
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\MobiGuide_MarkupCompile.cache
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\MobiGuide_MarkupCompile.lref
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\MainWindow.baml
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\MobiGuide.g.resources
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\MobiGuide.Properties.Resources.resources
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\MobiGuide.csproj.GenerateResource.Cache
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\MobiGuide.exe
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\MobiGuide.pdb
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\GeneratedInternalTypeHelper.g.cs

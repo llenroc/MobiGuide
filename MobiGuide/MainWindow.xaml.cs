@@ -24,5 +24,10 @@ namespace MobiGuide
         {
             InitializeComponent();
         }
-    }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            IconHelper.RemoveIcon(this);
+        }
+    } 
 }
