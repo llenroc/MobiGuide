@@ -89,9 +89,11 @@ namespace MobiGuide
                                 {
                                     while (reader.Read())
                                     {
+                                        Application.Current.Resources["UserAccountId"] = reader["UserAccountId"];
+                                        Application.Current.Resources["AirlineCode"] = reader["AirlineCode"];
                                         Application.Current.Resources["UserLogon"] = reader["UserLogon"];
-                                        Application.Current.Resources["firstName"] = reader["firstName"];
-                                        Application.Current.Resources["lastName"] = reader["lastName"];
+                                        Application.Current.Resources["FirstName"] = reader["FirstName"];
+                                        Application.Current.Resources["LastName"] = reader["LastName"];
                                     }
                                     con.Close();
                                     return true;

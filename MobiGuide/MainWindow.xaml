@@ -12,6 +12,10 @@
             <TextBlock x:Name="nameTxtBlock" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="Bold"/>
             <Button x:Name="logoutBtn" Content="Logout" VerticalAlignment="Center" Width="45" Height="20" Click="logoutBtn_Click"/>
         </StackPanel>
+        <StackPanel HorizontalAlignment="Left" Height="50" Margin="10,10,0,0" VerticalAlignment="Top" Orientation="Horizontal" >
+            <Image x:Name="logoImg" HorizontalAlignment="Left" Width="50" Height="50" Margin="0,0,20,0"/>
+            <TextBlock x:Name="airlineNameTxtBlock" VerticalAlignment="Bottom" TextWrapping="Wrap"/>
+        </StackPanel>
 
     </Grid>
 </Window>

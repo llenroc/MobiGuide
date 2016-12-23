@@ -41,7 +41,7 @@ CREATE TABLE AircraftConfiguration
 	AircraftTypeCode  CODE  ,
 	AircraftConfigurationCode  CODE  ,
 	AircraftConfigurationName  USR_NAME  ,
-	SeatMapImage  varbinary  NULL ,
+	SeatMapImage  varbinary(MAX)  NULL ,
 	AisleX  integer  NULL ,
 	FrontDoorBoardingFlag  FLAG  ,
 	FrontDoorX  integer  NULL ,
@@ -95,8 +95,8 @@ CREATE TABLE AirlineReference
 (
 	AirlineCode  CODE  NOT NULL ,
 	AirlineName  USR_NAME  ,
-	AirlineLogoSmall  varbinary  NULL ,
-	AirlineLogoLarge  varbinary  NULL ,
+	AirlineLogoSmall  varbinary(MAX)  NULL ,
+	AirlineLogoLarge  varbinary(MAX)  NULL ,
 	FontName  USR_NAME  ,
 	FontSize  integer  NULL ,
 	FontColor  integer  NULL ,
@@ -288,6 +288,46 @@ CREATE INDEX XIF1UserAccount ON UserAccount
 )
 go
 
+INSERT INTO AirlineReference (
+	AirlineCode,
+	AirlineName,
+	FontName,
+	FontColor,
+	BackGroundColor,
+	LineColor,
+	SeatColor,
+	ShowGuidanceInSeconds,
+	StatusCode,
+	CommitBy,
+	CommitDateTime
+) VALUES
+(
+	'PG',
+	'Bangkok Airways',
+	'Tahoma',
+	21156,
+	21156,
+	21156,
+	21156,
+	5,
+	NULL,
+	NULL,
+	GETDATE()
+);
+go
+
+UPDATE AirlineReference
+SET AirlineLogoLarge = 
+    (SELECT  BulkColumn FROM OPENROWSET(BULK  'C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\SampleData\PGBigLogo.png', SINGLE_BLOB) AS x)
+WHERE AirlineCode = 'PG'
+go
+
+UPDATE AirlineReference
+SET AirlineLogoSmall = 
+    (SELECT  BulkColumn FROM OPENROWSET(BULK  'C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\SampleData\PGSmallLogo.png', SINGLE_BLOB) AS x)
+WHERE AirlineCode = 'PG'
+go
+
 DECLARE @sysId uniqueidentifier  
 SET @sysId = NEWID() 
 INSERT INTO UserAccount 
@@ -333,7 +373,7 @@ INSERT INTO UserAccount
 VALUES
 (
 	@sysId,
-	NULL,
+	'PG',
 	'dome',
 	'test',
 	'Klinkliang',
@@ -343,4 +383,3 @@ VALUES
 	GETDATE()
 );
 go
-
