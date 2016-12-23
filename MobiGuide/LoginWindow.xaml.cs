@@ -56,10 +56,9 @@ namespace MobiGuide
             loginBtn.IsEnabled = true;
             if (result)
             {
-                Debug.WriteLine("hell yeah");
-            } else
-            {
-                Debug.WriteLine("dafuq");
+                MainWindow mainWindow = new MainWindow();
+                mainWindow.Show();
+                this.Close();
             }
         }
 
@@ -88,7 +87,12 @@ namespace MobiGuide
                             {
                                 if (reader.HasRows)
                                 {
-                                    MessageBox.Show("Login Success", "Result");
+                                    while (reader.Read())
+                                    {
+                                        Application.Current.Resources["UserLogon"] = reader["UserLogon"];
+                                        Application.Current.Resources["firstName"] = reader["firstName"];
+                                        Application.Current.Resources["lastName"] = reader["lastName"];
+                                    }
                                     con.Close();
                                     return true;
                                 }

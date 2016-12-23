@@ -316,4 +316,31 @@ VALUES
 );
 go
 
+DECLARE @sysId uniqueidentifier  
+SET @sysId = NEWID() 
+INSERT INTO UserAccount 
+(
+	UserAccountId,
+	AirlineCode,
+	UserLogon,
+	UserPassword,
+	LastName,
+	FirstName,
+	StatusCode,
+	CommitBy,
+	CommitDateTime
+)
+VALUES
+(
+	@sysId,
+	NULL,
+	'dome',
+	'test',
+	'Klinkliang',
+	'Thawatchai',
+	NULL,
+	NULL,
+	GETDATE()
+);
+go
 
