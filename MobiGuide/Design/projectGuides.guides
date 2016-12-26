@@ -10,5 +10,17 @@
         </GuideModel>
       </GuideModels>
     </ProjectItemGuide>
+    <ProjectItemGuide TargetFile="EditProfileWindow.xaml">
+      <GuideModels>
+        <GuideModel>
+          <Guides>
+            <Guide Alignment="Top" Position="83" />
+            <Guide Alignment="Top" Position="111" />
+            <Guide Alignment="Top" Position="140" />
+            <Guide Alignment="Top" Position="169" />
+          </Guides>
+        </GuideModel>
+      </GuideModels>
+    </ProjectItemGuide>
   </ProjectItemGuides>
 </ProjectGuidesConfiguration>

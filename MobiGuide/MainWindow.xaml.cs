@@ -15,15 +15,42 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Drawing;
+using System.ComponentModel;
 
 namespace MobiGuide
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    class UserInfo : INotifyPropertyChanged
+    {
+        // property changed event
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private string fullName;
+        private void OnPropertyChanged(String property)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(property));
+            }
+        }
+
+        public string FullName
+        {
+            get {
+                return fullName;
+            }
+            set {
+                fullName = value;
+                OnPropertyChanged("FullName");
+            }
+        }
+    }
     public partial class MainWindow : Window
     {
         static string connectionString = String.Empty;
+        UserInfo userInfo = new UserInfo();
         public MainWindow()
         {
             InitializeComponent();
@@ -41,7 +68,9 @@ namespace MobiGuide
                 //display user information
                 string firstName = Application.Current.Resources["FirstName"].ToString();
                 string lastName = Application.Current.Resources["LastName"].ToString();
-                nameTxtBlock.Text = String.Format("{0} {1}", firstName, lastName);
+                //nameTxtBlock.Text = String.Format("{0} {1}", firstName, lastName);
+                userInfo.FullName = String.Format("{0} {1}", firstName, lastName);
+                this.DataContext = userInfo;
 
                 //display airline information
                 string airlineName = String.Empty;
@@ -63,8 +92,9 @@ namespace MobiGuide
                         }
                     }
                 }
+                Application.Current.Resources["AirlineName"] = airlineName;
                 airlineNameTxtBlock.Text = airlineName;
-                
+                //display airline logo 
                 logoImg.Source = getLogo(airlineCode);
             } catch (Exception ex){
                 MessageBox.Show("Unexpected Error Occurred! Please contact Administator.", "Error");
@@ -74,38 +104,58 @@ namespace MobiGuide
 
         private void logoutBtn_Click(object sender, RoutedEventArgs e)
         {
-            Application.Current.Resources.Clear();
-            nameTxtBlock.Text = String.Empty;
-            LoginWindow loginWindow = new LoginWindow();
-            loginWindow.Show();
-            this.Close();
+            if(MessageBox.Show("Do you want to logout?", "Confirm", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+            {
+                //clear everything and do logout
+                Application.Current.Resources.Clear();
+                nameTxtBlock.Text = String.Empty;
+                LoginWindow loginWindow = new LoginWindow();
+                loginWindow.Show();
+                this.Close();
+            }
         }
 
         private static ImageSource getLogo (string airlineCode)
         {
-            SqlConnection con = new SqlConnection(connectionString);
-            con.Open();
-            SqlCommand cmd = new SqlCommand("SELECT AirlineLogoLarge FROM AirlineReference WHERE AirlineCode = '" + airlineCode + "'", con);
-            object obj = cmd.ExecuteScalar();
-            if(obj == null)
+            using (SqlConnection con = new SqlConnection(connectionString))
             {
-                con.Close();
-                return null;
-            } else
-            {
-                byte[] bArray = (byte[])cmd.ExecuteScalar();
-                con.Close();
+                try
+                {
+                    con.Open();
+                    SqlCommand cmd = new SqlCommand("SELECT AirlineLogoLarge FROM AirlineReference WHERE AirlineCode = '" + airlineCode + "'", con);
+                    object obj = cmd.ExecuteScalar();
+                    if (obj == null)
+                    {
+                        con.Close();
+                        return null;
+                    }
+                    else
+                    {
+                        byte[] bArray = (byte[])cmd.ExecuteScalar();
+                        con.Close();
 
-                BitmapImage biImg = new BitmapImage();
-                MemoryStream ms = new MemoryStream(bArray);
-                biImg.BeginInit();
-                biImg.StreamSource = ms;
-                biImg.EndInit();
+                        BitmapImage biImg = new BitmapImage();
+                        MemoryStream ms = new MemoryStream(bArray);
+                        biImg.BeginInit();
+                        biImg.StreamSource = ms;
+                        biImg.EndInit();
 
-                ImageSource imgSrc = biImg as ImageSource;
+                        ImageSource imgSrc = biImg as ImageSource;
 
-                return imgSrc;
+                        return imgSrc;
+                    }
+                } catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "ERROR");
+                    return null;
+                }
             }
+        }
+
+        private void editProfileBtn_Click(object sender, RoutedEventArgs e)
+        {
+            EditProfileWindow editProfileWindow = new EditProfileWindow();
+            editProfileWindow.ShowDialog();
         }
     }
 }

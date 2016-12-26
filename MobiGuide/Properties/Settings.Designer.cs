@@ -26,10 +26,8 @@ namespace MobiGuide.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=.\\\\SQLEXPRESS;\n                          AttachDbFilename= |DataDirec" +
-            "tory|\\\\Database.mdf;\n                          Integrated Security=True;\n       " +
-            "                   Connect Timeout=30;\n                          User Instance=T" +
-            "rue")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\Database.mdf;" +
+            "Integrated Security=True")]
         public string DatabaseConnectionString {
             get {
                 return ((string)(this["DatabaseConnectionString"]));
