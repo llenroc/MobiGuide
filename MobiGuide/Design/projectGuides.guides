@@ -22,5 +22,19 @@
         </GuideModel>
       </GuideModels>
     </ProjectItemGuide>
+    <ProjectItemGuide TargetFile="AddUserWindow.xaml">
+      <GuideModels>
+        <GuideModel>
+          <Guides>
+            <Guide Alignment="Top" Position="25" />
+            <Guide Alignment="Top" Position="54" />
+            <Guide Alignment="Top" Position="82" />
+            <Guide Alignment="Top" Position="111" />
+            <Guide Alignment="Top" Position="140" />
+            <Guide Alignment="Top" Position="168" />
+          </Guides>
+        </GuideModel>
+      </GuideModels>
+    </ProjectItemGuide>
   </ProjectItemGuides>
 </ProjectGuidesConfiguration>

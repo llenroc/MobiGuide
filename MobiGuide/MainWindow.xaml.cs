@@ -157,5 +157,11 @@ namespace MobiGuide
             EditProfileWindow editProfileWindow = new EditProfileWindow();
             editProfileWindow.ShowDialog();
         }
+
+        private void addUserBtn_Click(object sender, RoutedEventArgs e)
+        {
+            AddUserWindow addUserWindow = new AddUserWindow();
+            addUserWindow.ShowDialog();
+        }
     }
 }

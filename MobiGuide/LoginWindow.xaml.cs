@@ -109,7 +109,7 @@ namespace MobiGuide
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Login Error, Please contact administrator", "Result");
+                        MessageBox.Show(ex.Message, "ERROR");
                         Debug.WriteLine(ex.ToString());
                         return false;
                     }

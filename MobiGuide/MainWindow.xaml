@@ -16,7 +16,7 @@
             <TextBlock x:Name="nameTxtBlock" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" FontWeight="Bold" Text="{Binding Path=FullName}"/>
         </StackPanel>
         <StackPanel Height="25" VerticalAlignment="Top" Margin="0,38,10,0" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button x:Name="addUserBtn" Content="Add User" VerticalAlignment="Center" Height="20" Click="logoutBtn_Click" Width="55" Margin="0,0,10,0"/>
+            <Button x:Name="addUserBtn" Content="Add User" VerticalAlignment="Center" Height="20" Click="addUserBtn_Click" Width="55" Margin="0,0,10,0"/>
             <Button x:Name="editProfileBtn" Content="Edit Profile" VerticalAlignment="Center" Height="20" Click="editProfileBtn_Click" Margin="0,2.5,10,2.5" Width="65"/>
             <Button x:Name="logoutBtn" Content="Logout" VerticalAlignment="Center" Width="45" Height="20" Click="logoutBtn_Click" Margin="0,2.5"/>
         </StackPanel>
