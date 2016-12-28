@@ -163,5 +163,11 @@ namespace MobiGuide
             AddUserWindow addUserWindow = new AddUserWindow();
             addUserWindow.ShowDialog();
         }
+
+        private void editALRefBtn_Click(object sender, RoutedEventArgs e)
+        {
+            EditAirlineReferenceWindow editALRefWindow = new EditAirlineReferenceWindow();
+            editALRefWindow.ShowDialog();
+        }
     }
 }

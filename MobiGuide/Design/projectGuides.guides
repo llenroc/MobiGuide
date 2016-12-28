@@ -50,5 +50,30 @@
         </GuideModel>
       </GuideModels>
     </ProjectItemGuide>
+    <ProjectItemGuide TargetFile="EditAirlineReferenceWindow.xaml">
+      <GuideModels>
+        <GuideModel>
+          <Guides>
+            <Guide Alignment="Top" Position="25" />
+            <Guide Alignment="Top" Position="54" />
+            <Guide Alignment="Top" Position="67" />
+            <Guide Alignment="Top" Position="218" />
+            <Guide Alignment="Top" Position="227" />
+            <Guide Alignment="Top" Position="377" />
+            <Guide Alignment="Top" Position="402" />
+            <Guide Alignment="Left" Position="10" />
+            <Guide Alignment="Top" Position="430" />
+            <Guide Alignment="Top" Position="459" />
+            <Guide Alignment="Top" Position="488" />
+            <Guide Alignment="Top" Position="516" />
+            <Guide Alignment="Top" Position="545" />
+            <Guide Alignment="Top" Position="575" />
+            <Guide Alignment="Top" Position="604" />
+            <Guide Alignment="Top" Position="632" />
+            <Guide Alignment="Top" Position="661" />
+          </Guides>
+        </GuideModel>
+      </GuideModels>
+    </ProjectItemGuide>
   </ProjectItemGuides>
 </ProjectGuidesConfiguration>

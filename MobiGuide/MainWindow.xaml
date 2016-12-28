@@ -11,7 +11,7 @@
             <Image x:Name="logoImg" HorizontalAlignment="Left" Width="53.1" Margin="0,0,20,-0.1" Source="NoImg.jpg"/>
             <StackPanel>
                 <TextBlock x:Name="airlineNameTxtBlock" VerticalAlignment="Center" TextWrapping="Wrap" FontWeight="Bold" Margin="0,10,0,0" Text="[Airline Name]"/>
-                <Button x:Name="editALRefBtn" Content="Edit Airline Reference" Margin="0,6,0,0" VerticalAlignment="Center" Padding="3,1"/>
+                <Button x:Name="editALRefBtn" Content="Edit Airline Reference" Margin="0,6,0,0" VerticalAlignment="Center" Padding="3,1" Click="editALRefBtn_Click"/>
             </StackPanel>
         </StackPanel>
         <StackPanel Height="25" VerticalAlignment="Top" Margin="10,10,10,0" Orientation="Horizontal" HorizontalAlignment="Right">
