@@ -75,15 +75,27 @@ namespace MobiGuide
                         data.Add("UserPassword", pwdBox.Password);
                         data.Add("LastName", lastNameTxtBox.Text);
                         data.Add("FirstName", firstNameTxtBox.Text);
-                        bool result = await createNewUser(data);
-                        if (result)
+                        data.Add("StatusCode", (statusComboBox.SelectedItem as ComboBoxItem).Value.ToString());
+                        string cfmMsg = String.Format("Do you want to add new user?" + System.Environment.NewLine + System.Environment.NewLine +
+                            "Username : {0}" + System.Environment.NewLine +
+                            "First Name : {1}" + System.Environment.NewLine +
+                            "Last Name : {2}" + System.Environment.NewLine +
+                            "Password : {3}", uNameTxtBox.Text, firstNameTxtBox.Text, lastNameTxtBox.Text,
+                            pwdBox.Password.Length == 0 ? "(unchanged)" : new string('*', pwdBox.Password.Length));
+                        MessageBoxResult confirmResult = MessageBox.Show(cfmMsg, "Confirm?", MessageBoxButton.OKCancel);
+                        if (confirmResult == MessageBoxResult.OK)
                         {
-                            this.Hide();
-                            MessageBox.Show(String.Format("Add user [{0}] successfully.", data["UserLogon"]), "SUCCESS");
-                            this.Close();
-                        } else
-                        {
-                            MessageBox.Show("Cannot add new user at this time.", "ERROR");
+                            bool result = await createNewUser(data);
+                            if (result)
+                            {
+                                this.Hide();
+                                MessageBox.Show(String.Format("Add user [{0}] successfully.", data["UserLogon"]), "SUCCESS");
+                                this.Close();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Cannot add new user at this time.", "ERROR");
+                            }
                         }
                         break;
                     default:
@@ -101,6 +113,11 @@ namespace MobiGuide
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             alNameTxtBlock.Text = res["AirlineName"].ToString();
+
+            statusComboBox.Items.Add(new ComboBoxItem { Text = "Active", Value = "A" });
+            statusComboBox.Items.Add(new ComboBoxItem { Text = "Inactive", Value = "I" });
+            statusComboBox.SelectedIndex = 0;
+
             uNameTxtBox.Focus();
         }
 
@@ -142,8 +159,8 @@ namespace MobiGuide
                 {
                     string query = String.Format("DECLARE @id uniqueidentifier " +
                         "SET @id = NEWID() " +
-                        "INSERT INTO UserAccount VALUES (@id,'{0}','{1}','{2}','{3}','{4}',NULL,'{5}',GETDATE())",
-                        res["AirlineCode"], data["UserLogon"], data["UserPassword"], data["LastName"], data["FirstName"], res["UserAccountId"]);
+                        "INSERT INTO UserAccount VALUES (@id,'{0}','{1}','{2}','{3}','{4}','{5}','{6}',GETDATE())",
+                        res["AirlineCode"], data["UserLogon"], data["UserPassword"], data["LastName"], data["FirstName"], data["StatusCode"], res["UserAccountId"]);
                         con.Open();
                         SqlCommand cmd = new SqlCommand(query, con);
                         int row = cmd.ExecuteNonQuery();

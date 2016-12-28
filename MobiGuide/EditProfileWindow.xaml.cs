@@ -24,6 +24,7 @@ namespace MobiGuide
     {
         private static string newName = String.Empty;
         static string connectionString = String.Empty;
+        ResourceDictionary res = Application.Current.Resources;
         public static string NewName
         {
             get
@@ -59,12 +60,30 @@ namespace MobiGuide
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            ResourceDictionary res = Application.Current.Resources;
             uNameTxtBlock.Text = res["UserLogon"].ToString();
             alNameTxtBlock.Text = res["AirlineName"].ToString();
             firstNameTxtBox.Text = res["FirstName"].ToString();
             lastNameTxtBox.Text = res["LastName"].ToString();
+            commitDateTxtBlock.Text = res["CommitDateTime"].ToString();
+            loadCommitByUser();
+            
+            statusComboBox.Items.Add(new ComboBoxItem { Text = "Active", Value = "A" });
+            statusComboBox.Items.Add(new ComboBoxItem { Text = "Inactive", Value = "I" });
+
+            for(int i = 0; i < statusComboBox.Items.Count; i++)
+            {
+                if(res["StatusCode"].ToString().Equals((statusComboBox.Items[i] as ComboBoxItem).Value))
+                {
+                    statusComboBox.SelectedIndex = i;
+                    break;
+                }
+            }
             firstNameTxtBox.Focus();
+        }
+
+        private async void loadCommitByUser()
+        {
+            commitByTxtBlock.Text = await getCommitUser(res["CommitBy"].ToString());
         }
 
         private async void saveBtn_Click(object sender, RoutedEventArgs e)
@@ -85,6 +104,7 @@ namespace MobiGuide
                     Dictionary<string, string> data = new Dictionary<string, string>();
                     data.Add("firstName", firstNameTxtBox.Text);
                     data.Add("lastName", lastNameTxtBox.Text);
+                    data.Add("statusCode", (statusComboBox.SelectedItem as ComboBoxItem).Value.ToString());
                     data.Add("password", cfmPwdBox.Password);
                     if (await updateProfile(data))
                     {
@@ -97,8 +117,9 @@ namespace MobiGuide
                                 (window as MainWindow).DataContext = userInfo;
                             }
                         }
-                        Application.Current.Resources["FirstName"] = data["firstName"];
-                        Application.Current.Resources["LastName"] = data["lastName"];
+                        res["FirstName"] = data["firstName"];
+                        res["LastName"] = data["lastName"];
+                        res["StatusCode"] = data["statusCode"];
                         this.Hide();
                         MessageBox.Show("Update Profile Succussfully.", "SUCCESS");
                         this.Close();
@@ -119,11 +140,12 @@ namespace MobiGuide
                 {
                     using (SqlConnection con = new SqlConnection(connectionString))
                     {
-                        SqlCommand cmd = new SqlCommand(String.Format("UPDATE UserAccount " +
-                            "SET FirstName = '{0}', LastName = '{1}'{2} " +
-                            "WHERE UserAccountId = '{3}'", data["firstName"], data["lastName"],
+                        string query = String.Format("UPDATE UserAccount " +
+                            "SET FirstName = '{0}', LastName = '{1}', StatusCode='{2}'{3} " +
+                            "WHERE UserAccountId = '{4}'", data["firstName"], data["lastName"], data["statusCode"],
                             String.IsNullOrWhiteSpace(data["password"]) ? "" : ", UserPassword = '" + data["password"] + "'",
-                            Application.Current.Resources["UserAccountId"].ToString()), con);
+                            Application.Current.Resources["UserAccountId"].ToString());
+                        SqlCommand cmd = new SqlCommand(query, con);
                         con.Open();
                         cmd.ExecuteNonQuery();
                         con.Close();
@@ -137,6 +159,51 @@ namespace MobiGuide
                 }
             });
             return result;
+        }
+
+        private static async Task<string> getCommitUser(string guid)
+        {
+            string result = await Task.Run(() =>
+            {
+                try
+                {
+                    using (SqlConnection con = new SqlConnection(connectionString))
+                    {
+                        string query = String.Format("SELECT FirstName, LastName FROM UserAccount WHERE UserAccountId = '{0}'", guid);
+                        SqlCommand cmd = new SqlCommand(query, con);
+                        con.Open();
+                        using(SqlDataReader reader = cmd.ExecuteReader()){
+                            if (reader.HasRows)
+                            {
+                                while (reader.Read())
+                                {
+                                    return String.Format("{0} {1}", reader["FirstName"].ToString(), reader["LastName"].ToString());
+                                }
+                            } else
+                            {
+                                return null;
+                            }
+                        }
+                        con.Close();
+                        return null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "ERROR");
+                    return null;
+                }
+            });
+            return result;
+        }
+    }
+    public class ComboBoxItem
+    {
+        public string Text { get; set; }
+        public object Value { get; set; }
+        public override string ToString()
+        {
+            return Text;
         }
     }
 }

@@ -25,6 +25,8 @@ namespace MobiGuide
     /// </summary>
     public partial class LoginWindow : Window
     {
+        static ResourceDictionary res = Application.Current.Resources;
+        static string connectionString = ConfigurationManager.ConnectionStrings["DatabaseConnectionString"].ConnectionString;
         public LoginWindow()
         {
             InitializeComponent();
@@ -75,7 +77,6 @@ namespace MobiGuide
                 {
                     try
                     {
-                        string connectionString = ConfigurationManager.ConnectionStrings["DatabaseConnectionString"].ConnectionString;
                         using (SqlConnection con = new SqlConnection(connectionString))
                         {
                             SqlCommand cmd = new SqlCommand("SELECT * " +
@@ -89,11 +90,10 @@ namespace MobiGuide
                                 {
                                     while (reader.Read())
                                     {
-                                        Application.Current.Resources["UserAccountId"] = reader["UserAccountId"];
-                                        Application.Current.Resources["AirlineCode"] = reader["AirlineCode"];
-                                        Application.Current.Resources["UserLogon"] = reader["UserLogon"];
-                                        Application.Current.Resources["FirstName"] = reader["FirstName"];
-                                        Application.Current.Resources["LastName"] = reader["LastName"];
+                                        for(int i = 0; i < reader.FieldCount; i++)
+                                        {
+                                            res[reader.GetName(i)] = reader.GetValue(i);
+                                        }
                                     }
                                     con.Close();
                                     return true;

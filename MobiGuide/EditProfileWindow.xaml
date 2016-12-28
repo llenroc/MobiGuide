@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MobiGuide"
         mc:Ignorable="d"
-        Title="Edit User Profile" Height="300" Width="300"
+        Title="Edit User Profile" Height="360" Width="300"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
         SizeToContent="Width" Loaded="Window_Loaded">
     <StackPanel>
@@ -15,16 +15,22 @@
                 <TextBlock x:Name="textBlock_Copy" TextWrapping="Wrap" Text="Airline Name" FontSize="14" Margin="10,0,0,10"/>
                 <TextBlock x:Name="textBlock_Copy1" TextWrapping="Wrap" Text="First Name" FontSize="14" Margin="10,0,0,10"/>
                 <TextBlock x:Name="textBlock_Copy2" TextWrapping="Wrap" Text="Last Name" FontSize="14" Margin="10,0,0,10"/>
+                <TextBlock x:Name="textBlock_Copy5" TextWrapping="Wrap" Text="Status" FontSize="14" Margin="10,0,0,10"/>
                 <TextBlock x:Name="textBlock_Copy3" TextWrapping="Wrap" Text="New Password" FontSize="14" Margin="10,0,0,10"/>
                 <TextBlock x:Name="textBlock_Copy4" TextWrapping="Wrap" Text="Confirm Password" FontSize="14" Margin="10,0,0,10"/>
+                <TextBlock x:Name="textBlock_Copy6" TextWrapping="Wrap" Text="Commit By" FontSize="14" Margin="10,0,0,10"/>
+                <TextBlock x:Name="textBlock_Copy7" TextWrapping="Wrap" Text="Commit Time" FontSize="14" Margin="10,0,0,10"/>
             </StackPanel>
             <StackPanel x:Name="stackDetail" d:LayoutOverrides="Width" Margin="0,0,10,0">
                 <TextBlock x:Name="uNameTxtBlock" TextWrapping="Wrap" FontSize="14" Margin="10,10,0,10" FontWeight="Bold"/>
                 <TextBlock x:Name="alNameTxtBlock" TextWrapping="Wrap" FontSize="14" Margin="10,0,0,10" FontWeight="Bold"/>
                 <TextBox x:Name="firstNameTxtBox" Height="20" TextWrapping="Wrap" FontSize="14" Margin="10,0,0,8"/>
                 <TextBox x:Name="lastNameTxtBox" Height="20" TextWrapping="Wrap" FontSize="14" Margin="10,0,0,8"/>
-                <PasswordBox x:Name="newPwdBox" FontSize="14" Margin="10,0,0,10"/>
-                <PasswordBox x:Name="cfmPwdBox" FontSize="14" Margin="10,0,0,10"/>
+                <ComboBox x:Name="statusComboBox" Margin="10,0,0,9" SelectedIndex="0" HorizontalAlignment="Left"/>
+                <PasswordBox x:Name="newPwdBox" FontSize="14" Margin="10,0,0,8"/>
+                <PasswordBox x:Name="cfmPwdBox" FontSize="14" Margin="10,0,0,7"/>
+                <TextBlock x:Name="commitByTxtBlock" TextWrapping="Wrap" FontSize="14" Margin="10,0,0,9"/>
+                <TextBlock x:Name="commitDateTxtBlock" TextWrapping="Wrap" FontSize="14" Margin="10,0,0,10"/>
             </StackPanel>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">

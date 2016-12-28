@@ -10,6 +10,16 @@
         </GuideModel>
       </GuideModels>
     </ProjectItemGuide>
+    <ProjectItemGuide TargetFile="MainWindow.xaml">
+      <GuideModels>
+        <GuideModel>
+          <Guides>
+            <Guide Alignment="Top" Position="63" />
+            <Guide Alignment="Top" Position="10" />
+          </Guides>
+        </GuideModel>
+      </GuideModels>
+    </ProjectItemGuide>
     <ProjectItemGuide TargetFile="EditProfileWindow.xaml">
       <GuideModels>
         <GuideModel>
@@ -18,6 +28,9 @@
             <Guide Alignment="Top" Position="111" />
             <Guide Alignment="Top" Position="140" />
             <Guide Alignment="Top" Position="169" />
+            <Guide Alignment="Top" Position="197" />
+            <Guide Alignment="Top" Position="226" />
+            <Guide Alignment="Top" Position="254" />
           </Guides>
         </GuideModel>
       </GuideModels>
@@ -32,6 +45,7 @@
             <Guide Alignment="Top" Position="111" />
             <Guide Alignment="Top" Position="140" />
             <Guide Alignment="Top" Position="168" />
+            <Guide Alignment="Top" Position="196" />
           </Guides>
         </GuideModel>
       </GuideModels>

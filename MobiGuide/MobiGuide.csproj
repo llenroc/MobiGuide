@@ -162,6 +162,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="GenerateDB_20161126.SQL" />
+    <Resource Include="NoImg.jpg" />
     <Resource Include="SampleData\PGBigLogo.png" />
     <Resource Include="SampleData\PGSmallLogo.png" />
     <Resource Include="MayUseCode.txt" />
