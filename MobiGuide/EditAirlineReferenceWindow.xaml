@@ -8,7 +8,10 @@
         mc:Ignorable="d"
         Title="Edit Airline Reference" Height="542" Width="500"
         ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
-        SizeToContent="Width">
+        SizeToContent="Width" Loaded="Window_Loaded">
+    <Window.Resources>
+        <CollectionViewSource Source="{Binding Source={x:Static Fonts.SystemFontFamilies}}" x:Key="sysFonts"/>
+    </Window.Resources>
     <StackPanel>
         <ScrollViewer d:LayoutOverrides="LeftPosition, RightPosition" Margin="0,0,0,10" Height="450">
             <StackPanel>
@@ -34,40 +37,46 @@
                         <TextBlock TextWrapping="Wrap" FontSize="14" Margin="10,0,0,10" Text="Commit Time"/>
                     </StackPanel>
                     <StackPanel x:Name="stackDetail" d:LayoutOverrides="Width" Margin="0,0,10,0">
-                        <TextBlock x:Name="alCodeTxtBlock" TextWrapping="Wrap" FontSize="14" Margin="10,10,0,9" FontWeight="Bold" Text="PG"/>
-                        <TextBox x:Name="alNameTxtBox" Height="20" TextWrapping="Wrap" FontSize="14" Margin="10,0,0,9" Text="Bangkok Airways"/>
+                        <TextBlock x:Name="alCodeTxtBlock" TextWrapping="Wrap" FontSize="14" Margin="10,10,0,9" FontWeight="Bold" Text="[Airline Code]"/>
+                        <TextBox x:Name="alNameTxtBox" Height="20" TextWrapping="Wrap" FontSize="14" Margin="10,0,0,9" Text="[Airline Name]"/>
                         <StackPanel Margin="0,35,0,0">
                             <TextBlock x:Name="textBlock1" TextWrapping="Wrap" Text="Airline Large Logo" FontSize="14" Margin="10,0,0,0"/>
                             <StackPanel Orientation="Horizontal" d:LayoutOverrides="Width" Margin="10,10,0,0">
-                                <TextBox x:Name="textBox" TextWrapping="Wrap" Text="path/to/image/source/image.jpg" Margin="0" FontSize="14" Padding="1,0,10,1" Foreground="#FFABADB3"/>
-                                <Button x:Name="browseSrcLargeLogoBtn" Content="Browse" VerticalContentAlignment="Center" Margin="5,0,0,0" Padding="2,1" FontSize="14"/>
+                                <TextBox x:Name="srcLargeLogoTxtBox" TextWrapping="Wrap" Text="path/to/image/source/image.jpg" Margin="0" FontSize="14" Padding="1,0,10,1" Foreground="#FFABADB3" IsEnabled="False" MinWidth="220"/>
+                                <Button x:Name="browseSrcLargeLogoBtn" Content="Browse" VerticalContentAlignment="Center" Margin="5,0,0,0" Padding="2,1" FontSize="14" Click="browseSrcLargeLogoBtn_Click"/>
                             </StackPanel>
-                            <TextBlock x:Name="removeAlLargeLogoTxtBlock" TextWrapping="Wrap" Text="Remove" TextDecorations="Underline" Foreground="#FFEE1111" Margin="10,10,0,0"/>
+                            <TextBlock x:Name="removeAlLargeLogoTxtBlock" TextWrapping="Wrap" Text="Remove" TextDecorations="Underline" Foreground="#FFEE1111" Margin="10,10,0,0" Visibility="Hidden"/>
                         </StackPanel>
                         <StackPanel Margin="0,82,0,0">
                             <TextBlock x:Name="textBlock2" TextWrapping="Wrap" Text="Airline Small Logo" FontSize="14" Margin="10,0,0,0"/>
                             <StackPanel Orientation="Horizontal" d:LayoutOverrides="Width" Margin="10,10,0,0">
-                                <TextBox x:Name="textBox1" TextWrapping="Wrap" Text="path/to/image/source/image.jpg" Margin="0" FontSize="14" Padding="1,0,10,1" Foreground="#FFABADB3"/>
-                                <Button x:Name="browseSrcSmallLogoBtn" Content="Browse" VerticalContentAlignment="Center" Margin="5,0,0,0" Padding="2,1" FontSize="14"/>
+                                <TextBox x:Name="srcSmallLogoTxtBox" TextWrapping="Wrap" Text="path/to/image/source/image.jpg" Margin="0" FontSize="14" Padding="1,0,10,1" Foreground="#FFABADB3" IsEnabled="False" MinWidth="220"/>
+                                <Button x:Name="browseSrcSmallLogoBtn" Content="Browse" VerticalContentAlignment="Center" Margin="5,0,0,0" Padding="2,1" FontSize="14" Click="browseSrcSmallLogoBtn_Click"/>
                             </StackPanel>
-                            <TextBlock x:Name="removeAlSmallLogoTxtBlock" TextWrapping="Wrap" Text="Remove" TextDecorations="Underline" Foreground="#FFEE1111" Margin="10,10,0,0"/>
+                            <TextBlock x:Name="removeAlSmallLogoTxtBlock" TextWrapping="Wrap" Text="Remove" TextDecorations="Underline" Foreground="#FFEE1111" Margin="10,10,0,0" Visibility="Hidden"/>
                         </StackPanel>
-                        <ComboBox x:Name="fontNameComboBox" Margin="10,46,0,3" SelectedIndex="0" HorizontalAlignment="Left" FontSize="14">
-                            <ComboBoxItem Content="test"/>
+                        <ComboBox x:Name="fontNameComboBox" Grid.Row="3" Margin="10,49,0,2" HorizontalAlignment="Left"
+                            ItemsSource="{Binding Source={StaticResource sysFonts}}" Height="23" VerticalAlignment="Top" Grid.ColumnSpan="2">
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel />
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" FontFamily="{Binding}" Height="20"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
                         </ComboBox>
-                        <ComboBox x:Name="fontSizeComboBox" Margin="10,0,0,3" SelectedIndex="0" HorizontalAlignment="Left" FontSize="14">
-                            <ComboBoxItem Content="test"/>
-                        </ComboBox>
+                        <ComboBox x:Name="fontSizeComboBox" Margin="10,0,0,3" SelectedIndex="0" HorizontalAlignment="Left" FontSize="14" SelectedValuePath="Value"/>
                         <xctk:ColorPicker x:Name="fontColorPicker" Margin="10,0,0,4" DisplayColorAndName="True" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" MinWidth="100" Padding="0,0,3,0" FontSize="14"/>
                         <xctk:ColorPicker x:Name="backgroundColorPicker" Margin="10,0,0,4" DisplayColorAndName="True" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" MinWidth="100" Padding="0,0,3,0" FontSize="14"/>
                         <xctk:ColorPicker x:Name="lineColorPicker" Margin="10,0,0,3" DisplayColorAndName="True" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" MinWidth="100" Padding="0,0,3,0" FontSize="14"/>
                         <xctk:ColorPicker x:Name="seatColorPicker" Margin="10,0,0,6" DisplayColorAndName="True" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" MinWidth="100" Padding="0,0,3,3" FontSize="14"/>
                         <xctk:IntegerUpDown x:Name="dispGuideTimeIntUpDown" Margin="10,0,0,0" HorizontalAlignment="Left" Width="45" Value="1" DefaultValue="1" Minimum="1" Maximum="999" FontSize="14"/>
-                        <ComboBox x:Name="statusCodeComboBox" Margin="10,5,0,3" SelectedIndex="0" HorizontalAlignment="Left" FontSize="14">
-                            <ComboBoxItem Content="test"/>
-                        </ComboBox>
-                        <TextBlock x:Name="commitByTxtBlock" TextWrapping="Wrap" FontSize="14" Margin="10,4,0,9" Text="PG"/>
-                        <TextBlock x:Name="commitTimeTxtBlock" TextWrapping="Wrap" FontSize="14" Margin="10,1,0,9" Text="PG"/>
+                        <ComboBox x:Name="statusCodeComboBox" Margin="10,5,0,3" SelectedIndex="0" HorizontalAlignment="Left" FontSize="14" SelectedValuePath="Value"/>
+                        <TextBlock x:Name="commitByTxtBlock" TextWrapping="Wrap" FontSize="14" Margin="10,4,0,9" Text="[Commit By]"/>
+                        <TextBlock x:Name="commitTimeTxtBlock" TextWrapping="Wrap" FontSize="14" Margin="10,1,0,9" Text="[Commit Time]"/>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
