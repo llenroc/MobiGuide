@@ -112,7 +112,7 @@ namespace MobiGuide
                         {
                             if (window.GetType() == typeof(MainWindow))
                             {
-                                MobiGuide.UserInfo userInfo = new MobiGuide.UserInfo();
+                                MobiGuide.UserInfo userInfo = (MobiGuide.UserInfo)window.DataContext;
                                 userInfo.FullName = String.Format("{0} {1}", data["firstName"], data["lastName"]);
                                 (window as MainWindow).DataContext = userInfo;
                             }

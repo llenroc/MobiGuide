@@ -42,18 +42,22 @@
                         <StackPanel Margin="0,35,0,0">
                             <TextBlock x:Name="textBlock1" TextWrapping="Wrap" Text="Airline Large Logo" FontSize="14" Margin="10,0,0,0"/>
                             <StackPanel Orientation="Horizontal" d:LayoutOverrides="Width" Margin="10,10,0,0">
-                                <TextBox x:Name="srcLargeLogoTxtBox" TextWrapping="Wrap" Text="path/to/image/source/image.jpg" Margin="0" FontSize="14" Padding="1,0,10,1" Foreground="#FFABADB3" IsEnabled="False" MinWidth="220"/>
+                                <TextBox x:Name="srcLargeLogoTxtBox" TextWrapping="Wrap" Margin="0" FontSize="14" Padding="1,0,10,1" Foreground="#FFABADB3" IsEnabled="False" MinWidth="220"/>
                                 <Button x:Name="browseSrcLargeLogoBtn" Content="Browse" VerticalContentAlignment="Center" Margin="5,0,0,0" Padding="2,1" FontSize="14" Click="browseSrcLargeLogoBtn_Click"/>
                             </StackPanel>
-                            <TextBlock x:Name="removeAlLargeLogoTxtBlock" TextWrapping="Wrap" Text="Remove" TextDecorations="Underline" Foreground="#FFEE1111" Margin="10,10,0,0" Visibility="Hidden"/>
+                            <Button x:Name="removeLargeLogoBtn" HorizontalAlignment="Left" Margin="10,15,0,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="Red" Height="11" Padding="0,-5,0,0" BorderThickness="0" Visibility="Hidden" Click="removeLargeLogoBtn_Click">
+                                <TextBlock><Underline><Run Text="Remove"/></Underline></TextBlock>
+                            </Button>
                         </StackPanel>
                         <StackPanel Margin="0,82,0,0">
                             <TextBlock x:Name="textBlock2" TextWrapping="Wrap" Text="Airline Small Logo" FontSize="14" Margin="10,0,0,0"/>
                             <StackPanel Orientation="Horizontal" d:LayoutOverrides="Width" Margin="10,10,0,0">
-                                <TextBox x:Name="srcSmallLogoTxtBox" TextWrapping="Wrap" Text="path/to/image/source/image.jpg" Margin="0" FontSize="14" Padding="1,0,10,1" Foreground="#FFABADB3" IsEnabled="False" MinWidth="220"/>
+                                <TextBox x:Name="srcSmallLogoTxtBox" TextWrapping="Wrap" Margin="0" FontSize="14" Padding="1,0,10,1" Foreground="#FFABADB3" IsEnabled="False" MinWidth="220"/>
                                 <Button x:Name="browseSrcSmallLogoBtn" Content="Browse" VerticalContentAlignment="Center" Margin="5,0,0,0" Padding="2,1" FontSize="14" Click="browseSrcSmallLogoBtn_Click"/>
                             </StackPanel>
-                            <TextBlock x:Name="removeAlSmallLogoTxtBlock" TextWrapping="Wrap" Text="Remove" TextDecorations="Underline" Foreground="#FFEE1111" Margin="10,10,0,0" Visibility="Hidden"/>
+                            <Button x:Name="removeSmallLogoBtn" HorizontalAlignment="Left" Margin="10,15,0,0" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="Red" Height="11" Padding="0,-5,0,0" BorderThickness="0" Visibility="Hidden" Click="removeSmallLogoBtn_Click">
+                                <TextBlock><Underline><Run Text="Remove"/></Underline></TextBlock>
+                            </Button>
                         </StackPanel>
                         <ComboBox x:Name="fontNameComboBox" Grid.Row="3" Margin="10,49,0,2" HorizontalAlignment="Left"
                             ItemsSource="{Binding Source={StaticResource sysFonts}}" Height="23" VerticalAlignment="Top" Grid.ColumnSpan="2">

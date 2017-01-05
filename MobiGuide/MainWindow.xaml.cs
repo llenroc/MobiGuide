@@ -28,6 +28,7 @@ namespace MobiGuide
         public event PropertyChangedEventHandler PropertyChanged;
 
         private string fullName;
+        private string airlineName;
         private void OnPropertyChanged(String property)
         {
             if (PropertyChanged != null)
@@ -44,6 +45,18 @@ namespace MobiGuide
             set {
                 fullName = value;
                 OnPropertyChanged("FullName");
+            }
+        }
+        public string AirlineName
+        {
+            get
+            {
+                return airlineName;
+            }
+            set
+            {
+                airlineName = value;
+                OnPropertyChanged("AirlineName");
             }
         }
     }
@@ -70,7 +83,6 @@ namespace MobiGuide
                 string lastName = Application.Current.Resources["LastName"].ToString();
                 //nameTxtBlock.Text = String.Format("{0} {1}", firstName, lastName);
                 userInfo.FullName = String.Format("{0} {1}", firstName, lastName);
-                this.DataContext = userInfo;
 
                 //display airline information
                 string airlineName = String.Empty;
@@ -93,9 +105,14 @@ namespace MobiGuide
                     }
                 }
                 Application.Current.Resources["AirlineName"] = airlineName;
-                airlineNameTxtBlock.Text = airlineName;
+                userInfo.AirlineName = airlineName;
+                this.DataContext = userInfo;
                 //display airline logo 
-                logoImg.Source = getLogo(airlineCode);
+                ImageSource logoSource = getLogo(airlineCode);
+                if(logoSource != null)
+                {
+                    logoImg.Source = logoSource;
+                }
             } catch (Exception ex){
                 MessageBox.Show("Unexpected Error Occurred! Please contact Administator.", "Error");
                 this.Close();
@@ -124,14 +141,14 @@ namespace MobiGuide
                     con.Open();
                     SqlCommand cmd = new SqlCommand("SELECT AirlineLogoLarge FROM AirlineReference WHERE AirlineCode = '" + airlineCode + "'", con);
                     object obj = cmd.ExecuteScalar();
-                    if (obj == null)
+                    if (obj == DBNull.Value)
                     {
                         con.Close();
                         return null;
                     }
                     else
                     {
-                        byte[] bArray = (byte[])cmd.ExecuteScalar();
+                        byte[] bArray = (byte[])obj;
                         con.Close();
 
                         BitmapImage biImg = new BitmapImage();

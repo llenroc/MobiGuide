@@ -16,6 +16,7 @@ using CustomExtensions;
 using System.Diagnostics;
 using System.Data.SqlClient;
 using System.Configuration;
+using System.IO;
 
 namespace MobiGuide
 {
@@ -25,15 +26,122 @@ namespace MobiGuide
     public partial class EditAirlineReferenceWindow : Window
     {
         ResourceDictionary res = Application.Current.Resources;
+        private Dictionary<string, object> airlineRef = new Dictionary<string, object>();
         static string connectionString = ConfigurationManager.ConnectionStrings["DatabaseConnectionString"].ConnectionString;
+        private ImageUploadStatus largeLogoStatus = ImageUploadStatus.Remain;
+        private ImageUploadStatus smallLogoStatus = ImageUploadStatus.Remain;
+        private string largeLogoPath = String.Empty;
+        private string smallLogoPath = String.Empty;
         public EditAirlineReferenceWindow()
         {
             InitializeComponent();
         }
 
-        private void saveBtn_Click(object sender, RoutedEventArgs e)
+        private async void saveBtn_Click(object sender, RoutedEventArgs e)
         {
+            saveBtn.IsEnabled = false;
+            gatherDataToUpdate();
+            bool result = await Task.Run(() =>
+            {
+                try
+                {
+                    using (SqlConnection con = new SqlConnection(connectionString))
+                    {
+                        //update airline reference info
+                        string query = String.Format("UPDATE AirlineReference SET");
+                        for(int i = 0; i < airlineRef.Count; i++)
+                        {
+                            if(airlineRef.ElementAt(i).Key != "AirlineLogoSmall" && 
+                                airlineRef.ElementAt(i).Key != "AirlineLogoLarge" &&
+                                airlineRef.ElementAt(i).Key != "AirlineCode")
+                            {
+                                query += String.Format(" {0} = '{1}'", airlineRef.ElementAt(i).Key, airlineRef.ElementAt(i).Value);
+                                if (i < airlineRef.Count - 1) query += ",";
+                            }
+                        }
+                        SqlCommand cmd = new SqlCommand(query, con);
+                        con.Open();
+                        cmd.ExecuteNonQuery();
 
+                        //upload large logo
+                        switch (largeLogoStatus)
+                        {
+                            case ImageUploadStatus.New:
+                                query = String.Format("UPDATE AirlineReference ");
+                                query += String.Format("SET AirlineLogoLarge = ");
+                                query += String.Format("(SELECT BulkColumn FROM OPENROWSET(BULK  '{0}', SINGLE_BLOB) AS x) ", largeLogoPath);
+                                query += String.Format("WHERE AirlineCode = '{0}'", res["AirlineCode"].ToString());
+                                break;
+                            case ImageUploadStatus.Remove:
+                                query = String.Format("UPDATE AirlineReference ");
+                                query += String.Format("SET AirlineLogoLarge = NULL ");
+                                query += String.Format("WHERE AirlineCode = '{0}'", res["AirlineCode"].ToString());
+                                break;
+                        }
+                        cmd = new SqlCommand(query, con);
+                        cmd.ExecuteNonQuery();
+
+                        //upload small logo
+                        switch (smallLogoStatus)
+                        {
+                            case ImageUploadStatus.New:
+                                query = String.Format("UPDATE AirlineReference ");
+                                query += String.Format("SET AirlineLogoSmall = ");
+                                query += String.Format("(SELECT BulkColumn FROM OPENROWSET(BULK  '{0}', SINGLE_BLOB) AS x) ", smallLogoPath);
+                                query += String.Format("WHERE AirlineCode = '{0}'", res["AirlineCode"].ToString());
+                                break;
+                            case ImageUploadStatus.Remove:
+                                query = String.Format("UPDATE AirlineReference ");
+                                query += String.Format("SET AirlineLogoSmall = NULL ");
+                                query += String.Format("WHERE AirlineCode = '{0}'", res["AirlineCode"].ToString());
+                                break;
+                        }
+                        cmd = new SqlCommand(query, con);
+                        cmd.ExecuteNonQuery();
+
+                        con.Close();
+                        return true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "ERROR");
+                    return false;
+                }
+            });
+            if (result)
+            {
+                this.Hide();
+                foreach (Window window in Application.Current.Windows)
+                {
+                    if (window.GetType() == typeof(MainWindow))
+                    {
+                        MobiGuide.UserInfo userInfo = (MobiGuide.UserInfo)window.DataContext;
+                        userInfo.AirlineName = airlineRef["AirlineName"].ToString();
+                        (window as MainWindow).DataContext = userInfo;
+                    }
+                }
+                MessageBox.Show("Update Airline Reference Successfully", "SUCCESS");
+                this.Close();
+            } else
+            {
+                saveBtn.IsEnabled = true;
+            }
+        }
+
+        private void gatherDataToUpdate()
+        {
+            airlineRef["AirlineName"] = alNameTxtBox.Text;
+            airlineRef["FontName"] = fontNameComboBox.SelectedValue;
+            airlineRef["FontSize"] = fontSizeComboBox.SelectedValue;
+            airlineRef["FontColor"] = ((Color)fontColorPicker.SelectedColor).GetInteger();
+            airlineRef["BackGroundColor"] = ((Color)backgroundColorPicker.SelectedColor).GetInteger();
+            airlineRef["LineColor"] = ((Color)lineColorPicker.SelectedColor).GetInteger();
+            airlineRef["SeatColor"] = ((Color)seatColorPicker.SelectedColor).GetInteger();
+            airlineRef["ShowGuidanceInSeconds"] = dispGuideTimeIntUpDown.Value;
+            airlineRef["StatusCode"] = statusCodeComboBox.SelectedValue;
+            airlineRef["CommitBy"] = res["UserAccountId"];
+            airlineRef["CommitDateTime"] = DateTime.Now;
         }
 
         private void cancelBtn_Click(object sender, RoutedEventArgs e)
@@ -53,6 +161,21 @@ namespace MobiGuide
                 srcLargeLogoTxtBox.Text = filePath.Length >= 30 ? filePath.Shorten() : filePath;
 
                 alLargeLogoImg.Source = new BitmapImage(new Uri(filePath));
+                largeLogoPath = filePath;
+
+                removeLargeLogoBtn.Visibility = Visibility.Visible;
+                switch (largeLogoStatus)
+                {
+                    case ImageUploadStatus.Remain:
+                        largeLogoStatus = ImageUploadStatus.New;
+                        break;
+                    case ImageUploadStatus.New:
+                        largeLogoStatus = ImageUploadStatus.Remain;
+                        break;
+                    case ImageUploadStatus.Remove:
+                        largeLogoStatus = ImageUploadStatus.New;
+                        break;
+                }
             }
         }
 
@@ -68,6 +191,21 @@ namespace MobiGuide
                 srcSmallLogoTxtBox.Text = filePath.Length >= 30 ? filePath.Shorten() : filePath;
 
                 alSmallLogoImg.Source = new BitmapImage(new Uri(filePath));
+                smallLogoPath = filePath;
+
+                removeSmallLogoBtn.Visibility = Visibility.Visible;
+                switch (smallLogoStatus)
+                {
+                    case ImageUploadStatus.Remain:
+                        smallLogoStatus = ImageUploadStatus.New;
+                        break;
+                    case ImageUploadStatus.New:
+                        smallLogoStatus = ImageUploadStatus.Remain;
+                        break;
+                    case ImageUploadStatus.Remove:
+                        smallLogoStatus = ImageUploadStatus.New;
+                        break;
+                }
             }
         }
 
@@ -86,15 +224,10 @@ namespace MobiGuide
 
             statusCodeComboBox.Items.Add(new ComboBoxItem { Text = "Active", Value = "A" });
             statusCodeComboBox.Items.Add(new ComboBoxItem { Text = "Inactive", Value = "I" });
-
-            fontColorPicker.SelectedColor = Colors.Black;
-            backgroundColorPicker.SelectedColor = Colors.White;
-            lineColorPicker.SelectedColor = Colors.Red;
-            seatColorPicker.SelectedColor = Colors.Red;
             ///end of setup default UIs
 
             //get Airline Reference
-            Dictionary<string, object> airlineRef = await getDataRow("AirlineReference", new Dictionary<string, object>()
+            airlineRef = await getDataRow("AirlineReference", new Dictionary<string, object>()
             {
                 { "AirlineCode", airlineCode }
             });
@@ -124,10 +257,17 @@ namespace MobiGuide
                 }
             }
 
+            //font size combobox
             if (!String.IsNullOrEmpty(airlineRef["FontSize"].ToString()))
             {
                 fontSizeComboBox.SelectedValue = (int)airlineRef["FontSize"];
             }
+
+            //colors
+            fontColorPicker.SelectedColor = ((int)airlineRef["FontColor"]).GetColor();
+            backgroundColorPicker.SelectedColor = ((int)airlineRef["BackGroundColor"]).GetColor();
+            lineColorPicker.SelectedColor = ((int)airlineRef["LineColor"]).GetColor();
+            seatColorPicker.SelectedColor = ((int)airlineRef["SeatColor"]).GetColor();
 
             dispGuideTimeIntUpDown.Value = (int)airlineRef["ShowGuidanceInSeconds"];
             statusCodeComboBox.SelectedValue = airlineRef["StatusCode"].ToString();
@@ -140,6 +280,18 @@ namespace MobiGuide
             if(commitUser.Count > 0)
             {
                 commitByTxtBlock.Text = String.Format("{0} {1}", commitUser["FirstName"].ToString(), commitUser["LastName"].ToString());
+            }
+
+            if (airlineRef["AirlineLogoLarge"] != DBNull.Value)
+            {
+                alLargeLogoImg.Source = BlobToSource(airlineRef["AirlineLogoLarge"]);
+                removeLargeLogoBtn.Visibility = Visibility.Visible;
+
+            }
+            if (airlineRef["AirlineLogoSmall"] != DBNull.Value)
+            {
+                alSmallLogoImg.Source = BlobToSource(airlineRef["AirlineLogoSmall"]);
+                removeSmallLogoBtn.Visibility = Visibility.Visible;
             }
         }
 
@@ -186,6 +338,76 @@ namespace MobiGuide
                 }
             });
             return result;
+        }
+
+        private static ImageSource BlobToSource(object obj)
+        {
+            try
+            {
+                if (obj == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    byte[] bArray = (byte[])obj;
+
+                    BitmapImage biImg = new BitmapImage();
+                    MemoryStream ms = new MemoryStream(bArray);
+                    biImg.BeginInit();
+                    biImg.StreamSource = ms;
+                    biImg.EndInit();
+
+                    ImageSource imgSrc = biImg as ImageSource;
+
+                    return imgSrc;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "ERROR");
+                return null;
+            }
+        }
+
+        private enum ImageUploadStatus
+        {
+            Remove,
+            New,
+            Remain
+        }
+
+        private void removeLargeLogoBtn_Click(object sender, RoutedEventArgs e)
+        {
+            removeLargeLogoBtn.Visibility = Visibility.Hidden;
+            alLargeLogoImg.Source = new BitmapImage(new Uri(@"NoImg.jpg", UriKind.RelativeOrAbsolute));
+            srcLargeLogoTxtBox.Text = String.Empty;
+            switch (largeLogoStatus)
+            {
+                case ImageUploadStatus.Remain:
+                    largeLogoStatus = ImageUploadStatus.Remove;
+                    break;
+                case ImageUploadStatus.New:
+                    largeLogoStatus = ImageUploadStatus.Remain;
+                    break;
+            }
+                    
+        }
+
+        private void removeSmallLogoBtn_Click(object sender, RoutedEventArgs e)
+        {
+            removeSmallLogoBtn.Visibility = Visibility.Hidden;
+            alSmallLogoImg.Source = new BitmapImage(new Uri(@"NoImg.jpg", UriKind.RelativeOrAbsolute));
+            srcSmallLogoTxtBox.Text = String.Empty;
+            switch (smallLogoStatus)
+            {
+                case ImageUploadStatus.Remain:
+                    smallLogoStatus = ImageUploadStatus.Remove;
+                    break;
+                case ImageUploadStatus.New:
+                    smallLogoStatus = ImageUploadStatus.Remain;
+                    break;
+            }
         }
     }
 }
