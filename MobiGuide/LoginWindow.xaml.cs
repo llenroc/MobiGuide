@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -17,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Configuration;
 using System.Windows.Controls.Primitives;
+using DatabaseConnector;
 
 namespace MobiGuide
 {
@@ -26,7 +25,7 @@ namespace MobiGuide
     public partial class LoginWindow : Window
     {
         static ResourceDictionary res = Application.Current.Resources;
-        static string connectionString = ConfigurationManager.ConnectionStrings["DatabaseConnectionString"].ConnectionString;
+        DBConnector dbCon = new DBConnector();
         public LoginWindow()
         {
             InitializeComponent();
@@ -64,58 +63,38 @@ namespace MobiGuide
             }
         }
 
-        private static async Task<bool> doLogin(string username, string password)
+        private async Task<bool> doLogin(string username, string password)
         {
-            bool result = await Task.Run(() =>
+            if (String.IsNullOrWhiteSpace(username) || String.IsNullOrWhiteSpace(password))
             {
-                if (String.IsNullOrWhiteSpace(username) || String.IsNullOrWhiteSpace(password))
+                MessageBox.Show("Please fill both Username and Password", "Error");
+                return false;
+            }
+            else
+            {
+                DataRow conditions = new DataRow();
+                conditions.Set("UserLogon", username);
+                conditions.Set("UserPassword", password);
+                DataRow result = await dbCon.getDataRow("UserAccount", conditions);
+                if (result.HasData)
                 {
-                    MessageBox.Show("Please fill both Username and Password", "Error");
+                    res["UserAccountId"] = result.Get("UserAccountId");
+                    res["AirlineCode"] = result.Get("AirlineCode");
+                    return true;
+                } else if (!result.HasData)
+                {
+                    MessageBox.Show("UserLogon or Password do not match", "WARNING");
+                    return false;
+                } else if (!result.NoError)
+                {
+                    MessageBox.Show("Failed to login, please contact administrator", "ERROR");
+                    return false;
+                } else
+                {
+                    MessageBox.Show("Failed to login, please contact administrator", "ERROR");
                     return false;
                 }
-                else
-                {
-                    try
-                    {
-                        using (SqlConnection con = new SqlConnection(connectionString))
-                        {
-                            SqlCommand cmd = new SqlCommand("SELECT * " +
-                                "FROM UserAccount " +
-                                "WHERE UserLogon = '" + username + "' " + 
-                                "AND UserPassword = '" + password + "'", con);
-                            con.Open();
-                            using (SqlDataReader reader = cmd.ExecuteReader())
-                            {
-                                if (reader.HasRows)
-                                {
-                                    while (reader.Read())
-                                    {
-                                        for(int i = 0; i < reader.FieldCount; i++)
-                                        {
-                                            res[reader.GetName(i)] = reader.GetValue(i);
-                                        }
-                                    }
-                                    con.Close();
-                                    return true;
-                                }
-                                else
-                                {
-                                    MessageBox.Show("Login Failed", "Result");
-                                    con.Close();
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show(ex.Message, "ERROR");
-                        Debug.WriteLine(ex.ToString());
-                        return false;
-                    }
-                }
-            });
-            return result;
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

@@ -14,6 +14,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using CustomExtensions;
+using DatabaseConnector;
 
 namespace MobiGuide
 {
@@ -23,7 +25,7 @@ namespace MobiGuide
     public partial class AddUserWindow : Window
     {
         static ResourceDictionary res = Application.Current.Resources;
-        static string connectionString = ConfigurationManager.ConnectionStrings["DatabaseConnectionString"].ConnectionString;
+        DBConnector dbCon = new DBConnector();
         public AddUserWindow()
         {
             InitializeComponent();
@@ -37,10 +39,6 @@ namespace MobiGuide
             if (e.Key == Key.Space)
             {
                 e.Handled = true;
-            }
-            if (e.Key == Key.Enter)
-            {
-                saveBtn.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
             }
             base.OnPreviewKeyDown(e);
         }
@@ -70,12 +68,15 @@ namespace MobiGuide
                         MessageBox.Show("Unexpected error occurred! Please contact administrator.", "ERROR");
                         break;
                     case uLogon.NoExist:
-                        Dictionary<string, string> data = new Dictionary<string, string>();
-                        data.Add("UserLogon", uNameTxtBox.Text);
-                        data.Add("UserPassword", pwdBox.Password);
-                        data.Add("LastName", lastNameTxtBox.Text);
-                        data.Add("FirstName", firstNameTxtBox.Text);
-                        data.Add("StatusCode", (statusComboBox.SelectedItem as ComboBoxItem).Value.ToString());
+                        DataRow data = new DataRow();
+                        data.Set("UserLogon", uNameTxtBox.Text);
+                        data.Set("UserPassword", pwdBox.Password);
+                        data.Set("LastName", lastNameTxtBox.Text);
+                        data.Set("FirstName", firstNameTxtBox.Text);
+                        data.Set("StatusCode", (statusComboBox.SelectedItem as ComboBoxItem).Value.ToString());
+                        data.Set("AirlineCode", res["AirlineCode"]);
+                        data.Set("CommitBy", res["UserAccountId"]);
+                        data.Set("CommitDateTime", DateTime.Now);
                         string cfmMsg = String.Format("Do you want to add new user?" + System.Environment.NewLine + System.Environment.NewLine +
                             "Username : {0}" + System.Environment.NewLine +
                             "First Name : {1}" + System.Environment.NewLine +
@@ -85,11 +86,11 @@ namespace MobiGuide
                         MessageBoxResult confirmResult = MessageBox.Show(cfmMsg, "Confirm?", MessageBoxButton.OKCancel);
                         if (confirmResult == MessageBoxResult.OK)
                         {
-                            bool result = await createNewUser(data);
+                            bool result = await dbCon.createNewRow("UserAccount", data, "UserAccountId");
                             if (result)
                             {
-                                this.Hide();
-                                MessageBox.Show(String.Format("Add user [{0}] successfully.", data["UserLogon"]), "SUCCESS");
+                                MessageBox.Show(String.Format("Add user [{0}] successfully.", data.Get("UserLogon")), "SUCCESS");
+                                DialogResult = true;
                                 this.Close();
                             }
                             else
@@ -107,12 +108,19 @@ namespace MobiGuide
 
         private void cancelBtn_Click(object sender, RoutedEventArgs e)
         {
+            DialogResult = false;
             this.Close();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            alNameTxtBlock.Text = res["AirlineName"].ToString();
+            displayInfo();
+        }
+
+        private async void displayInfo()
+        {
+            alNameTxtBlock.Text = (await dbCon.getDataRow("AirlineReference", 
+                new DataRow("AirlineCode", res["AirlineCode"]))).Get("AirlineName").ToString();
 
             statusComboBox.Items.Add(new ComboBoxItem { Text = "Active", Value = "A" });
             statusComboBox.Items.Add(new ComboBoxItem { Text = "Inactive", Value = "I" });
@@ -121,60 +129,19 @@ namespace MobiGuide
             uNameTxtBox.Focus();
         }
 
-        private static async Task<uLogon> checkExistingULogon(string uName)
+        private async Task<uLogon> checkExistingULogon(string uName)
         {
-            uLogon result = await Task.Run(() =>
+            try
             {
-                try
+                if ((await dbCon.getDataRow("UserAccount", new DataRow("UserLogon", uName))).HasData)
                 {
-                    using (SqlConnection con = new SqlConnection(connectionString))
-                    {
-                        string query = String.Format("SELECT UserLogon FROM UserAccount WHERE UserLogon = '{0}'", uName);
-                        SqlCommand cmd = new SqlCommand(query, con);
-                        con.Open();
-                        using (SqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            bool hasRow = reader.HasRows;
-                            con.Close();
-                            if (hasRow) return uLogon.Exist;
-                            else return uLogon.NoExist;
-                        }
-                    }
+                    return uLogon.Exist;
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Result");
-                    return uLogon.Error;
-                }
-            });
-            return result;
-        }
-        private static async Task<bool> createNewUser(Dictionary<string, string> data)
-        {
-            bool result = await Task.Run(() =>
+                else return uLogon.NoExist;
+            } catch (Exception ex)
             {
-                try
-                {
-                using (SqlConnection con = new SqlConnection(connectionString))
-                {
-                    string query = String.Format("DECLARE @id uniqueidentifier " +
-                        "SET @id = NEWID() " +
-                        "INSERT INTO UserAccount VALUES (@id,'{0}','{1}','{2}','{3}','{4}','{5}','{6}',GETDATE())",
-                        res["AirlineCode"], data["UserLogon"], data["UserPassword"], data["LastName"], data["FirstName"], data["StatusCode"], res["UserAccountId"]);
-                        con.Open();
-                        SqlCommand cmd = new SqlCommand(query, con);
-                        int row = cmd.ExecuteNonQuery();
-                        if (row > 0) return true;
-                        else return false;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Result");
-                    return false;
-                }
-            });
-            return result;
+                return uLogon.Error;
+            }
         }
         private enum uLogon
         {

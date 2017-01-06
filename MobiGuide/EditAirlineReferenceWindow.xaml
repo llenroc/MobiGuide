@@ -20,10 +20,10 @@
                         <TextBlock TextWrapping="Wrap" Text="Airline Code" FontSize="14" Margin="10,10,0,10"/>
                         <TextBlock TextWrapping="Wrap" Text="Airline Name" FontSize="14" Margin="10,0,0,10"/>
                         <Border BorderThickness="0.5" BorderBrush="Black" Margin="10,0,10,9">
-                            <Image x:Name="alLargeLogoImg" Source="NoImg.jpg" Height="149.6" Width="150"/>
+                            <Image x:Name="alLargeLogoImg" Height="149.6" Width="150"/>
                         </Border>
                         <Border BorderThickness="0.5" BorderBrush="Black" Margin="10,0,10,9">
-                            <Image x:Name="alSmallLogoImg"  Source="NoImg.jpg" Height="149.6" Width="150"/>
+                            <Image x:Name="alSmallLogoImg" Height="149.6" Width="150"/>
                         </Border>
                         <TextBlock TextWrapping="Wrap" FontSize="14" Margin="10,0,0,10" Text="Font Name"/>
                         <TextBlock TextWrapping="Wrap" FontSize="14" Margin="10,0,0,10" Text="Font Size"/>
@@ -86,8 +86,8 @@
             </StackPanel>
         </ScrollViewer>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,14,0,0">
-            <Button x:Name="saveBtn" Content="Save" Height="25" Margin="0,0,10,0" Width="60" Click="saveBtn_Click"/>
-            <Button x:Name="cancelBtn" Content="Cancel" Width="60" Height="25" Click="cancelBtn_Click"/>
+            <Button x:Name="saveBtn" Content="Save" Height="25" Margin="0,0,10,0" Width="60" Click="saveBtn_Click" IsDefault="True"/>
+            <Button x:Name="cancelBtn" Content="Cancel" Width="60" Height="25" Click="cancelBtn_Click" IsCancel="True"/>
         </StackPanel>
     </StackPanel>
 </Window>

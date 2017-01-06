@@ -100,7 +100,8 @@
     <Compile Include="AddUserWindow.xaml.cs">
       <DependentUpon>AddUserWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CustomExtensions.cs" />
+    <Compile Include="Class\CustomExtensions.cs" />
+    <Compile Include="Class\DatabaseConnector.cs" />
     <Compile Include="EditAirlineReferenceWindow.xaml.cs">
       <DependentUpon>EditAirlineReferenceWindow.xaml</DependentUpon>
     </Compile>
