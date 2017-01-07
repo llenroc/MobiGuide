@@ -24,7 +24,6 @@ namespace MobiGuide
     /// </summary>
     public partial class LoginWindow : Window
     {
-        static ResourceDictionary res = Application.Current.Resources;
         DBConnector dbCon = new DBConnector();
         public LoginWindow()
         {
@@ -72,18 +71,16 @@ namespace MobiGuide
             }
             else
             {
-                DataRow conditions = new DataRow();
-                conditions.Set("UserLogon", username);
-                conditions.Set("UserPassword", password);
-                DataRow result = await dbCon.getDataRow("UserAccount", conditions);
-                if (result.HasData)
+                DataRow result = await dbCon.getDataRow("UserAccount", 
+                    new DataRow("UserLogon", username, "UserPassword", password));
+                if (result.HasData && result.NoError)
                 {
-                    res["UserAccountId"] = result.Get("UserAccountId");
-                    res["AirlineCode"] = result.Get("AirlineCode");
+                    Application.Current.Resources["UserAccountId"] = result.Get("UserAccountId");
+                    Application.Current.Resources["AirlineCode"] = result.Get("AirlineCode");
                     return true;
-                } else if (!result.HasData)
+                } else if (!result.HasData && result.NoError)
                 {
-                    MessageBox.Show("UserLogon or Password do not match", "WARNING");
+                    MessageBox.Show("Username or Password do not match", "WARNING");
                     return false;
                 } else if (!result.NoError)
                 {

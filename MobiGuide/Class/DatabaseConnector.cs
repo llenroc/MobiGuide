@@ -64,8 +64,7 @@ namespace DatabaseConnector
         {
             get
             {
-                if (this.datas.Count > 0 && !this.datas.ContainsKey("error")) return true;
-                else return false;
+                return this.datas.Count > 0 ? true : false;
             }
         }
         public bool NoError
