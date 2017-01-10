@@ -1,0 +1,40 @@
+﻿<Window x:Class="MobiGuide.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MobiGuide"
+        mc:Ignorable="d"
+        Title="MobiGuide" Height="600" Width="800" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
+    <Grid>
+        <Menu x:Name="mainMenu" Height="25" VerticalAlignment="Top" IsMainMenu="True">
+            <MenuItem Header="User" Height="25">
+                <MenuItem x:Name="AddNewUserMenuItem" Header="Add New User" Click="AddNewUserMenuItem_Click"/>
+                <MenuItem x:Name="EditCurrentUserMenuItem" Header="Edit Current User" Click="EditCurrentUserMenuItem_Click"/>
+                <MenuItem x:Name="LogoutMenuItem" Header="Logout" Click="LogoutMenuItem_Click"/>
+            </MenuItem>
+            <MenuItem Header="Airline" Height="25">
+                <MenuItem x:Name="EditAirlineReferenceMenuItem" Header="Edit Airline Reference" Click="EditAirlineReferenceMenuItem_Click"/>
+            </MenuItem>
+            <MenuItem Header="Airport">
+                <MenuItem x:Name="AirportReferenceMenuItem" Header="Reference">
+                    <MenuItem x:Name="AddAirportReferenceMenuItem" Header="Add" Click="AddAirportReferenceMenuItem_Click"/>
+                    <MenuItem x:Name="EditAirportReferenceMenuItem" Header="Edit" Click="EditAirportReferenceMenuItem_Click"/>
+                </MenuItem>
+                <MenuItem x:Name="AirportTranslation" Header="Translation"/>
+            </MenuItem>
+        </Menu>
+
+        <StackPanel HorizontalAlignment="Left" Height="53" Margin="10,30,0,0" VerticalAlignment="Top" Orientation="Horizontal" >
+            <Image x:Name="logoImg" HorizontalAlignment="Left" Width="53.1" Margin="0,0,20,-0.1" Source="NoImg.jpg"/>
+            <StackPanel>
+                <TextBlock x:Name="airlineNameTxtBlock" VerticalAlignment="Center" TextWrapping="Wrap" FontWeight="Bold" Margin="0,5,0,0" Text="[Airline Name]"/>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Height="25" VerticalAlignment="Top" Margin="10,30,10,0" Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock x:Name="textBlock" TextWrapping="Wrap" Text="Logged In As :" VerticalAlignment="Center" Margin="0,0,5,0"/>
+            <TextBlock x:Name="nameTxtBlock" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" FontWeight="Bold" Text="[FirstName LastName]"/>
+        </StackPanel>
+
+    </Grid>
+</Window>

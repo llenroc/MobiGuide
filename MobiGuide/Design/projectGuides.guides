@@ -40,16 +40,6 @@
         </GuideModel>
       </GuideModels>
     </ProjectItemGuide>
-    <ProjectItemGuide TargetFile="MainWindow.xaml">
-      <GuideModels>
-        <GuideModel>
-          <Guides>
-            <Guide Alignment="Top" Position="63" />
-            <Guide Alignment="Top" Position="10" />
-          </Guides>
-        </GuideModel>
-      </GuideModels>
-    </ProjectItemGuide>
     <ProjectItemGuide TargetFile="EditAirlineReferenceWindow.xaml">
       <GuideModels>
         <GuideModel>
@@ -64,13 +54,47 @@
             <Guide Alignment="Left" Position="10" />
             <Guide Alignment="Top" Position="430" />
             <Guide Alignment="Top" Position="459" />
-            <Guide Alignment="Top" Position="488" />
-            <Guide Alignment="Top" Position="516" />
+            <Guide Alignment="Top" Position="514" />
+            <Guide Alignment="Top" Position="481" />
             <Guide Alignment="Top" Position="545" />
             <Guide Alignment="Top" Position="575" />
             <Guide Alignment="Top" Position="604" />
             <Guide Alignment="Top" Position="632" />
             <Guide Alignment="Top" Position="661" />
+            <Guide Alignment="Top" Position="450" />
+          </Guides>
+        </GuideModel>
+      </GuideModels>
+    </ProjectItemGuide>
+    <ProjectItemGuide TargetFile="MainWindow.xaml">
+      <GuideModels>
+        <GuideModel>
+          <Guides>
+            <Guide Alignment="Top" Position="63" />
+            <Guide Alignment="Top" Position="10" />
+            <Guide Alignment="Top" Position="28" />
+          </Guides>
+        </GuideModel>
+      </GuideModels>
+    </ProjectItemGuide>
+    <ProjectItemGuide TargetFile="Windows\AddAirportReference.xaml">
+      <GuideModels>
+        <GuideModel>
+          <Guides>
+            <Guide Alignment="Top" Position="25" />
+            <Guide Alignment="Top" Position="53" />
+            <Guide Alignment="Top" Position="83" />
+          </Guides>
+        </GuideModel>
+      </GuideModels>
+    </ProjectItemGuide>
+    <ProjectItemGuide TargetFile="Windows\EditAirportReferenceWindow.xaml">
+      <GuideModels>
+        <GuideModel>
+          <Guides>
+            <Guide Alignment="Top" Position="25" />
+            <Guide Alignment="Top" Position="111" />
+            <Guide Alignment="Top" Position="139" />
           </Guides>
         </GuideModel>
       </GuideModels>

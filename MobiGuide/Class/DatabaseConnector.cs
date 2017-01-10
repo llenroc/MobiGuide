@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
@@ -12,10 +13,12 @@ namespace DatabaseConnector
     public class DataRow
     {
         private Dictionary<string, object> datas;
+        private ERROR error;
 
         public DataRow()
         {
             this.datas = new Dictionary<string, object>();
+            this.error = ERROR.NotSet;
         }
 
         public DataRow(params object[] parameters)
@@ -67,15 +70,61 @@ namespace DatabaseConnector
                 return this.datas.Count > 0 ? true : false;
             }
         }
-        public bool NoError
+        public ERROR Error
+        {
+            get { return this.error; }
+            set { this.error = value; }
+        }
+    }
+
+    public class DataList
+    {
+        private List<DataRow> datas;
+        private ERROR error;
+
+        public DataList()
+        {
+            this.datas = new List<DataRow>();
+            this.error = ERROR.NotSet;
+        }
+
+        public DataRow GetListAt(int index)
+        {
+            return this.datas[index];
+        }
+        public int Count
+        {
+            get { return this.datas.Count; }
+        }
+        public bool HasData
         {
             get
             {
-                if (this.datas.ContainsKey("error")) return false;
-                else return true;
+                return this.datas.Count > 0 ? true : false;
             }
         }
+        public void Add(DataRow data)
+        {
+            this.datas.Add(data);
+        }
+        public ERROR Error
+        {
+            get { return this.error; }
+            set { this.error = value; }
+        }
+        public IEnumerator GetEnumerator()
+        {
+            return (this.datas as IEnumerable).GetEnumerator();
+        }
     }
+
+    public enum ERROR
+    {
+        HasError,
+        NoError,
+        NotSet
+    }
+
     public class DBConnector
     {
         private static string connectionString;
@@ -85,6 +134,11 @@ namespace DatabaseConnector
         }
 
         public async Task<DataRow> getDataRow(string tableName, DataRow conditions)
+        {
+            return await getDataRow(tableName, conditions, null);
+        }
+
+        public async Task<DataRow> getDataRow(string tableName, DataRow conditions, string additionalQuery)
         {
             DataRow result = await Task.Run(() =>
             {
@@ -103,6 +157,7 @@ namespace DatabaseConnector
                                 if (i < conditions.Count - 1) query += " AND";
                             }
                         }
+                        if (additionalQuery != null && !String.IsNullOrWhiteSpace(additionalQuery)) query += " " + additionalQuery;
                         SqlCommand cmd = new SqlCommand(query, con);
                         con.Open();
                         DataRow row = new DataRow();
@@ -119,14 +174,73 @@ namespace DatabaseConnector
                                 }
                             }
                         }
+                        row.Error = ERROR.NoError;
                         return row;
                     }
                 }
                 catch (Exception ex)
                 {
-                    DataRow error = new DataRow();
-                    error.Set("error", ex.Message);
-                    return error;
+                    DataRow row = new DataRow();
+                    row.Error = ERROR.HasError;
+                    return row;
+                }
+            });
+            return result;
+        }
+        public async Task<DataList> getDataList(string tableName, DataRow conditions)
+        {
+            return await getDataList(tableName, conditions, null);
+        }
+        public async Task<DataList> getDataList(string tableName, DataRow conditions, string additionalQuery)
+        {
+            DataList result = await Task.Run(() =>
+            {
+                try
+                {
+                    using (SqlConnection con = new SqlConnection(connectionString))
+                    {
+                        DataList dataList = new DataList();
+                        string query = String.Format("SELECT * FROM {0}", tableName);
+                        if(conditions != null)
+                        {
+                            if (conditions.Count > 0)
+                            {
+                                query += " WHERE";
+                                for (int i = 0; i < conditions.Count; i++)
+                                {
+                                    query += String.Format(" {0} = '{1}'", conditions.GetKeyAt(i),
+                                        conditions.GetAt(i).ToString());
+                                    if (i < conditions.Count - 1) query += " AND";
+                                }
+                            }
+                        }
+                        if (additionalQuery != null && !String.IsNullOrWhiteSpace(additionalQuery)) query += " " + additionalQuery;
+                        SqlCommand cmd = new SqlCommand(query, con);
+                        con.Open();
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.HasRows)
+                            {
+                                while (reader.Read())
+                                {
+                                    DataRow row = new DataRow();
+                                    for (int i = 0; i < reader.FieldCount; i++)
+                                    {
+                                        row.Set(reader.GetName(i), reader.GetValue(i));
+                                    }
+                                    dataList.Add(row);
+                                }
+                            }
+                        }
+                        dataList.Error = ERROR.NoError;
+                        return dataList;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    DataList list = new DataList();
+                    list.Error = ERROR.HasError;
+                    return list;
                 }
             });
             return result;
@@ -216,7 +330,7 @@ namespace DatabaseConnector
                         string query = String.Empty;
                         if (!String.IsNullOrWhiteSpace(uniqueColumn))
                             query += String.Format("DECLARE @id uniqueidentifier SET @id = NEWID() ");
-                        query += "INSERT INTO UserAccount (";
+                        query += String.Format("INSERT INTO {0} (", tableName);
                         if (!String.IsNullOrWhiteSpace(uniqueColumn))
                         {
                             query += String.Format("{0},", uniqueColumn);

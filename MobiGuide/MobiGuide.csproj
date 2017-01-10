@@ -97,31 +97,45 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AddUserWindow.xaml.cs">
+    <Compile Include="Windows\AddAirportReferenceWindow.xaml.cs">
+      <DependentUpon>AddAirportReferenceWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\AddUserWindow.xaml.cs">
       <DependentUpon>AddUserWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Class\CustomExtensions.cs" />
     <Compile Include="Class\DatabaseConnector.cs" />
-    <Compile Include="EditAirlineReferenceWindow.xaml.cs">
+    <Compile Include="Windows\EditAirlineReferenceWindow.xaml.cs">
       <DependentUpon>EditAirlineReferenceWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="EditProfileWindow.xaml.cs">
+    <Compile Include="Windows\EditAirportReferenceWindow.xaml.cs">
+      <DependentUpon>EditAirportReferenceWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\EditProfileWindow.xaml.cs">
       <DependentUpon>EditProfileWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helper\WaterMarkTextHelper.cs" />
-    <Page Include="AddUserWindow.xaml">
+    <Page Include="Windows\AddAirportReferenceWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="EditAirlineReferenceWindow.xaml">
+    <Page Include="Windows\AddUserWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="EditProfileWindow.xaml">
+    <Page Include="Windows\EditAirlineReferenceWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow.xaml">
+    <Page Include="Windows\EditAirportReferenceWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\EditProfileWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\MainWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -144,7 +158,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">

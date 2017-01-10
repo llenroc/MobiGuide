@@ -73,16 +73,16 @@ namespace MobiGuide
             {
                 DataRow result = await dbCon.getDataRow("UserAccount", 
                     new DataRow("UserLogon", username, "UserPassword", password));
-                if (result.HasData && result.NoError)
+                if (result.HasData && result.Error == ERROR.NoError)
                 {
                     Application.Current.Resources["UserAccountId"] = result.Get("UserAccountId");
                     Application.Current.Resources["AirlineCode"] = result.Get("AirlineCode");
                     return true;
-                } else if (!result.HasData && result.NoError)
+                } else if (!result.HasData && result.Error == ERROR.NoError)
                 {
                     MessageBox.Show("Username or Password do not match", "WARNING");
                     return false;
-                } else if (!result.NoError)
+                } else if (result.Error == ERROR.HasError)
                 {
                     MessageBox.Show("Failed to login, please contact administrator", "ERROR");
                     return false;
