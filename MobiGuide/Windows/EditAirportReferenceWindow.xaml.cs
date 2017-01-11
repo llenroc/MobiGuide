@@ -110,7 +110,7 @@ namespace MobiGuide
         private void RemoveNotSelectOptionItem(object sender, SelectionChangedEventArgs e)
         {
             if ((sender as ComboBox).Items.Count > 0) (sender as ComboBox).Items.RemoveAt(0);
-            airportCodeComboBox.SelectionChanged -= RemoveNotSelectOptionItem;
+            (sender as ComboBox).SelectionChanged -= RemoveNotSelectOptionItem;
             airportNameTextBlock.Visibility = Visibility.Visible;
             airportNameTextBox.Visibility = Visibility.Visible;
             statusTextBlock.Visibility = Visibility.Visible;

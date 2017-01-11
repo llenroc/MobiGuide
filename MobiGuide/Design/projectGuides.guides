@@ -99,5 +99,28 @@
         </GuideModel>
       </GuideModels>
     </ProjectItemGuide>
+    <ProjectItemGuide TargetFile="Windows\EditLanguageReferenceWindow.xaml">
+      <GuideModels>
+        <GuideModel>
+          <Guides>
+            <Guide Alignment="Top" Position="54" />
+            <Guide Alignment="Top" Position="82" />
+            <Guide Alignment="Top" Position="111" />
+            <Guide Alignment="Top" Position="140" />
+          </Guides>
+        </GuideModel>
+      </GuideModels>
+    </ProjectItemGuide>
+    <ProjectItemGuide TargetFile="Windows\AddAirportTranslationWindow.xaml">
+      <GuideModels>
+        <GuideModel>
+          <Guides>
+            <Guide Alignment="Top" Position="25" />
+            <Guide Alignment="Top" Position="54" />
+            <Guide Alignment="Top" Position="82" />
+          </Guides>
+        </GuideModel>
+      </GuideModels>
+    </ProjectItemGuide>
   </ProjectItemGuides>
 </ProjectGuidesConfiguration>

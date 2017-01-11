@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -10,37 +11,64 @@ using System.Windows;
 
 namespace DatabaseConnector
 {
+    public class DataColumn
+    {
+        private string _key;
+        private object _value;
+        public DataColumn() : this(String.Empty, null)
+        {
+            
+        }
+        public DataColumn(string key, object value)
+        {
+            this._key = key;
+            this._value = value;
+        }
+        public string Key
+        {
+            get { return this._key; }
+            set { this._key = value; }
+        }
+        public object Value
+        {
+            get { return this._value; }
+            set { this._value = value; }
+        }
+    }
     public class DataRow
     {
-        private Dictionary<string, object> datas;
+        private List<DataColumn> datas;
         private ERROR error;
 
         public DataRow()
         {
-            this.datas = new Dictionary<string, object>();
+            this.datas = new List<DataColumn>();
             this.error = ERROR.NotSet;
         }
 
         public DataRow(params object[] parameters)
         {
-            this.datas = new Dictionary<string, object>();
+            this.datas = new List<DataColumn>();
             if(parameters.Length % 2 == 0)
             {
                 for(int i = 0; i < parameters.Length; i += 2)
                 {
-                    this.datas.Add(parameters[i].ToString(), parameters[i + 1]);
+                    this.datas.Add(new DataColumn(parameters[i].ToString(), parameters[i + 1]));
                 }
             }
         }
 
         public object Get(string key)
         {
-            if (this.datas.ContainsKey(key)) return this.datas[key];
-            else return null;
+            foreach(DataColumn column in datas)
+            {
+                if (column.Key.Equals(key)) return column.Value;
+            }
+            return null;
         }
         public void Set(string key, object data)
         {
-            this.datas.Add(key, data);
+            this.datas.Add(new DataColumn(key, data));
         }
         public string GetKeyAt(int index)
         {
@@ -63,6 +91,14 @@ namespace DatabaseConnector
             }
             return false;
         }
+        public int IndexOf(string key)
+        {
+            for (int i = 0; i < this.datas.Count; i++)
+            {
+                if (this.datas.ElementAt(i).Key.Equals(key)) return i;
+            }
+            return -1;
+        }
         public bool HasData
         {
             get
@@ -70,13 +106,16 @@ namespace DatabaseConnector
                 return this.datas.Count > 0 ? true : false;
             }
         }
+        public IEnumerator GetEnumerator()
+        {
+            return (this.datas as IEnumerable).GetEnumerator();
+        }
         public ERROR Error
         {
             get { return this.error; }
             set { this.error = value; }
         }
     }
-
     public class DataList
     {
         private List<DataRow> datas;
@@ -137,7 +176,6 @@ namespace DatabaseConnector
         {
             return await getDataRow(tableName, conditions, null);
         }
-
         public async Task<DataRow> getDataRow(string tableName, DataRow conditions, string additionalQuery)
         {
             DataRow result = await Task.Run(() =>
@@ -245,7 +283,6 @@ namespace DatabaseConnector
             });
             return result;
         }
-
         public async Task<bool> updateDataRow(string tableName, DataRow dataToUpdate, DataRow condition)
         {
             bool result = await Task.Run(() =>
@@ -281,9 +318,7 @@ namespace DatabaseConnector
             });
             return result;
         }
-
-        public async Task<bool> updateBlobData(string tableName, string blobColumnName, 
-            string filePath, DataRow condition)
+        public async Task<bool> updateBlobData(string tableName, string blobColumnName, string filePath, DataRow condition)
         {
             bool result = await Task.Run(() => 
             {
@@ -318,7 +353,6 @@ namespace DatabaseConnector
             });
             return result;
         }
-
         public async Task<bool> createNewRow(string tableName, DataRow data, string uniqueColumn)
         {
             bool result = await Task.Run(() =>
@@ -327,6 +361,7 @@ namespace DatabaseConnector
                 {
                     using (SqlConnection con = new SqlConnection(connectionString))
                     {
+                        //create query
                         string query = String.Empty;
                         if (!String.IsNullOrWhiteSpace(uniqueColumn))
                             query += String.Format("DECLARE @id uniqueidentifier SET @id = NEWID() ");
@@ -344,12 +379,29 @@ namespace DatabaseConnector
                         if(!String.IsNullOrWhiteSpace(uniqueColumn)) query += "@id, ";
                         for (int i = 0; i < data.Count; i++)
                         {
-                            query += String.Format("'{0}'", data.GetAt(i));
+                            query += String.Format("@{0}", data.GetKeyAt(i));
                             if (i < data.Count - 1) query += ", ";
                         }
                         query += ")";
                         SqlCommand cmd = new SqlCommand(query, con);
+
+                        //try to map sqldbtype to values
+                        SqlCommand typeCmd = con.CreateCommand();
+                        typeCmd.CommandText = String.Format("SET FMTONLY ON; SELECT * FROM {0}; SET FMTONLY OFF", tableName);
                         con.Open();
+                        using (SqlDataReader reader = typeCmd.ExecuteReader())
+                        {
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                SqlDbType type = (SqlDbType)(int)reader.GetSchemaTable().Rows[i]["ProviderType"];
+                                string key = reader.GetName(i);
+                                if (data.ContainKey(key))
+                                {
+                                    int indexOfKey = data.IndexOf(key);
+                                    cmd.Parameters.Add(String.Format("@{0}", data.GetKeyAt(indexOfKey)), type).Value = data.GetAt(indexOfKey);
+                                }
+                            }
+                        }
                         cmd.ExecuteNonQuery();
                         con.Close();
                         return true;

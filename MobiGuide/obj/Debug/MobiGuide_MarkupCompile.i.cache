@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\App.xaml
-81451685892
+11877084722
 3-1540110636
-1990059123
+22-475062728
 22-856613515
-Windows\AddAirportReferenceWindow.xaml;Windows\AddUserWindow.xaml;Windows\EditAirlineReferenceWindow.xaml;Windows\EditAirportReferenceWindow.xaml;Windows\EditProfileWindow.xaml;Windows\MainWindow.xaml;Resource.xaml;LoginWindow.xaml;
+Windows\AddAirportTranslationWindow.xaml;Windows\AddLanguageReferenceWindow.xaml;Windows\AddAirportReferenceWindow.xaml;Windows\AddUserWindow.xaml;Windows\EditAirlineReferenceWindow.xaml;Windows\EditLanguageReferenceWindow.xaml;Windows\EditAirportReferenceWindow.xaml;Windows\EditProfileWindow.xaml;Windows\MainWindow.xaml;Resource.xaml;LoginWindow.xaml;
 
 True
 

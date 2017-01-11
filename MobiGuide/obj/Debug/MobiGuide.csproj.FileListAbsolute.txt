@@ -45,3 +45,9 @@ C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuid
 C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\EditAirportReferenceWindow.baml
 C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\AddAirportReferenceWindow.g.cs
 C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\AddAirportReferenceWindow.baml
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\AddLanguageReferenceWindow.g.cs
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\AddLanguageReferenceWindow.baml
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\EditLanguageReferenceWindow.g.cs
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\EditLanguageReferenceWindow.baml
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\AddAirportTranslationWindow.g.cs
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\AddAirportTranslationWindow.baml

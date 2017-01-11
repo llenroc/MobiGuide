@@ -115,5 +115,28 @@ namespace MobiGuide
             EditAirportReferenceWindow editAirportReferenceWindow = new EditAirportReferenceWindow();
             editAirportReferenceWindow.ShowDialog();
         }
+
+        private void AddLanguageReference_Click(object sender, RoutedEventArgs e)
+        {
+            AddLanguageReferenceWindow addLanguageReferenceWindow = new AddLanguageReferenceWindow();
+            addLanguageReferenceWindow.ShowDialog();
+        }
+
+        private void EditLanguageReference_Click(object sender, RoutedEventArgs e)
+        {
+            EditLanguageReferenceWindow editLanguageReferenceWindow = new EditLanguageReferenceWindow();
+            editLanguageReferenceWindow.ShowDialog();
+        }
+
+        private void AddAirportTranslationMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            AddAirportTranslationWindow addAirportTranslationWindow = new AddAirportTranslationWindow();
+            addAirportTranslationWindow.ShowDialog();
+        }
+
+        private void EditAirportTranslationMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
