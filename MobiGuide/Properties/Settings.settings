@@ -9,5 +9,18 @@
 &lt;/SerializableConnectionString&gt;</DesignTimeValue>
       <Value Profile="(Default)">Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database.mdf;Integrated Security=True</Value>
     </Setting>
+    <Setting Name="GetUntranslateAirportListQuery" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">SELECT DISTINCT ar.*
+FROM AirportReference ar
+LEFT JOIN AirportTranslation atr
+ON ar.AirportCode = atr.AirportCode
+WHERE ar.AirportCode IN (
+	SELECT atr2.AirportCode
+	FROM AirportTranslation atr2
+	WHERE atr2.LanguageCode IN (SELECT LanguageCode FROM LanguageReference)
+	GROUP BY AirportCode
+	HAVING COUNT(atr2.AirportCode) &lt;&gt; (SELECT COUNT(*) FROM LanguageReference)
+) OR atr.LanguageCode IS NULL ORDER BY ar.AirportCode</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

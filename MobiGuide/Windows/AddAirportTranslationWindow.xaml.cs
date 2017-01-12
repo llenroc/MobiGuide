@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using DatabaseConnector;
 using System.Diagnostics;
+using System.IO;
 
 namespace MobiGuide
 {
@@ -54,7 +55,8 @@ namespace MobiGuide
 
         private async void FetchAirportList()
         {
-            DataList airportList = await dbCon.getDataList("AirportReference", null, "ORDER BY AirportCode");
+            string query = MobiGuide.Properties.Settings.Default.GetUntranslateAirportListQuery.Replace(Environment.NewLine, " ").Replace("\t", " ");
+            DataList airportList = (DataList)(await dbCon.customQuery(SQLStatementType.SELECT_LIST, query));
             if (airportList.HasData && airportList.Error == ERROR.NoError)
             {
                 foreach (DataRow airport in airportList)
@@ -80,19 +82,8 @@ namespace MobiGuide
         private async void FetchLanguageList(string airportCode)
         {
             LanguageComboBox.Items.Clear();
-            string addQuery = String.Empty;
-            DataList airportTransList = await dbCon.getDataList("AirportTranslation", new DataRow("AirportCode", airportCode));
-            if(airportTransList.HasData && airportTransList.Error == ERROR.NoError)
-            {
-                addQuery += "WHERE LanguageCode NOT IN (";
-                for(int i = 0; i < airportTransList.Count; i++)
-                {
-                    addQuery += String.Format("'{0}'", airportTransList.GetListAt(i).Get("LanguageCode").ToString());
-                    if (i < airportTransList.Count - 1) addQuery += ",";
-                }
-                addQuery += ") ";
-            }
-            DataList languageList = await dbCon.getDataList("LanguageReference", null, String.Format("{0}ORDER BY LanguageCode", addQuery));
+            string query = String.Format("SELECT * FROM LanguageReference WHERE LanguageCode NOT IN (SELECT LanguageCode FROM AirportTranslation WHERE AirportCode = '{0}') ORDER BY LanguageCode", airportCode);
+            DataList languageList = (DataList)await dbCon.customQuery(SQLStatementType.SELECT_LIST, query);
             if (languageList.HasData && languageList.Error == ERROR.NoError)
             {
                 foreach (DataRow language in languageList)

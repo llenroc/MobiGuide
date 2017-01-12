@@ -413,5 +413,63 @@ namespace DatabaseConnector
             });
             return result;
         }
+
+        public async Task<object> customQuery(SQLStatementType type, string query)
+        {
+            return await Task.Run(() =>
+            {
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    con.Open();
+                    try
+                    {
+                        switch (type)
+                        {
+                            case (SQLStatementType.SELECT_LIST):
+                                try
+                                {
+                                    DataList dataList = new DataList();
+                                    using (SqlDataReader reader = cmd.ExecuteReader())
+                                    {
+                                        if (reader.HasRows)
+                                        {
+                                            while (reader.Read())
+                                            {
+                                                DataRow row = new DataRow();
+                                                for (int i = 0; i < reader.FieldCount; i++)
+                                                {
+                                                    row.Set(reader.GetName(i), reader.GetValue(i));
+                                                }
+                                                dataList.Add(row);
+                                            }
+                                        }
+                                        dataList.Error = ERROR.NoError;
+                                        return (object)dataList;
+                                    }
+                                } catch (Exception)
+                                {
+                                    DataList error = new DataList();
+                                    error.Error = ERROR.HasError;
+                                    return error;
+                                }
+                            default:
+                                return true;
+                        }
+                    } catch (Exception)
+                    {
+                        return false;
+                    }
+                }
+            });
+        }
+    }
+    public enum SQLStatementType
+    {
+        SELECT_ONE,
+        SELECT_LIST,
+        INSERT,
+        UPDATE,
+        DELETE
     }
 }

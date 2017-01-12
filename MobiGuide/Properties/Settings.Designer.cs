@@ -33,5 +33,24 @@ namespace MobiGuide.Properties {
                 return ((string)(this["DatabaseConnectionString"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"SELECT DISTINCT ar.*
+FROM AirportReference ar
+LEFT JOIN AirportTranslation atr
+ON ar.AirportCode = atr.AirportCode
+WHERE ar.AirportCode IN (
+	SELECT atr2.AirportCode
+	FROM AirportTranslation atr2
+	WHERE atr2.LanguageCode IN (SELECT LanguageCode FROM LanguageReference)
+	GROUP BY AirportCode
+	HAVING COUNT(atr2.AirportCode) <> (SELECT COUNT(*) FROM LanguageReference)
+) OR atr.LanguageCode IS NULL ORDER BY ar.AirportCode")]
+        public string GetUntranslateAirportListQuery {
+            get {
+                return ((string)(this["GetUntranslateAirportListQuery"]));
+            }
+        }
     }
 }
