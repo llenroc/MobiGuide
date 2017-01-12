@@ -35,14 +35,14 @@
         </Menu>
 
         <StackPanel HorizontalAlignment="Left" Height="53" Margin="10,30,0,0" VerticalAlignment="Top" Orientation="Horizontal" >
-            <Image x:Name="logoImg" HorizontalAlignment="Left" Width="53.1" Margin="0,0,20,-0.1" Source="NoImg.jpg"/>
+            <Image x:Name="logoImg" HorizontalAlignment="Left" Width="53.1" Margin="0,0,20,-0.1"/>
             <StackPanel>
-                <TextBlock x:Name="airlineNameTxtBlock" VerticalAlignment="Center" TextWrapping="Wrap" FontWeight="Bold" Margin="0,5,0,0" Text="[Airline Name]"/>
+                <TextBlock x:Name="airlineNameTxtBlock" VerticalAlignment="Center" TextWrapping="Wrap" FontWeight="Bold" Margin="0,5,0,0"/>
             </StackPanel>
         </StackPanel>
         <StackPanel Height="25" VerticalAlignment="Top" Margin="10,30,10,0" Orientation="Horizontal" HorizontalAlignment="Right">
             <TextBlock x:Name="textBlock" TextWrapping="Wrap" Text="Logged In As :" VerticalAlignment="Center" Margin="0,0,5,0"/>
-            <TextBlock x:Name="nameTxtBlock" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" FontWeight="Bold" Text="[FirstName LastName]"/>
+            <TextBlock x:Name="nameTxtBlock" TextWrapping="Wrap" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0" FontWeight="Bold"/>
         </StackPanel>
 
     </Grid>

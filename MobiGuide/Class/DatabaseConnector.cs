@@ -294,7 +294,7 @@ namespace DatabaseConnector
                         string query = String.Format("UPDATE {0} SET", tableName);
                         for (int i = 0; i < dataToUpdate.Count; i++)
                         {
-                            query += String.Format(" {0} = '{1}'", dataToUpdate.GetKeyAt(i), dataToUpdate.GetAt(i));
+                            query += String.Format(" {0} = @{1}", dataToUpdate.GetKeyAt(i), dataToUpdate.GetKeyAt(i));
                             if (i < dataToUpdate.Count - 1) query += ",";
                         }
                         if(condition.Count > 0)
@@ -307,7 +307,24 @@ namespace DatabaseConnector
                             }
                         }
                         SqlCommand cmd = new SqlCommand(query, con);
+
+                        SqlCommand typeCmd = con.CreateCommand();
+                        typeCmd.CommandText = String.Format("SET FMTONLY ON; SELECT * FROM {0}; SET FMTONLY OFF", tableName);
                         con.Open();
+                        using (SqlDataReader reader = typeCmd.ExecuteReader())
+                        {
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                SqlDbType type = (SqlDbType)(int)reader.GetSchemaTable().Rows[i]["ProviderType"];
+                                string key = reader.GetName(i);
+                                if (dataToUpdate.ContainKey(key))
+                                {
+                                    int indexOfKey = dataToUpdate.IndexOf(key);
+                                    cmd.Parameters.Add(String.Format("@{0}", dataToUpdate.GetKeyAt(indexOfKey)), type).Value = dataToUpdate.GetAt(indexOfKey);
+                                }
+                            }
+                        }
+
                         cmd.ExecuteNonQuery();
                         return true;
                     }

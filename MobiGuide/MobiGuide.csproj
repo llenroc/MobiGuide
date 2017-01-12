@@ -97,6 +97,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Windows\EditAirportTranslationWindow.xaml.cs">
+      <DependentUpon>EditAirportTranslationWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\AddAirportTranslationWindow.xaml.cs">
       <DependentUpon>AddAirportTranslationWindow.xaml</DependentUpon>
     </Compile>
@@ -124,6 +127,10 @@
       <DependentUpon>EditProfileWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helper\WaterMarkTextHelper.cs" />
+    <Page Include="Windows\EditAirportTranslationWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Windows\AddAirportTranslationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

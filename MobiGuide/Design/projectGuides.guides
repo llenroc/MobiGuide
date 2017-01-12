@@ -122,5 +122,17 @@
         </GuideModel>
       </GuideModels>
     </ProjectItemGuide>
+    <ProjectItemGuide TargetFile="Windows\EditAirportTranslationWindow.xaml">
+      <GuideModels>
+        <GuideModel>
+          <Guides>
+            <Guide Alignment="Top" Position="111" />
+            <Guide Alignment="Top" Position="140" />
+            <Guide Alignment="Top" Position="168" />
+            <Guide Alignment="Left" Position="108" />
+          </Guides>
+        </GuideModel>
+      </GuideModels>
+    </ProjectItemGuide>
   </ProjectItemGuides>
 </ProjectGuidesConfiguration>

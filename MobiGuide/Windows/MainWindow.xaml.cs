@@ -136,7 +136,8 @@ namespace MobiGuide
 
         private void EditAirportTranslationMenuItem_Click(object sender, RoutedEventArgs e)
         {
-
+            EditAirportTranslationWindow editAirportTranslationWindow = new EditAirportTranslationWindow();
+            editAirportTranslationWindow.ShowDialog();
         }
     }
 }
