@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MobiGuide.Helper;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -24,6 +25,9 @@ namespace MobiGuide
                 new RoutedEventHandler(PasswordBox_GotFocus));
 
             base.OnStartup(e);
+
+            EventManager.RegisterClassHandler(typeof(DataGrid), DataGrid.PreviewMouseLeftButtonDownEvent,
+                new RoutedEventHandler(EventHelper.DataGridPreviewMouseLeftButtonDownEvent));
         }
 
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)

@@ -139,5 +139,10 @@ namespace MobiGuide
             EditAirportTranslationWindow editAirportTranslationWindow = new EditAirportTranslationWindow();
             editAirportTranslationWindow.ShowDialog();
         }
+        private void AirportMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            AirportReferenceWindow airportReferenceWindow = new AirportReferenceWindow();
+            airportReferenceWindow.ShowDialog();
+        }
     }
 }

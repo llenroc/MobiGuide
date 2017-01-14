@@ -53,3 +53,11 @@ C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuid
 C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\AddAirportTranslationWindow.baml
 C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\EditAirportTranslationWindow.g.cs
 C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\EditAirportTranslationWindow.baml
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\AirportReferenceWindow.g.cs
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\AirportReferenceWindow.baml
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\NewEditAirportReferenceWindow.g.cs
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\NewEditAirportReferenceWindow.baml
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\bin\Debug\Microsoft.Practices.ServiceLocation.dll
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\bin\Debug\Microsoft.Practices.ServiceLocation.pdb
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\bin\Debug\Microsoft.Practices.ServiceLocation.xml
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\App.baml
