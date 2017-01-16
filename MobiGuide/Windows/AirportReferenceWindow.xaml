@@ -23,7 +23,8 @@
         <Grid ScrollViewer.VerticalScrollBarVisibility="Auto" Height="330" Margin="0,10,0,0">
             <DataGrid x:Name="airportDataGrid" AutoGenerateColumns="False" d:LayoutOverrides="Width" VerticalAlignment="Top" SelectionUnit="FullRow" 
                       Padding="0" SelectionMode="Single" CanUserAddRows="False" 
-                      HorizontalGridLinesBrush="#FFD1D1D1" VerticalGridLinesBrush="#FFD1D1D1" AlternationCount="2" AlternatingRowBackground="#FFEEFFA2" BorderBrush="{x:Null}" BorderThickness="0" IsReadOnly="True" SelectionChanged="airportDataGrid_SelectionChanged">
+                      HorizontalGridLinesBrush="#FFD1D1D1" VerticalGridLinesBrush="#FFD1D1D1" AlternationCount="2" AlternatingRowBackground="#FFEEFFA2" BorderBrush="{x:Null}" BorderThickness="0" IsReadOnly="True" 
+                      SelectionChanged="airportDataGrid_SelectionChanged" MouseDoubleClick="airportDataGrid_MouseDoubleClick">
                 <DataGrid.CellStyle>
                     <Style TargetType="{x:Type DataGridCell}">
                         <Style.Triggers>

@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using CustomExtensions;
 using DatabaseConnector;
+using Properties;
 
 namespace MobiGuide
 {
@@ -58,24 +59,23 @@ namespace MobiGuide
         }
         private async void displayInfo()
         {
-            DataRow userInfo = await dbCon.getDataRow("UserAccount", new DataRow("UserAccountId", res["UserAccountId"]));
+            DataRow userInfo = await dbCon.GetDataRow("UserAccount", new DataRow("UserAccountId", res["UserAccountId"]));
 
             uNameTxtBlock.Text = userInfo.Get("UserLogon").ToString();
             firstNameTxtBox.Text = userInfo.Get("FirstName").ToString();
             lastNameTxtBox.Text = userInfo.Get("LastName").ToString();
             commitDateTxtBlock.Text = userInfo.Get("CommitDateTime").ToString();
 
-            alNameTxtBlock.Text = (await dbCon.getDataRow("AirlineReference",
+            alNameTxtBlock.Text = (await dbCon.GetDataRow("AirlineReference",
                 new DataRow("AirlineCode", res["AirlineCode"]))).Get("AirlineName").ToString();
-            DataRow commitByUser = await dbCon.getDataRow("UserAccount", new DataRow("UserAccountId", userInfo.Get("CommitBy")));
-            commitByTxtBlock.Text = String.Format("{0} {1}", commitByUser.Get("FirstName").ToString(), commitByUser.Get("LastName").ToString());
+            commitByTxtBlock.Text = await dbCon.GetFullNameFromUid(userInfo.Get("CommitBy").ToString());
 
-            statusComboBox.Items.Add(new ComboBoxItem { Text = "Active", Value = "A" });
-            statusComboBox.Items.Add(new ComboBoxItem { Text = "Inactive", Value = "I" });
+            statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Active", Value = "A" });
+            statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Inactive", Value = "I" });
 
             for (int i = 0; i < statusComboBox.Items.Count; i++)
             {
-                if (userInfo.Get("StatusCode").ToString().Equals((statusComboBox.Items[i] as ComboBoxItem).Value))
+                if (userInfo.Get("StatusCode").ToString().Equals((statusComboBox.Items[i] as CustomComboBoxItem).Value))
                 {
                     statusComboBox.SelectedIndex = i;
                     break;
@@ -103,10 +103,10 @@ namespace MobiGuide
                     DataRow data = new DataRow();
                     data.Set("FirstName", firstNameTxtBox.Text);
                     data.Set("LastName", lastNameTxtBox.Text);
-                    data.Set("StatusCode", (statusComboBox.SelectedItem as ComboBoxItem).Value.ToString());
+                    data.Set("StatusCode", (statusComboBox.SelectedItem as CustomComboBoxItem).Value.ToString());
                     if(newPwdBox.Password.Length != 0) data.Set("UserPassword", cfmPwdBox.Password);
 
-                    if (await dbCon.updateDataRow("UserAccount", data, new DataRow("UserAccountId", res["UserAccountId"])))
+                    if (await dbCon.UpdateDataRow("UserAccount", data, new DataRow("UserAccountId", res["UserAccountId"])))
                     {
                         MessageBox.Show("Update Profile Succussfully.", "SUCCESS");
                         DialogResult = true;
@@ -120,16 +120,6 @@ namespace MobiGuide
                     }
                 }
             }
-        }
-    }
-
-    public class ComboBoxItem
-    {
-        public string Text { get; set; }
-        public object Value { get; set; }
-        public override string ToString()
-        {
-            return Text;
         }
     }
 }

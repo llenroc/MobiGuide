@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using CustomExtensions;
 using System.IO;
 using DatabaseConnector;
+using Properties;
 
 namespace MobiGuide
 {
@@ -44,16 +45,16 @@ namespace MobiGuide
             DataRow airlineRef = gatherDataToUpdate();
             DataRow condition = new DataRow();
             condition.Set("AirlineCode", res["AirlineCode"]);
-            bool updateResult = await dbCon.updateDataRow("AirlineReference", airlineRef, condition);
+            bool updateResult = await dbCon.UpdateDataRow("AirlineReference", airlineRef, condition);
             switch (largeLogoStatus)
             {
                 case ImageUploadStatus.New:
-                    if (!await dbCon.updateBlobData("AirlineReference", "AirlineLogoLarge",
+                    if (!await dbCon.UpdateBlobData("AirlineReference", "AirlineLogoLarge",
                         largeLogoPath, condition))
                         MessageBox.Show("Failed to update Airline Large Logo", "ERROR");
                     break;
                 case ImageUploadStatus.Remove:
-                    if (!await dbCon.updateBlobData("AirlineReference", "AirlineLogoLarge",
+                    if (!await dbCon.UpdateBlobData("AirlineReference", "AirlineLogoLarge",
                         null, condition))
                         MessageBox.Show("Failed to remove Airline Large Logo", "ERROR");
                     break;
@@ -61,12 +62,12 @@ namespace MobiGuide
             switch (smallLogoStatus)
             {
                 case ImageUploadStatus.New:
-                    if (!await dbCon.updateBlobData("AirlineReference", "AirlineLogoSmall",
+                    if (!await dbCon.UpdateBlobData("AirlineReference", "AirlineLogoSmall",
                         smallLogoPath, condition))
                         MessageBox.Show("Failed to update Airline Small Logo", "ERROR");
                     break;
                 case ImageUploadStatus.Remove:
-                    if (!await dbCon.updateBlobData("AirlineReference", "AirlineLogoSmall",
+                    if (!await dbCon.UpdateBlobData("AirlineReference", "AirlineLogoSmall",
                         null, condition))
                         MessageBox.Show("Failed to remove Airline Small Logo", "ERROR");
                     break;
@@ -87,7 +88,7 @@ namespace MobiGuide
         {
             DataRow data = new DataRow();
             data.Set("AirlineName", alNameTxtBox.Text);
-            data.Set("FontName", fontNameComboBox.SelectedValue);
+            data.Set("FontName", fontNameComboBox.SelectedValue.ToString());
             data.Set("FontSize", fontSizeComboBox.SelectedValue);
             data.Set("FontColor", ((Color)fontColorPicker.SelectedColor).GetInteger());
             data.Set("BackGroundColor", ((Color)backgroundColorPicker.SelectedColor).GetInteger());
@@ -166,7 +167,7 @@ namespace MobiGuide
             }
         }
 
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             displayInfo();
         }
@@ -181,17 +182,17 @@ namespace MobiGuide
             int[] fontSizeStep = { 6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 36, 48, 72 };
             foreach (int fontSize in fontSizeStep)
             {
-                fontSizeComboBox.Items.Add(new ComboBoxItem { Text = fontSize + " px", Value = fontSize });
+                fontSizeComboBox.Items.Add(new CustomComboBoxItem { Text = fontSize + " px", Value = fontSize });
             }
 
-            statusCodeComboBox.Items.Add(new ComboBoxItem { Text = "Active", Value = "A" });
-            statusCodeComboBox.Items.Add(new ComboBoxItem { Text = "Inactive", Value = "I" });
+            statusCodeComboBox.Items.Add(new CustomComboBoxItem { Text = "Active", Value = "A" });
+            statusCodeComboBox.Items.Add(new CustomComboBoxItem { Text = "Inactive", Value = "I" });
             ///end of setup default UIs
 
             //get Airline Reference
             DataRow condition = new DataRow();
             condition.Set("AirlineCode", res["AirlineCode"]);
-            airlineRef = await dbCon.getDataRow("AirlineReference", condition);
+            airlineRef = await dbCon.GetDataRow("AirlineReference", condition);
 
             alNameTxtBox.Text = airlineRef.Get("AirlineName").ToString();
 
@@ -236,14 +237,7 @@ namespace MobiGuide
             commitTimeTxtBlock.Text = airlineRef.Get("CommitDateTime").ToString();
 
             //display CommitBy full name
-            DataRow commitUCon = new DataRow();
-            commitUCon.Set("UserAccountId", airlineRef.Get("CommitBy"));
-            DataRow commitUser = await dbCon.getDataRow("UserAccount", commitUCon);
-            if (commitUser.Count > 0)
-            {
-                commitByTxtBlock.Text = String.Format("{0} {1}",
-                    commitUser.Get("FirstName").ToString(), commitUser.Get("LastName").ToString());
-            }
+            commitByTxtBlock.Text = await dbCon.GetFullNameFromUid(airlineRef.Get("CommitBy").ToString());
 
             if (airlineRef.Get("AirlineLogoLarge") != DBNull.Value)
             {

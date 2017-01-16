@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using CustomExtensions;
 using DatabaseConnector;
+using Properties;
 
 namespace MobiGuide
 {
@@ -73,7 +74,7 @@ namespace MobiGuide
                         data.Set("UserPassword", pwdBox.Password);
                         data.Set("LastName", lastNameTxtBox.Text);
                         data.Set("FirstName", firstNameTxtBox.Text);
-                        data.Set("StatusCode", (statusComboBox.SelectedItem as ComboBoxItem).Value.ToString());
+                        data.Set("StatusCode", (statusComboBox.SelectedItem as CustomComboBoxItem).Value.ToString());
                         data.Set("AirlineCode", res["AirlineCode"]);
                         data.Set("CommitBy", res["UserAccountId"]);
                         data.Set("CommitDateTime", DateTime.Now);
@@ -86,7 +87,7 @@ namespace MobiGuide
                         MessageBoxResult confirmResult = MessageBox.Show(cfmMsg, "Confirm?", MessageBoxButton.OKCancel);
                         if (confirmResult == MessageBoxResult.OK)
                         {
-                            bool result = await dbCon.createNewRow("UserAccount", data, "UserAccountId");
+                            bool result = await dbCon.CreateNewRow("UserAccount", data, "UserAccountId");
                             if (result)
                             {
                                 MessageBox.Show(String.Format("Add user [{0}] successfully.", data.Get("UserLogon")), "SUCCESS");
@@ -119,11 +120,11 @@ namespace MobiGuide
 
         private async void displayInfo()
         {
-            alNameTxtBlock.Text = (await dbCon.getDataRow("AirlineReference", 
+            alNameTxtBlock.Text = (await dbCon.GetDataRow("AirlineReference", 
                 new DataRow("AirlineCode", res["AirlineCode"]))).Get("AirlineName").ToString();
 
-            statusComboBox.Items.Add(new ComboBoxItem { Text = "Active", Value = "A" });
-            statusComboBox.Items.Add(new ComboBoxItem { Text = "Inactive", Value = "I" });
+            statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Active", Value = "A" });
+            statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Inactive", Value = "I" });
             statusComboBox.SelectedIndex = 0;
 
             uNameTxtBox.Focus();
@@ -133,7 +134,7 @@ namespace MobiGuide
         {
             try
             {
-                if ((await dbCon.getDataRow("UserAccount", new DataRow("UserLogon", uName))).HasData)
+                if ((await dbCon.GetDataRow("UserAccount", new DataRow("UserLogon", uName))).HasData)
                 {
                     return uLogon.Exist;
                 }

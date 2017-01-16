@@ -7,6 +7,59 @@ using System.Threading.Tasks;
 
 namespace Properties
 {
+    public class AirportReference
+    {
+        private string _airportCode;
+        private string _airportName;
+        private string _status;
+        public AirportReference() : this(String.Empty, String.Empty, String.Empty)
+        {
+        }
+        public AirportReference(string airportCode, string airportName, string statusCode)
+        {
+            _airportCode = airportCode;
+            _airportName = airportName;
+            switch (statusCode)
+            {
+                case "A":
+                    _status = "Active";
+                    break;
+                case "I":
+                    _status = "Inactive";
+                    break;
+            }
+        }
+        public string AirportCode
+        {
+            get { return _airportCode; }
+            set { _airportCode = value; }
+        }
+        public string AirportName
+        {
+            get { return _airportName; }
+            set { _airportName = value; }
+        }
+
+        public string SeletedLanguageCode { get; internal set; }
+
+        public string Status
+        {
+            get { return _status; }
+            set
+            {
+                switch (value)
+                {
+                    case "A":
+                        _status = "Active";
+                        break;
+                    case "I":
+                        _status = "Inactive";
+                        break;
+                }
+            }
+        }
+
+    }
     public class AirportTranslation : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -85,5 +138,14 @@ namespace Properties
     {
         NEW,
         EDIT
+    }
+    public class CustomComboBoxItem
+    {
+        public string Text { get; set; }
+        public object Value { get; set; }
+        public override string ToString()
+        {
+            return Text;
+        }
     }
 }

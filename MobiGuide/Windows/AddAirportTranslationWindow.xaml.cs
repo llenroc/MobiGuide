@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using DatabaseConnector;
 using System.Diagnostics;
 using System.IO;
+using Properties;
 
 namespace MobiGuide
 {
@@ -56,12 +57,12 @@ namespace MobiGuide
         private async void FetchAirportList()
         {
             string query = MobiGuide.Properties.Settings.Default.GetUntranslateAirportListQuery.Replace(Environment.NewLine, " ").Replace("\t", " ");
-            DataList airportList = (DataList)(await dbCon.customQuery(SQLStatementType.SELECT_LIST, query));
+            DataList airportList = (DataList)(await dbCon.CustomQuery(SQLStatementType.SELECT_LIST, query));
             if (airportList.HasData && airportList.Error == ERROR.NoError)
             {
                 foreach (DataRow airport in airportList)
                 {
-                    airportNameComboBox.Items.Add(new ComboBoxItem
+                    airportNameComboBox.Items.Add(new CustomComboBoxItem
                     {
                         Text = String.Format("{0} - {1}", airport.Get("AirportCode"), airport.Get("AirportName")),
                         Value = airport.Get("AirportCode")
@@ -83,12 +84,12 @@ namespace MobiGuide
         {
             LanguageComboBox.Items.Clear();
             string query = String.Format("SELECT * FROM LanguageReference WHERE LanguageCode NOT IN (SELECT LanguageCode FROM AirportTranslation WHERE AirportCode = '{0}') ORDER BY LanguageCode", airportCode);
-            DataList languageList = (DataList)await dbCon.customQuery(SQLStatementType.SELECT_LIST, query);
+            DataList languageList = (DataList)await dbCon.CustomQuery(SQLStatementType.SELECT_LIST, query);
             if (languageList.HasData && languageList.Error == ERROR.NoError)
             {
                 foreach (DataRow language in languageList)
                 {
-                    LanguageComboBox.Items.Add(new ComboBoxItem
+                    LanguageComboBox.Items.Add(new CustomComboBoxItem
                     {
                         Text = String.Format("{0} - {1}", language.Get("LanguageCode"), language.Get("LanguageName")),
                         Value = language.Get("LanguageCode")
@@ -129,7 +130,7 @@ namespace MobiGuide
                     "CommitBy", Application.Current.Resources["UserAccountId"],
                     "CommitDateTime", DateTime.Now
                 );
-            return await dbCon.createNewRow("AirportTranslation", data, "AirportTranslationId");
+            return await dbCon.CreateNewRow("AirportTranslation", data, "AirportTranslationId");
         }
 
         private void airportNameComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

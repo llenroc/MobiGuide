@@ -39,13 +39,11 @@ namespace DatabaseConnector
     {
         private List<DataColumn> datas;
         private ERROR error;
-
         public DataRow()
         {
             this.datas = new List<DataColumn>();
             this.error = ERROR.NotSet;
         }
-
         public DataRow(params object[] parameters)
         {
             this.datas = new List<DataColumn>();
@@ -57,7 +55,6 @@ namespace DatabaseConnector
                 }
             }
         }
-
         public object Get(string key)
         {
             foreach(DataColumn column in datas)
@@ -78,7 +75,11 @@ namespace DatabaseConnector
         {
             return this.datas.ElementAt(index).Value;
         }
-
+        public DataRow RemoveAt(int index)
+        {
+            this.datas.RemoveAt(index);
+            return this;
+        }
         public int Count
         {
             get { return this.datas.Count; }
@@ -120,13 +121,11 @@ namespace DatabaseConnector
     {
         private List<DataRow> datas;
         private ERROR error;
-
         public DataList()
         {
             this.datas = new List<DataRow>();
             this.error = ERROR.NotSet;
         }
-
         public DataRow GetListAt(int index)
         {
             return this.datas[index];
@@ -156,14 +155,20 @@ namespace DatabaseConnector
             return (this.datas as IEnumerable).GetEnumerator();
         }
     }
-
     public enum ERROR
     {
         HasError,
         NoError,
         NotSet
     }
-
+    public enum SQLStatementType
+    {
+        SELECT_ONE,
+        SELECT_LIST,
+        INSERT,
+        UPDATE,
+        DELETE
+    }
     public class DBConnector
     {
         private static string connectionString;
@@ -171,12 +176,11 @@ namespace DatabaseConnector
         {
             connectionString = ConfigurationManager.ConnectionStrings["DatabaseConnectionString"].ConnectionString;
         }
-
-        public async Task<DataRow> getDataRow(string tableName, DataRow conditions)
+        public async Task<DataRow> GetDataRow(string tableName, DataRow conditions)
         {
-            return await getDataRow(tableName, conditions, null);
+            return await GetDataRow(tableName, conditions, null);
         }
-        public async Task<DataRow> getDataRow(string tableName, DataRow conditions, string additionalQuery)
+        public async Task<DataRow> GetDataRow(string tableName, DataRow conditions, string additionalQuery)
         {
             DataRow result = await Task.Run(() =>
             {
@@ -225,11 +229,11 @@ namespace DatabaseConnector
             });
             return result;
         }
-        public async Task<DataList> getDataList(string tableName, DataRow conditions)
+        public async Task<DataList> GetDataList(string tableName, DataRow conditions)
         {
-            return await getDataList(tableName, conditions, null);
+            return await GetDataList(tableName, conditions, null);
         }
-        public async Task<DataList> getDataList(string tableName, DataRow conditions, string additionalQuery)
+        public async Task<DataList> GetDataList(string tableName, DataRow conditions, string additionalQuery)
         {
             DataList result = await Task.Run(() =>
             {
@@ -283,7 +287,7 @@ namespace DatabaseConnector
             });
             return result;
         }
-        public async Task<bool> updateDataRow(string tableName, DataRow dataToUpdate, DataRow condition)
+        public async Task<bool> UpdateDataRow(string tableName, DataRow dataToUpdate, DataRow condition)
         {
             bool result = await Task.Run(() =>
             {
@@ -335,7 +339,7 @@ namespace DatabaseConnector
             });
             return result;
         }
-        public async Task<bool> updateBlobData(string tableName, string blobColumnName, string filePath, DataRow condition)
+        public async Task<bool> UpdateBlobData(string tableName, string blobColumnName, string filePath, DataRow condition)
         {
             bool result = await Task.Run(() => 
             {
@@ -370,7 +374,7 @@ namespace DatabaseConnector
             });
             return result;
         }
-        public async Task<bool> createNewRow(string tableName, DataRow data, string uniqueColumn)
+        public async Task<bool> CreateNewRow(string tableName, DataRow data, string uniqueColumn)
         {
             bool result = await Task.Run(() =>
             {
@@ -430,8 +434,7 @@ namespace DatabaseConnector
             });
             return result;
         }
-
-        public async Task<object> customQuery(SQLStatementType type, string query)
+        public async Task<object> CustomQuery(SQLStatementType type, string query)
         {
             return await Task.Run(() =>
             {
@@ -480,13 +483,13 @@ namespace DatabaseConnector
                 }
             });
         }
-    }
-    public enum SQLStatementType
-    {
-        SELECT_ONE,
-        SELECT_LIST,
-        INSERT,
-        UPDATE,
-        DELETE
+        public async Task<string> GetFullNameFromUid(string uid)
+        {
+            DataRow row = await GetDataRow("UserAccount", new DataRow("UserAccountId", uid));
+            if(row.HasData && row.Error == ERROR.NoError)
+            {
+                return String.Format("{0} {1}", row.Get("FirstName").ToString(), row.Get("LastName").ToString());
+            } else return "";
+        }
     }
 }

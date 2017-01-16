@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Properties;
 
 namespace MobiGuide
 {
@@ -54,8 +55,8 @@ namespace MobiGuide
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            statusComboBox.Items.Add(new ComboBoxItem { Text = "Active", Value = "A" });
-            statusComboBox.Items.Add(new ComboBoxItem { Text = "Inactive", Value = "I" });
+            statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Active", Value = "A" });
+            statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Inactive", Value = "I" });
 
             FetchLanguageList();
         }
@@ -63,14 +64,14 @@ namespace MobiGuide
         private async void FetchLanguageList()
         {
             languageCodeComboBox.Items.Clear();
-            DataList list = await dbCon.getDataList("LanguageReference", null, "ORDER BY LanguageCode");
+            DataList list = await dbCon.GetDataList("LanguageReference", null, "ORDER BY LanguageCode");
 
-            languageCodeComboBox.Items.Add(new ComboBoxItem { Text = "---", Value = "NOSEL" });
+            languageCodeComboBox.Items.Add(new CustomComboBoxItem { Text = "---", Value = "NOSEL" });
             if(list.Error == ERROR.NoError && list.HasData)
             {
                 foreach(DataRow row in list)
                 {
-                    languageCodeComboBox.Items.Add(new ComboBoxItem { Text = row.Get("LanguageCode").ToString(), Value = row.Get("LanguageCode").ToString() });
+                    languageCodeComboBox.Items.Add(new CustomComboBoxItem { Text = row.Get("LanguageCode").ToString(), Value = row.Get("LanguageCode").ToString() });
                 }
                 languageCodeComboBox.SelectionChanged += RemoveNotSelectOptionItem;
                 languageCodeComboBox.SelectionChanged += LanguageCodeComboBox_SelectionChanged;
@@ -88,22 +89,19 @@ namespace MobiGuide
 
         private async void GetLanguageReferenceData(string languageCode)
         {
-            DataRow languageRef = await dbCon.getDataRow("LanguageReference", new DataRow("LanguageCode", languageCode));
+            DataRow languageRef = await dbCon.GetDataRow("LanguageReference", new DataRow("LanguageCode", languageCode));
             if(languageRef.HasData && languageRef.Error == ERROR.NoError)
             {
                 languageNameTextBox.Text = languageRef.Get("LanguageName") != DBNull.Value ? languageRef.Get("LanguageName").ToString() : "NULL";
                 statusComboBox.SelectedValue = languageRef.Get("StatusCode") != DBNull.Value ? languageRef.Get("StatusCode") : "A";
                 commitDateTimeTextBlockValue.Text = languageRef.Get("CommitDateTime") != DBNull.Value ? languageRef.Get("CommitDateTime").ToString() : "NULL";
-                DataRow commitBy = await dbCon.getDataRow("UserAccount", new DataRow("UserAccountId", languageRef.Get("CommitBy")));
-                if (commitBy.HasData && commitBy.Error == ERROR.NoError)
-                    commitByTextBlockValue.Text = String.Format("{0} {1}", commitBy.Get("FirstName"), commitBy.Get("LastName"));
-                else commitByTextBlockValue.Text = "NULL";
+                commitByTextBlockValue.Text = await dbCon.GetFullNameFromUid(languageRef.Get("CommitBy").ToString());
             }
         }
 
         private async Task<bool> SaveEditLanguageReference(DataRow data, DataRow conditions)
         {
-            return await dbCon.updateDataRow("LanguageReference", data, conditions);
+            return await dbCon.UpdateDataRow("LanguageReference", data, conditions);
             
         }
 

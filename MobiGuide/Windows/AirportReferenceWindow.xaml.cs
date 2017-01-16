@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using DatabaseConnector;
 using Properties;
+using System.Diagnostics;
 
 namespace MobiGuide
 {
@@ -30,24 +31,28 @@ namespace MobiGuide
         {
             InitializeComponent();
 
-            statusComboBox.Items.Add(new ComboBoxItem { Text = "Any", Value = "" });
-            statusComboBox.Items.Add(new ComboBoxItem { Text = "Active", Value = "A" });
-            statusComboBox.Items.Add(new ComboBoxItem { Text = "Inactive", Value = "I" });
+            statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Any", Value = "" });
+            statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Active", Value = "A" });
+            statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Inactive", Value = "I" });
         }
 
-        private async void searchBtn_Click(object sender, RoutedEventArgs e)
+        private void searchBtn_Click(object sender, RoutedEventArgs e)
+        {
+            DoSearch();
+        }
+        private async void DoSearch()
         {
             string airportCode = airportCodeTextBox.Text;
             string airportName = airportNameTextBox.Text;
             string status = statusComboBox.SelectedValue.ToString();
 
-            DataList list = await dbCon.getDataList("AirportReference", null, 
-                String.Format("WHERE AirportCode LIKE '%{0}%' AND AirportName LIKE '%{1}%' AND StatusCode LIKE '%{2}%' COLLATE SQL_Latin1_General_CP1_CI_AS ORDER BY AirportCode", 
+            DataList list = await dbCon.GetDataList("AirportReference", null,
+                String.Format("WHERE AirportCode LIKE '%{0}%' AND AirportName LIKE '%{1}%' AND StatusCode LIKE '%{2}%' COLLATE SQL_Latin1_General_CP1_CI_AS ORDER BY AirportCode",
                 airportCode, airportName, status));
-            if(list.HasData && list.Error == ERROR.NoError)
+            if (list.HasData && list.Error == ERROR.NoError)
             {
                 List<AirportReference> _itemSource = new List<AirportReference>();
-                foreach(DataRow row in list)
+                foreach (DataRow row in list)
                 {
                     AirportReference airportRef = new AirportReference(
                         row.Get("AirportCode").ToString(),
@@ -57,7 +62,8 @@ namespace MobiGuide
                     _itemSource.Add(airportRef);
                 }
                 airportDataGrid.ItemsSource = _itemSource;
-            } else
+            }
+            else
             {
                 airportDataGrid.ItemsSource = null;
                 airportDataGrid.SelectedIndex = -1;
@@ -66,14 +72,20 @@ namespace MobiGuide
 
         private void newBtn_Click(object sender, RoutedEventArgs e)
         {
-            NewEditAirportReferenceWindow newAirportReferenceWindow = new NewEditAirportReferenceWindow(STATUS.NEW);
+            NewEditAirportReferenceWindow newAirportReferenceWindow = new NewEditAirportReferenceWindow();
             newAirportReferenceWindow.ShowDialog();
         }
 
         private void editBtn_Click(object sender, RoutedEventArgs e)
         {
-            NewEditAirportReferenceWindow editAirportReferenceWindow = new NewEditAirportReferenceWindow(STATUS.EDIT);
+            int indexOfSelectedItem = (sender as DataGrid).SelectedIndex;
+            string airportCode = (airportDataGrid.SelectedItem as AirportReference).AirportCode;
+            NewEditAirportReferenceWindow editAirportReferenceWindow = new NewEditAirportReferenceWindow(airportCode);
             editAirportReferenceWindow.ShowDialog();
+            if (editAirportReferenceWindow.DialogResult.HasValue && editAirportReferenceWindow.DialogResult.Value)
+            {
+                DoSearch();
+            }
         }
 
         private void airportDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -90,58 +102,16 @@ namespace MobiGuide
             airportDataGrid.ItemsSource = null;
             airportDataGrid.SelectedIndex = -1;
         }
-    }
-    public class AirportReference
-    {
-        private string _airportCode;
-        private string _airportName;
-        private string _status;
-        public AirportReference() : this(String.Empty, String.Empty, String.Empty)
+
+        private void airportDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-        }
-        public AirportReference(string airportCode, string airportName, string statusCode)
-        {
-            _airportCode = airportCode;
-            _airportName = airportName;
-            switch (statusCode)
-            {
-                case "A":
-                    _status = "Active";
-                    break;
-                case "I":
-                    _status = "Inactive";
-                    break;
+            int indexOfSelectedItem = (sender as DataGrid).SelectedIndex;
+            string airportCode = ((sender as DataGrid).SelectedItem as AirportReference).AirportCode;
+            NewEditAirportReferenceWindow editAirportReferenceWindow = new NewEditAirportReferenceWindow(airportCode);
+            editAirportReferenceWindow.ShowDialog();
+            if (editAirportReferenceWindow.DialogResult.HasValue && editAirportReferenceWindow.DialogResult.Value) {
+                DoSearch();
             }
         }
-        public string AirportCode
-        {
-            get { return _airportCode; }
-            set { _airportCode = value; }
-        }
-        public string AirportName
-        {
-            get { return _airportName; }
-            set { _airportName = value; }
-        }
-
-        public string SeletedLanguageCode { get; internal set; }
-
-        public string Status
-        {
-            get { return _status; }
-            set
-            {
-                switch (value)
-                {
-                    case "A":
-                        _status = "Active";
-                        break;
-                    case "I":
-                        _status = "Inactive";
-                        break;
-                }
-            }
-        }
-
     }
 }

@@ -71,7 +71,7 @@ namespace MobiGuide
             }
             else
             {
-                DataRow result = await dbCon.getDataRow("UserAccount", 
+                DataRow result = await dbCon.GetDataRow("UserAccount", 
                     new DataRow("UserLogon", username, "UserPassword", password));
                 if (result.HasData && result.Error == ERROR.NoError)
                 {

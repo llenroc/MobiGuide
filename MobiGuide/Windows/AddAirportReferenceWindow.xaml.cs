@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using DatabaseConnector;
+using Properties;
 
 namespace MobiGuide
 {
@@ -34,8 +35,8 @@ namespace MobiGuide
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            statusComboBox.Items.Add(new ComboBoxItem { Text = "Active", Value = "A" });
-            statusComboBox.Items.Add(new ComboBoxItem { Text = "Inactive", Value = "I" });
+            statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Active", Value = "A" });
+            statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Inactive", Value = "I" });
             airportCodeTextBox.Focus();
         }
 
@@ -62,7 +63,7 @@ namespace MobiGuide
                         "StatusCode", statusComboBox.SelectedValue.ToString(),
                         "CommitBy", Application.Current.Resources["UserAccountId"],
                         "CommitDateTime", DateTime.Now);
-                    if (await dbCon.createNewRow("AirportReference", airportReferenceData, null))
+                    if (await dbCon.CreateNewRow("AirportReference", airportReferenceData, null))
                     {
                         DialogResult = true;
                         MessageBox.Show("Add Airport Reference Successfully", "SUCCESS");
@@ -85,7 +86,7 @@ namespace MobiGuide
         }
         private async Task<bool> IsExistingAirportCode(string code)
         {
-            DataRow result = await dbCon.getDataRow("AirportReference", new DataRow("AirportCode", code));
+            DataRow result = await dbCon.GetDataRow("AirportReference", new DataRow("AirportCode", code));
             if (result.HasData && result.Error == ERROR.NoError) return true;
             else if (result.Error == ERROR.HasError) return true;
             else return false;

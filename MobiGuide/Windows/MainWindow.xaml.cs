@@ -54,12 +54,11 @@ namespace MobiGuide
             DBConnector dbCon = new DBConnector();
             DataRow userCondi = new DataRow();
             userCondi.Set("UserAccountId", res["UserAccountId"]);
-            DataRow userInfo = await dbCon.getDataRow("UserAccount", userCondi);
-            nameTxtBlock.Text = String.Format("{0} {1}", userInfo.Get("FirstName").ToString(), userInfo.Get("LastName").ToString());
+            nameTxtBlock.Text = await dbCon.GetFullNameFromUid(res["UserAccountId"].ToString());
 
             DataRow airlineRefCondi = new DataRow();
             airlineRefCondi.Set("AirlineCode", res["AirlineCode"]);
-            DataRow airlineRef = await dbCon.getDataRow("AirlineReference", airlineRefCondi);
+            DataRow airlineRef = await dbCon.GetDataRow("AirlineReference", airlineRefCondi);
             airlineNameTxtBlock.Text = airlineRef.Get("AirlineName").ToString();
 
             ImageSource logoSource = ((object)airlineRef.Get("AirlineLogoSmall")).BlobToSource();

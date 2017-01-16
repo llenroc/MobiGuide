@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using DatabaseConnector;
 using System.Diagnostics;
 using System.IO;
+using Properties;
 
 namespace MobiGuide
 {
@@ -55,12 +56,12 @@ namespace MobiGuide
         private async void FetchAirportList()
         {
             string query = "SELECT DISTINCT AirportCode, AirportName FROM AirportReference WHERE AirportCode IN (SELECT DISTINCT AirportCode FROM AirportTranslation) ORDER BY AirportCode";
-            DataList airportList = (DataList)(await dbCon.customQuery(SQLStatementType.SELECT_LIST, query));
+            DataList airportList = (DataList)(await dbCon.CustomQuery(SQLStatementType.SELECT_LIST, query));
             if (airportList.HasData && airportList.Error == ERROR.NoError)
             {
                 foreach (DataRow airport in airportList)
                 {
-                    airportNameComboBox.Items.Add(new ComboBoxItem
+                    airportNameComboBox.Items.Add(new CustomComboBoxItem
                     {
                         Text = String.Format("{0} - {1}", airport.Get("AirportCode"), airport.Get("AirportName")),
                         Value = airport.Get("AirportCode")
@@ -82,12 +83,12 @@ namespace MobiGuide
         {
             LanguageComboBox.Items.Clear();
             string query = String.Format("SELECT LanguageCode, LanguageName FROM LanguageReference WHERE LanguageCode IN (SELECT LanguageCode FROM AirportTranslation WHERE AirportCode = '{0}') ORDER BY LanguageCode", airportCode);
-            DataList languageList = (DataList)await dbCon.customQuery(SQLStatementType.SELECT_LIST, query);
+            DataList languageList = (DataList)await dbCon.CustomQuery(SQLStatementType.SELECT_LIST, query);
             if (languageList.HasData && languageList.Error == ERROR.NoError)
             {
                 foreach (DataRow language in languageList)
                 {
-                    LanguageComboBox.Items.Add(new ComboBoxItem
+                    LanguageComboBox.Items.Add(new CustomComboBoxItem
                     {
                         Text = String.Format("{0} - {1}", language.Get("LanguageCode"), language.Get("LanguageName")),
                         Value = language.Get("LanguageCode")
@@ -127,7 +128,7 @@ namespace MobiGuide
                     "CommitBy", Application.Current.Resources["UserAccountId"],
                     "CommitDateTime", DateTime.Now
                 );
-            return await dbCon.updateDataRow("AirportTranslation", data, new DataRow("AirportTranslationId", selectedAirportTransId));
+            return await dbCon.UpdateDataRow("AirportTranslation", data, new DataRow("AirportTranslationId", selectedAirportTransId));
         }
 
         private void airportNameComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -168,15 +169,11 @@ namespace MobiGuide
             string airportCode = airportNameComboBox.SelectedValue.ToString();
             string languageCode = LanguageComboBox.SelectedValue.ToString();
 
-            DataRow airportTranslation = await dbCon.getDataRow("AirportTranslation", new DataRow("AirportCode", airportCode, "LanguageCode", languageCode));
+            DataRow airportTranslation = await dbCon.GetDataRow("AirportTranslation", new DataRow("AirportCode", airportCode, "LanguageCode", languageCode));
             if(airportTranslation.HasData && airportTranslation.Error == ERROR.NoError)
             {
                 nameInLanguageTextBox.Text = airportTranslation.Get("AirportName").ToString();
-                DataRow commitByUser = await dbCon.getDataRow("UserAccount", new DataRow("UserAccountId", airportTranslation.Get("CommitBy")));
-                if(commitByUser.HasData && commitByUser.Error == ERROR.NoError)
-                {
-                    commitByTextBlockValue.Text = String.Format("{0} {1}", commitByUser.Get("FirstName").ToString(), commitByUser.Get("LastName").ToString());
-                }
+                commitByTextBlockValue.Text = await dbCon.GetFullNameFromUid(airportTranslation.Get("CommitBy").ToString());
                 commitDateTimeTextBlockValue.Text = airportTranslation.Get("CommitDateTime").ToString();
 
                 selectedAirportTransId = airportTranslation.Get("AirportTranslationId").ToString();
