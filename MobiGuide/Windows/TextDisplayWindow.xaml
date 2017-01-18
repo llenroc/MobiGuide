@@ -1,0 +1,27 @@
+﻿<Window x:Class="MobiGuide.TextDisplayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MobiGuide"
+        mc:Ignorable="d"
+        Title="TextDisplayWindow" Height="500" Width="600" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
+    <StackPanel>
+        <StackPanel Orientation="Horizontal" Height="37" VerticalAlignment="Center" Margin="0,10,0,0">
+            <TextBlock x:Name="textBlock" TextWrapping="Wrap" FontSize="14" Text="Language Code" Margin="10,0,0,0" VerticalAlignment="Center"/>
+            <TextBox x:Name="languageCodeTextBox" TextWrapping="Wrap" Width="200" FontSize="14" VerticalAlignment="Center" Margin="25,0,0,0" IsEnabled="False"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Height="37" VerticalAlignment="Center" Margin="0,10,0,0">
+            <TextBlock x:Name="textBlock1" TextWrapping="Wrap" FontSize="14" Text="Language Name" Margin="10,0,0,0" VerticalAlignment="Center"/>
+            <TextBox x:Name="languageNameTextBox" TextWrapping="Wrap" Width="200" FontSize="14" VerticalAlignment="Center" Margin="20,0,0,0" IsEnabled="False"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
+            <TextBlock x:Name="textBlock2" TextWrapping="Wrap" FontSize="14" Text="Display Text" Margin="10,7,0,0" VerticalAlignment="Top"/>
+            <TextBox x:Name="displayTextTextBox" TextWrapping="Wrap" Width="430" FontSize="14" VerticalAlignment="Center" Margin="48,8.19,0,0" Height="300"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,15,33,10" HorizontalAlignment="Right">
+            <Button x:Name="saveBtn" Content="Save" Width="75" FontSize="14" VerticalAlignment="Center" Margin="0" IsDefault="True" Click="saveBtn_Click"/>
+            <Button x:Name="closeBtn" Content="Close" Width="75" FontSize="14" VerticalAlignment="Center" Margin="10,0,0,0" IsCancel="True" Click="closeBtn_Click"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

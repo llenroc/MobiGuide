@@ -16,6 +16,15 @@ namespace CustomExtensions
             str = "..." + str.Substring(str.Length - 29, str.Length - (str.Length - 29));
             return str;
         }
+        public static string Shorten(this string str, int length)
+        {
+            return str.Length > length ? str.Substring(0, length - 4) + "..." : str;
+        }
+
+        public static bool IsNull(this string str)
+        {
+            return String.IsNullOrWhiteSpace(str);
+        }
     }
 
     public static class IntegerExtension

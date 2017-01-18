@@ -18,7 +18,7 @@ exec sp_addtype GUID, "uniqueidentifier", "NULL"
 go
 
 
-exec sp_addtype LARGE_TEXT, "text", "NULL"
+exec sp_addtype LARGE_TEXT, "nvarchar(MAX)", "NULL"
 go
 
 

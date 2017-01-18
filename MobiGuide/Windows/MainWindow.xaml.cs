@@ -143,5 +143,11 @@ namespace MobiGuide
             AirportReferenceWindow airportReferenceWindow = new AirportReferenceWindow();
             airportReferenceWindow.ShowDialog();
         }
+
+        private void TextTemplate_Click(object sender, RoutedEventArgs e)
+        {
+            TextTemplateWindow textTemplateWindow = new TextTemplateWindow();
+            textTemplateWindow.ShowDialog();
+        }
     }
 }

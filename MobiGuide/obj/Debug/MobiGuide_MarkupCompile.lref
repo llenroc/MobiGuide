@@ -1,5 +1,6 @@
 ﻿
 FC:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\App.xaml;;
+FC:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\Windows\TextTemplateWindow.xaml;;
 FC:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\Windows\AirportReferenceWindow.xaml;;
 FC:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\Windows\EditAirportTranslationWindow.xaml;;
 FC:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\Windows\AddAirportTranslationWindow.xaml;;
@@ -14,4 +15,6 @@ FC:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGui
 FC:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\Resource.xaml;;
 FC:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\LoginWindow.xaml;;
 FC:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\Windows\NewEditAirportReferenceWindow.xaml;;
+FC:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\Windows\NewEditTextTemplateWindow.xaml;;
+FC:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\Windows\TextDisplayWindow.xaml;;
 

@@ -114,7 +114,7 @@ namespace MobiGuide
                     if (AirportTranslationList[indexOfItemInAirportTranslationList].IsEnabled == true)
                     {
                         DataRow languageDetail = await dbCon.GetDataRow("LanguageReference",
-                        new DataRow("LanguageCode", langComboBox.SelectedItem.ToString()));
+                            new DataRow("LanguageCode", langComboBox.SelectedItem.ToString()));
                         if (languageDetail.HasData && languageDetail.Error == ERROR.NoError)
                         {
                             AirportTranslationList[indexOfItemInAirportTranslationList].LanguageName = languageDetail.Get("LanguageName").ToString();
@@ -127,10 +127,10 @@ namespace MobiGuide
                             exceptCodes.Add((sender as ComboBox).SelectedItem.ToString());
                             for (int i = 0; i < AirportTranslationList.Count; i++)
                             {
-                                if (AirportTranslationList[i].SelectedLanguageCode != null && !String.IsNullOrWhiteSpace(AirportTranslationList[i].SelectedLanguageCode.ToString()))
+                                if (AirportTranslationList[i].LanguageCode != null && !String.IsNullOrWhiteSpace(AirportTranslationList[i].LanguageCode.ToString()))
                                 {
 
-                                    exceptCodes.Add(AirportTranslationList[i].SelectedLanguageCode.ToString());
+                                    exceptCodes.Add(AirportTranslationList[i].LanguageCode.ToString());
                                 }
                             }
                             DataList availableLanguage = await LoadLanguageList(exceptCodes.ToArray());
@@ -172,7 +172,7 @@ namespace MobiGuide
                     at = new AirportTranslation();
                     at.AirportTranslationId = row.Get("AirportTranslationId").ToString();
                     at.AirportName = row.Get("AirportName").ToString();
-                    at.SelectedLanguageCode = row.Get("LanguageCode").ToString();
+                    at.LanguageCode = row.Get("LanguageCode").ToString();
                     at.LanguageName = (await dbCon.GetDataRow("LanguageReference", 
                         new DataRow("LanguageCode", row.Get("LanguageCode")))).Get("LanguageName").ToString();
                     at.IsEnabled = false;
@@ -193,7 +193,7 @@ namespace MobiGuide
                 {
                     at.LanguageList.Add(row.Get("LanguageCode").ToString());
                 }
-                AirportTranslationList.Add(at);
+                if (at.LanguageList.Count > 0) AirportTranslationList.Add(at);
             }
         }
         private async Task<DataRow> LoadAirportReference(string airportCode)
@@ -276,17 +276,17 @@ namespace MobiGuide
                     DataList airportTranslationDataList = new DataList();
                     foreach (AirportTranslation at in AirportTranslationList)
                     {
-                        if (at.SelectedLanguageCode != null && String.IsNullOrWhiteSpace(at.AirportName))
+                        if (at.LanguageCode != null && String.IsNullOrWhiteSpace(at.AirportName))
                         {
                             MessageBox.Show("Please fill all display name in different languages", "WARNING");
                             saveBtn.IsEnabled = true;
                             return;
                         }
-                        if (at.SelectedLanguageCode != null && !String.IsNullOrWhiteSpace(at.AirportName))
+                        if (at.LanguageCode != null && !String.IsNullOrWhiteSpace(at.AirportName))
                         {
                             DataRow airportTranslationData = new DataRow(
                                 "AirportCode", airportCodeTextBox.Text.ToUpper(),
-                                "LanguageCode", at.SelectedLanguageCode,
+                                "LanguageCode", at.LanguageCode,
                                 "AirportName", at.AirportName,
                                 "CommitBy", Application.Current.Resources["UserAccountId"],
                                 "CommitDateTime", DateTime.Now
@@ -331,19 +331,19 @@ namespace MobiGuide
                 DataList airportTranslationDataListToUpdate = new DataList();
                 foreach (AirportTranslation at in AirportTranslationList)
                 {
-                    if (at.SelectedLanguageCode != null && String.IsNullOrWhiteSpace(at.AirportName))
+                    if (at.LanguageCode != null && String.IsNullOrWhiteSpace(at.AirportName))
                     {
                         MessageBox.Show("Please fill all display name in different languages", "WARNING");
                         saveBtn.IsEnabled = true;
                         return;
                     }
-                    if (at.SelectedLanguageCode != null && !String.IsNullOrWhiteSpace(at.AirportName))
+                    if (at.LanguageCode != null && !String.IsNullOrWhiteSpace(at.AirportName))
                     {
                         if(at.LanguageList.Count > 0)
                         {
                             DataRow airportTranslationData = new DataRow(
                                 "AirportCode", airportCodeTextBox.Text.ToUpper(),
-                                "LanguageCode", at.SelectedLanguageCode,
+                                "LanguageCode", at.LanguageCode,
                                 "AirportName", at.AirportName,
                                 "CommitBy", Application.Current.Resources["UserAccountId"],
                                 "CommitDateTime", DateTime.Now

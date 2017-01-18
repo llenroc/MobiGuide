@@ -26,12 +26,7 @@
                     <MenuItem x:Name="EditAirportTranslationMenuItem" Header="Edit" Click="EditAirportTranslationMenuItem_Click"/>
                 </MenuItem>-->
             </MenuItem>
-            <MenuItem Header="Languages">
-                <MenuItem x:Name="LanguagesReferenceMenuItem" Header="Reference">
-                    <MenuItem x:Name="AddLanguageReference" Header="Add" Click="AddLanguageReference_Click"/>
-                    <MenuItem x:Name="EditLanguageReference" Header="Edit" Click="EditLanguageReference_Click"/>
-                </MenuItem>
-            </MenuItem>
+            <MenuItem x:Name="TextTemplate" Header="Text Template" Click="TextTemplate_Click"/>
         </Menu>
 
         <StackPanel HorizontalAlignment="Left" Height="53" Margin="10,30,0,0" VerticalAlignment="Top" Orientation="Horizontal" >

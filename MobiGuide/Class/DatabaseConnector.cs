@@ -47,7 +47,8 @@ namespace DatabaseConnector
         public DataRow(params object[] parameters)
         {
             this.datas = new List<DataColumn>();
-            if(parameters.Length % 2 == 0)
+            this.error = ERROR.NotSet;
+            if (parameters.Length % 2 == 0)
             {
                 for(int i = 0; i < parameters.Length; i += 2)
                 {
@@ -430,6 +431,73 @@ namespace DatabaseConnector
                 } catch (Exception ex)
                 {
                     return false;
+                }
+            });
+            return result;
+        }
+        public async Task<DataRow> CreateNewRowAndGetUId(string tableName, DataRow data, string uniqueColumn)
+        {
+            DataRow result = await Task.Run(() =>
+            {
+                try
+                {
+                    using (SqlConnection con = new SqlConnection(connectionString))
+                    {
+                        //create query
+                        string query = String.Empty;
+                        if (!String.IsNullOrWhiteSpace(uniqueColumn))
+                            query += String.Format("DECLARE @id uniqueidentifier SET @id = NEWID() ");
+                        query += String.Format("INSERT INTO {0} (", tableName);
+                        if (!String.IsNullOrWhiteSpace(uniqueColumn))
+                        {
+                            query += String.Format("{0},", uniqueColumn);
+                        }
+                        for (int i = 0; i < data.Count; i++)
+                        {
+                            query += data.GetKeyAt(i);
+                            if (i < data.Count - 1) query += ",";
+                        }
+                        query += String.Format(") OUTPUT INSERTED.{0} VALUES (", uniqueColumn);
+                        if (!String.IsNullOrWhiteSpace(uniqueColumn)) query += "@id, ";
+                        for (int i = 0; i < data.Count; i++)
+                        {
+                            query += String.Format("@{0}", data.GetKeyAt(i));
+                            if (i < data.Count - 1) query += ", ";
+                        }
+                        query += ")";
+                        SqlCommand cmd = new SqlCommand(query, con);
+
+                        //try to map sqldbtype to values
+                        SqlCommand typeCmd = con.CreateCommand();
+                        typeCmd.CommandText = String.Format("SET FMTONLY ON; SELECT * FROM {0}; SET FMTONLY OFF", tableName);
+                        con.Open();
+                        using (SqlDataReader reader = typeCmd.ExecuteReader())
+                        {
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                SqlDbType type = (SqlDbType)(int)reader.GetSchemaTable().Rows[i]["ProviderType"];
+                                string key = reader.GetName(i);
+                                if (data.ContainKey(key))
+                                {
+                                    int indexOfKey = data.IndexOf(key);
+                                    cmd.Parameters.Add(String.Format("@{0}", data.GetKeyAt(indexOfKey)), type).Value = data.GetAt(indexOfKey);
+                                }
+                            }
+                        }
+                        Guid newId = (Guid) cmd.ExecuteScalar();
+                        con.Close();
+                        DataRow res = new DataRow(
+                                String.Format("{0}", uniqueColumn), newId
+                            );
+                        res.Error = ERROR.NoError;
+                        return res;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    DataRow error = new DataRow();
+                    error.Error = ERROR.HasError;
+                    return error;
                 }
             });
             return result;

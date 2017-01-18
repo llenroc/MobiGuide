@@ -103,6 +103,15 @@
     </ApplicationDefinition>
     <Compile Include="Class\Properties.cs" />
     <Compile Include="Helper\EventHelper.cs" />
+    <Compile Include="Windows\NewEditTextTemplateWindow.xaml.cs">
+      <DependentUpon>NewEditTextTemplateWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\TextDisplayWindow.xaml.cs">
+      <DependentUpon>TextDisplayWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\TextTemplateWindow.xaml.cs">
+      <DependentUpon>TextTemplateWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\AirportReferenceWindow.xaml.cs">
       <DependentUpon>AirportReferenceWindow.xaml</DependentUpon>
     </Compile>
@@ -139,6 +148,18 @@
     <Compile Include="Windows\NewEditAirportReferenceWindow.xaml.cs">
       <DependentUpon>NewEditAirportReferenceWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Windows\NewEditTextTemplateWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\TextDisplayWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\TextTemplateWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Windows\AirportReferenceWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

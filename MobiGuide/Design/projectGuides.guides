@@ -152,5 +152,27 @@
         </GuideModel>
       </GuideModels>
     </ProjectItemGuide>
+    <ProjectItemGuide TargetFile="Windows\TextTemplateWindow.xaml">
+      <GuideModels>
+        <GuideModel>
+          <Guides>
+            <Guide Alignment="Left" Position="104" />
+            <Guide Alignment="Left" Position="480" />
+            <Guide Alignment="Left" Position="600" />
+          </Guides>
+        </GuideModel>
+      </GuideModels>
+    </ProjectItemGuide>
+    <ProjectItemGuide TargetFile="Windows\NewEditTextTemplateWindow.xaml">
+      <GuideModels>
+        <GuideModel>
+          <Guides>
+            <Guide Alignment="Left" Position="126" />
+            <Guide Alignment="Left" Position="297" />
+            <Guide Alignment="Left" Position="500" />
+          </Guides>
+        </GuideModel>
+      </GuideModels>
+    </ProjectItemGuide>
   </ProjectItemGuides>
 </ProjectGuidesConfiguration>

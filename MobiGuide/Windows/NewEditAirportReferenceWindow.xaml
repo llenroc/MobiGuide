@@ -64,12 +64,12 @@
                         </DataGridTemplateColumn.CellStyle>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding SelectedLanguageCode}" FontSize="14"/>
+                                <TextBlock Text="{Binding LanguageCode}" FontSize="14"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                         <DataGridTemplateColumn.CellEditingTemplate>
                             <DataTemplate>
-                                <ComboBox Height="auto" ItemsSource="{Binding LanguageList}" SelectedItem="{Binding SelectedLanguageCode, Mode=TwoWay}" Margin="0" FontSize="14" SelectionChanged="ComboBox_SelectionChanged" />
+                                <ComboBox Height="auto" ItemsSource="{Binding LanguageList}" SelectedItem="{Binding LanguageCode, Mode=TwoWay}" Margin="0" FontSize="14" SelectionChanged="ComboBox_SelectionChanged" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellEditingTemplate>
                     </DataGridTemplateColumn>
