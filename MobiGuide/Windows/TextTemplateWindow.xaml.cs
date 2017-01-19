@@ -60,7 +60,7 @@ namespace MobiGuide
                         TextDisplay = row.Get("TextTemplate").ToString(),
                         Status = row.Get("StatusCode").ToString(),
                         RotateInSeconds = (int)row.Get("RotateInSeconds"),
-                        TextTemplateId = row.Get("TextTemplateId").ToString()
+                        TextTemplateId = (Guid)row.Get("TextTemplateId")
                     };
                     _itemSource.Add(textTemplateRef);
                 }
@@ -81,14 +81,17 @@ namespace MobiGuide
 
         private void editBtn_Click(object sender, RoutedEventArgs e)
         {
-            //int indexOfSelectedItem = (sender as DataGrid).SelectedIndex;
-            //string textName = (textTemplateDataGrid.SelectedItem as AirportReference).TextName;
-            //NewEditAirportReferenceWindow editAirportReferenceWindow = new NewEditAirportReferenceWindow(textName);
-            //editAirportReferenceWindow.ShowDialog();
-            //if (editAirportReferenceWindow.DialogResult.HasValue && editAirportReferenceWindow.DialogResult.Value)
-            //{
-            //    DoSearch();
-            //}
+            int indexOfSelectedItem = textTemplateDataGrid.SelectedIndex;
+            if (indexOfSelectedItem > -1)
+            {
+                Guid textTemplateId = (textTemplateDataGrid.SelectedItem as TextTemplate).TextTemplateId;
+                NewEditTextTemplateWindow editTextTemplateWindow = new NewEditTextTemplateWindow(textTemplateId);
+                editTextTemplateWindow.ShowDialog();
+                if (editTextTemplateWindow.DialogResult.HasValue && editTextTemplateWindow.DialogResult.Value)
+                {
+                    DoSearch();
+                }
+            }
         }
 
         private void textTemplateDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -108,13 +111,17 @@ namespace MobiGuide
 
         private void textTemplateDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            //int indexOfSelectedItem = (sender as DataGrid).SelectedIndex;
-            //string textName = ((sender as DataGrid).SelectedItem as AirportReference).TextName;
-            //NewEditAirportReferenceWindow editAirportReferenceWindow = new NewEditAirportReferenceWindow(textName);
-            //editAirportReferenceWindow.ShowDialog();
-            //if (editAirportReferenceWindow.DialogResult.HasValue && editAirportReferenceWindow.DialogResult.Value) {
-            //    DoSearch();
-            //}
+            int indexOfSelectedItem = (sender as DataGrid).SelectedIndex;
+            if(indexOfSelectedItem > -1)
+            {
+                Guid textTemplateId = (textTemplateDataGrid.SelectedItem as TextTemplate).TextTemplateId;
+                NewEditTextTemplateWindow editTextTemplateWindow = new NewEditTextTemplateWindow(textTemplateId);
+                editTextTemplateWindow.ShowDialog();
+                if (editTextTemplateWindow.DialogResult.HasValue && editTextTemplateWindow.DialogResult.Value)
+                {
+                    DoSearch();
+                }
+            }
         }
     }
 }

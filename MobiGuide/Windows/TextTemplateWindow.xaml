@@ -20,11 +20,11 @@
             <TextBox x:Name="textTemplateTextBox" TextWrapping="Wrap" Width="376" FontSize="14" VerticalAlignment="Center" Margin="10,7.19,0,7.19"/>
             <Button x:Name="clearBtn" Content="Clear" Width="75" FontSize="14" VerticalAlignment="Center" Margin="120,6,0,6" Click="clearBtn_Click"/>
         </StackPanel>
-        <Grid ScrollViewer.VerticalScrollBarVisibility="Auto" Height="330" Margin="0,10,0,0">
+        <Grid ScrollViewer.VerticalScrollBarVisibility="Auto" Height="330" Margin="10,10,10,0">
             <DataGrid x:Name="textTemplateDataGrid" AutoGenerateColumns="False" d:LayoutOverrides="Width" VerticalAlignment="Top" SelectionUnit="FullRow" 
                       Padding="0" SelectionMode="Single" CanUserAddRows="False" 
                       HorizontalGridLinesBrush="#FFD1D1D1" VerticalGridLinesBrush="#FFD1D1D1" AlternationCount="2" AlternatingRowBackground="#FFEEFFA2" BorderBrush="{x:Null}" BorderThickness="0" IsReadOnly="True" 
-                      SelectionChanged="textTemplateDataGrid_SelectionChanged" MouseDoubleClick="textTemplateDataGrid_MouseDoubleClick">
+                      SelectionChanged="textTemplateDataGrid_SelectionChanged" MouseDoubleClick="textTemplateDataGrid_MouseDoubleClick" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalScrollBarVisibility="Disabled">
                 <DataGrid.CellStyle>
                     <Style TargetType="{x:Type DataGridCell}">
                         <Style.Triggers>

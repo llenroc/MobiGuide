@@ -134,15 +134,6 @@
         </GuideModel>
       </GuideModels>
     </ProjectItemGuide>
-    <ProjectItemGuide TargetFile="Windows\AirportReferenceWindow.xaml">
-      <GuideModels>
-        <GuideModel>
-          <Guides>
-            <Guide Alignment="Left" Position="104" />
-          </Guides>
-        </GuideModel>
-      </GuideModels>
-    </ProjectItemGuide>
     <ProjectItemGuide TargetFile="Windows\NewEditAirportReferenceWindow.xaml">
       <GuideModels>
         <GuideModel>
@@ -163,6 +154,15 @@
         </GuideModel>
       </GuideModels>
     </ProjectItemGuide>
+    <ProjectItemGuide TargetFile="Windows\AirportReferenceWindow.xaml">
+      <GuideModels>
+        <GuideModel>
+          <Guides>
+            <Guide Alignment="Left" Position="104" />
+          </Guides>
+        </GuideModel>
+      </GuideModels>
+    </ProjectItemGuide>
     <ProjectItemGuide TargetFile="Windows\NewEditTextTemplateWindow.xaml">
       <GuideModels>
         <GuideModel>
@@ -170,6 +170,7 @@
             <Guide Alignment="Left" Position="126" />
             <Guide Alignment="Left" Position="297" />
             <Guide Alignment="Left" Position="500" />
+            <Guide Alignment="Left" Position="10" />
           </Guides>
         </GuideModel>
       </GuideModels>

@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -29,19 +28,19 @@ namespace MobiGuide
     public partial class NewEditTextTemplateWindow : Window
     {
         private STATUS Status { get; set; }
-        private string TextTemplateId { get; set; }
+        private Guid TextTemplateId { get; set; }
         public ObservableCollection<TextTranslation> TextTranslationList { get; set; }
         DBConnector dbCon = new DBConnector();
         protected override void OnSourceInitialized(EventArgs e)
         {
             IconHelper.RemoveIcon(this);
         }
-        public NewEditTextTemplateWindow() : this(null) { }
-        public NewEditTextTemplateWindow(string textTemplateId)
+        public NewEditTextTemplateWindow() : this(Guid.Empty) { }
+        public NewEditTextTemplateWindow(Guid textTemplateId)
         {
             InitializeComponent();
 
-            if (!String.IsNullOrWhiteSpace(textTemplateId))
+            if (textTemplateId != Guid.Empty)
             {
                 this.Status = STATUS.EDIT;
                 this.TextTemplateId = textTemplateId;
@@ -57,12 +56,12 @@ namespace MobiGuide
                 this.Title = "Edit Text Template";
             }
         }
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Active", Value = "A" });
             statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Inactive", Value = "I" });
 
-            // add blank row if new or load current airportTranslation if edit
+            // add blank row if new or load current TextTranslation if edit
             switch (Status)
             {
                 case STATUS.NEW:
@@ -71,22 +70,41 @@ namespace MobiGuide
                     InitializeTextTranslationList();
                     break;
                 case STATUS.EDIT:
-
+                    LoadTextTemplateData();
+                    InitializeTextTranslationList();
                     break;
 
             }
         }
+
+        private async void LoadTextTemplateData()
+        {
+            try
+            {
+                DataRow textTemplate = await dbCon.GetDataRow("TextTemplate", new DataRow("TextTemplateId", TextTemplateId));
+                if(textTemplate.HasData && textTemplate.Error == ERROR.NoError)
+                {
+                    textNameTextBox.Text = textTemplate.Get("TextName").ToString();
+                    textTemplateTextBox.Text = textTemplate.Get("TextTemplate").ToString();
+                    rotateInSecondsUpDown.Value = (int)textTemplate.Get("RotateInSeconds");
+                    statusComboBox.SelectedValue = textTemplate.Get("StatusCode");
+                    commitByTextBlockValue.Text = await dbCon.GetFullNameFromUid(textTemplate.Get("CommitBy").ToString());
+                    commitTimeTextBlockValue.Text = textTemplate.Get("CommitDateTime").ToString();
+                } else
+                {
+                    throw new Exception();
+                }
+            } catch (Exception)
+            {
+                MessageBox.Show("Failed to download Text Template Data", "ERROR");
+                DialogResult = false;
+                this.Close();
+            }
+        }
+
         private void saveBtn_Click(object sender, RoutedEventArgs e)
         {
-            switch (Status)
-            {
-                case STATUS.NEW:
-                    SaveTextTemplateAndTranslations();
-                    break;
-                case STATUS.EDIT:
-                    //UpdateAirportReferenceAndTranslation();
-                    break;
-            }
+            SaveTextTemplateAndTranslations();
         }
 
         private async void SaveTextTemplateAndTranslations()
@@ -114,27 +132,78 @@ namespace MobiGuide
                     "CommitBy", Application.Current.Resources["UserAccountId"],
                     "CommitDateTime", DateTime.Now
                 );
-            DataRow result = await dbCon.CreateNewRowAndGetUId("TextTemplate", textTemplate, "TextTemplateId");
-            if (result.HasData && result.Error == ERROR.NoError)
+            try
             {
-                foreach(TextTranslation tt in TextTranslationList)
+                if (Status == STATUS.NEW)
                 {
-                    DataRow textTranslation = new DataRow(
-                            "TextTemplateId", result.Get("TextTemplateId"),
-                            "LanguageCode", tt.LanguageCode,
-                            "TextTemplate", tt.TextTemplate,
-                            "CommitBy", Application.Current.Resources["UserAccountId"],
-                            "CommitDateTime", DateTime.Now
-                        );
-                    await dbCon.CreateNewRow("TextTranslation", textTranslation, "TextTranslationId");
+                    DataRow result = await dbCon.CreateNewRowAndGetUId("TextTemplate", textTemplate, "TextTemplateId");
+                    if (result.HasData && result.Error == ERROR.NoError)
+                    {
+                        foreach (TextTranslation tt in TextTranslationList)
+                        {
+                            DataRow textTranslation = new DataRow(
+                                    "TextTemplateId", result.Get("TextTemplateId"),
+                                    "LanguageCode", tt.LanguageCode,
+                                    "TextTemplate", tt.TextTemplate,
+                                    "CommitBy", Application.Current.Resources["UserAccountId"],
+                                    "CommitDateTime", DateTime.Now
+                                );
+                            await dbCon.CreateNewRow("TextTranslation", textTranslation, "TextTranslationId");
+                        }
+                        MessageBox.Show("Create Text Template Successfully.", "SUCCESS");
+                        DialogResult = true;
+                        this.Close();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to create Text Template.", "ERROR");
+                        saveBtn.IsEnabled = true;
+                    }
                 }
-                MessageBox.Show("Create Text Template Successfully.", "SUCCESS");
-                DialogResult = true;
-                this.Close();
-            } else
+                else
+                {
+                    bool result = await dbCon.UpdateDataRow("TextTemplate", textTemplate, new DataRow("TextTemplateId", TextTemplateId));
+                    if (result)
+                    {
+                        foreach (TextTranslation tt in TextTranslationList)
+                        {
+                            if (tt.TextTranslationId != Guid.Empty)
+                            {
+                                DataRow textTranslation = new DataRow(
+                                    "LanguageCode", tt.LanguageCode,
+                                    "TextTemplate", tt.TextTemplate,
+                                    "CommitBy", Application.Current.Resources["UserAccountId"],
+                                    "CommitDateTime", DateTime.Now
+                                );
+                                await dbCon.UpdateDataRow("TextTranslation", textTranslation, new DataRow("TextTranslationId", tt.TextTranslationId, "TextTemplateId", tt.TextTemplateId));
+                            }
+                            else
+                            {
+                                DataRow textTranslation = new DataRow(
+                                    "TextTemplateId", TextTemplateId,
+                                    "LanguageCode", tt.LanguageCode,
+                                    "TextTemplate", tt.TextTemplate,
+                                    "CommitBy", Application.Current.Resources["UserAccountId"],
+                                    "CommitDateTime", DateTime.Now
+                                );
+                                await dbCon.CreateNewRow("TextTranslation", textTranslation, "TextTranslationId");
+                            }
+                        }
+                        MessageBox.Show("Update Text Template Successfully.", "SUCCESS");
+                        DialogResult = true;
+                        this.Close();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to update Text Template.", "ERROR");
+                        saveBtn.IsEnabled = true;
+                    }
+                }
+            } catch (Exception)
             {
-                MessageBox.Show("Failed to create Text Template.", "ERROR");
-                saveBtn.IsEnabled = true;
+                MessageBox.Show("Failed to create/update Text Template and Translation", "ERROR");
+                DialogResult = false;
+                this.Close();
             }
         }
         private async void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -180,6 +249,7 @@ namespace MobiGuide
                                 textTransDataGrid.CancelEdit();
                             }
                         }
+                        textTransDataGrid.SelectedIndex = -1;
                     }
                 }
             }
@@ -226,27 +296,75 @@ namespace MobiGuide
             TextTranslationList = new ObservableCollection<TextTranslation>();
             TextTranslationList.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(TextTranslationList_CollectionChanged);
             textTransDataGrid.ItemsSource = TextTranslationList;
-            TextTranslation tt = new TextTranslation();
-            tt.LanguageList = await LoadLanguageList();
+
+            //Add existing translation to datagrid
+            //Add uncommit language translation to last row as a combobox itemssource
+            TextTranslation tt;
+            List<string> excepts = new List<string>();
+            if(Status == STATUS.EDIT)
+            {
+                DataList list = await dbCon.GetDataList("TextTranslation", new DataRow("TextTemplateId", TextTemplateId));
+                if(list.HasData && list.Error == ERROR.NoError)
+                {
+                    foreach(DataRow row in list)
+                    {
+                        tt = new TextTranslation
+                        {
+                            TextTranslationId = (Guid)row.Get("TextTranslationId"),
+                            TextTemplateId = (Guid)row.Get("TextTemplateId"),
+                            LanguageCode = row.Get("LanguageCode").ToString(),
+                            LanguageName = (await dbCon.GetDataRow("LanguageReference", 
+                                new DataRow("LanguageCode", row.Get("LanguageCode").ToString()))).Get("LanguageName").ToString(),
+                            TextTemplate = row.Get("TextTemplate").ToString(),
+                            IsEnabled = false
+                        };
+                        TextTranslationList.Add(tt);
+                        excepts.Add(row.Get("LanguageCode").ToString());
+                    }
+                }
+            }
+            tt = new TextTranslation();
+            tt.LanguageList = await LoadLanguageList(excepts.ToArray());
             if (tt.LanguageList.Count > 0) TextTranslationList.Add(tt);
         }
 
         private void textTransDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            TextTranslation selectedItem = (sender as DataGrid).SelectedItem as TextTranslation;
-            int indexOfSelectedItem = TextTranslationList.IndexOf(selectedItem);
+            EditDisplayText();
+        }
 
-            if(indexOfSelectedItem > -1 && !String.IsNullOrWhiteSpace(selectedItem.LanguageCode))
+        private void editBtn_Click(object sender, RoutedEventArgs e)
+        {
+            EditDisplayText();
+        }
+
+        private void EditDisplayText()
+        {
+            int indexOfSelectedItem = textTransDataGrid.SelectedIndex;
+
+            if (indexOfSelectedItem > -1 && !String.IsNullOrWhiteSpace((textTransDataGrid.SelectedItem as TextTranslation).LanguageCode))
             {
                 TextTranslation tt = TextTranslationList[indexOfSelectedItem] as TextTranslation;
                 TextDisplayWindow textDisplayWindow = new TextDisplayWindow(tt.LanguageCode, tt.LanguageName, tt.TextTemplate);
                 textDisplayWindow.ShowDialog();
-                if(textDisplayWindow.DialogResult.HasValue && textDisplayWindow.DialogResult.Value)
+                if (textDisplayWindow.DialogResult.HasValue && textDisplayWindow.DialogResult.Value)
                 {
                     string textTemplate = textDisplayWindow.DisplayText;
                     TextTranslationList[indexOfSelectedItem].TextTemplate = textTemplate;
+                } else
+                {
+                    textTransDataGrid.SelectedIndex = -1;
                 }
             }
+        }
+
+        private void textTransDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if ((sender as DataGrid).SelectedIndex > -1 && !String.IsNullOrWhiteSpace((textTransDataGrid.SelectedItem as TextTranslation).LanguageCode))
+            {
+                editBtn.IsEnabled = true;
+            }
+            else editBtn.IsEnabled = false;
         }
     }
 }

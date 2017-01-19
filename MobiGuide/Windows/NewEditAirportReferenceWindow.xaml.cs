@@ -170,7 +170,7 @@ namespace MobiGuide
                 foreach(DataRow row in atList)
                 {
                     at = new AirportTranslation();
-                    at.AirportTranslationId = row.Get("AirportTranslationId").ToString();
+                    at.AirportTranslationId = (Guid)row.Get("AirportTranslationId");
                     at.AirportName = row.Get("AirportName").ToString();
                     at.LanguageCode = row.Get("LanguageCode").ToString();
                     at.LanguageName = (await dbCon.GetDataRow("LanguageReference", 

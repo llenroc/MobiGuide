@@ -64,14 +64,14 @@ namespace Properties
     public abstract class LanguageTranslation : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        private string _translationId;
+        private Guid _translationId;
         private string _languageCode;
         private List<string> _languageList;
         private string _languageName;
         private string _display;
         private bool _isEnabled;
 
-        public string TranslationId
+        public Guid TranslationId
         {
             get { return _translationId; }
             set
@@ -128,7 +128,7 @@ namespace Properties
         }
         public LanguageTranslation()
         {
-            this._translationId = String.Empty;
+            this._translationId = Guid.Empty;
             this._languageName = String.Empty;
             this._display = String.Empty;
             this._languageList = new List<string>();
@@ -146,7 +146,7 @@ namespace Properties
     public class AirportTranslation : LanguageTranslation
     {
         public AirportTranslation() : base() { }
-        public string AirportTranslationId
+        public Guid AirportTranslationId
         {
             get { return base.TranslationId; }
             set
@@ -165,8 +165,8 @@ namespace Properties
     }
     public class TextTranslation : LanguageTranslation
     {
-        private string _textTemplateId;
-        public string TextTemplateId
+        private Guid _textTemplateId;
+        public Guid TextTemplateId
         {
             get { return this._textTemplateId; }
             set
@@ -175,7 +175,7 @@ namespace Properties
                 OnPropertyChanged("TextTemplateId");
             }
         }
-        public string TextTranslationId
+        public Guid TextTranslationId
         {
             get { return base.TranslationId; }
             set
@@ -202,8 +202,8 @@ namespace Properties
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public TextTemplate(){ }
-        private string _textTemplateId;
-        public string TextTemplateId
+        private Guid _textTemplateId;
+        public Guid TextTemplateId
         {
             get { return _textTemplateId; }
             set
