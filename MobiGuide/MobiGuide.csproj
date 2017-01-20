@@ -103,11 +103,20 @@
     </ApplicationDefinition>
     <Compile Include="Class\Properties.cs" />
     <Compile Include="Helper\EventHelper.cs" />
+    <Compile Include="Windows\AircraftConfigurationWindow.xaml.cs">
+      <DependentUpon>AircraftConfigurationWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\NewEditAircraftTypeWindow.xaml.cs">
+      <DependentUpon>NewEditAircraftTypeWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\NewEditTextTemplateWindow.xaml.cs">
       <DependentUpon>NewEditTextTemplateWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\TextDisplayWindow.xaml.cs">
       <DependentUpon>TextDisplayWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\AircraftTypeWindow.xaml.cs">
+      <DependentUpon>AircraftTypeWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\TextTemplateWindow.xaml.cs">
       <DependentUpon>TextTemplateWindow.xaml</DependentUpon>
@@ -148,6 +157,14 @@
     <Compile Include="Windows\NewEditAirportReferenceWindow.xaml.cs">
       <DependentUpon>NewEditAirportReferenceWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Windows\AircraftConfigurationWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\NewEditAircraftTypeWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Windows\NewEditTextTemplateWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -155,6 +172,10 @@
     <Page Include="Windows\TextDisplayWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\AircraftTypeWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Windows\TextTemplateWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

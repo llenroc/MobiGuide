@@ -149,5 +149,17 @@ namespace MobiGuide
             TextTemplateWindow textTemplateWindow = new TextTemplateWindow();
             textTemplateWindow.ShowDialog();
         }
+
+        private void AircraftType_Click(object sender, RoutedEventArgs e)
+        {
+            AircraftTypeWindow aircraftTypeWindow = new AircraftTypeWindow();
+            aircraftTypeWindow.ShowDialog();
+        }
+
+        private void AircraftConfiguration_Click(object sender, RoutedEventArgs e)
+        {
+            AircraftConfigurationWindow aircraftConfigurationWindow = new AircraftConfigurationWindow();
+            aircraftConfigurationWindow.ShowDialog();
+        }
     }
 }

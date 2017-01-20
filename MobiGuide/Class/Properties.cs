@@ -8,41 +8,31 @@ using CustomExtensions;
 
 namespace Properties
 {
-    public class AirportReference
+    //abstract properties
+    public abstract class Reference : INotifyPropertyChanged
     {
-        private string _airportCode;
-        private string _airportName;
+        public event PropertyChangedEventHandler PropertyChanged;
+        private string _code;
+        private string _name;
         private string _status;
-        public AirportReference() : this(String.Empty, String.Empty, String.Empty)
+        public string Code
         {
-        }
-        public AirportReference(string airportCode, string airportName, string statusCode)
-        {
-            _airportCode = airportCode;
-            _airportName = airportName;
-            switch (statusCode)
+            get { return _code; }
+            set
             {
-                case "A":
-                    _status = "Active";
-                    break;
-                case "I":
-                    _status = "Inactive";
-                    break;
+                _code = value;
+                OnPropertyChanged("Code");
             }
         }
-        public string AirportCode
+        public string Name
         {
-            get { return _airportCode; }
-            set { _airportCode = value; }
+            get { return _name; }
+            set
+            {
+                _name = value;
+                OnPropertyChanged("Name");
+            }
         }
-        public string AirportName
-        {
-            get { return _airportName; }
-            set { _airportName = value; }
-        }
-
-        public string SeletedLanguageCode { get; internal set; }
-
         public string Status
         {
             get { return _status; }
@@ -57,9 +47,17 @@ namespace Properties
                         _status = "Inactive";
                         break;
                 }
+                OnPropertyChanged("Status");
             }
         }
-
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
     }
     public abstract class LanguageTranslation : INotifyPropertyChanged
     {
@@ -142,6 +140,32 @@ namespace Properties
                 handler(this, new PropertyChangedEventArgs(name));
             }
         }
+    }
+
+    public class AirportReference : Reference
+    {
+        public AirportReference() : this(String.Empty, String.Empty, String.Empty)
+        {
+        }
+        public AirportReference(string airportCode, string airportName, string statusCode)
+        {
+            base.Code = airportCode;
+            base.Name = airportName;
+            base.Status = statusCode;
+        }
+        public string AirportCode
+        {
+            get { return base.Code; }
+            set { base.Code = value; }
+        }
+        public string AirportName
+        {
+            get { return base.Name; }
+            set { base.Name = value; }
+        }
+
+        public string SeletedLanguageCode { get; internal set; }
+
     }
     public class AirportTranslation : LanguageTranslation
     {
@@ -288,6 +312,156 @@ namespace Properties
             if (handler != null)
             {
                 handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+    }
+    public class AircraftType : Reference
+    {
+        public string AircraftTypeCode
+        {
+            get { return base.Code;}
+            set
+            {
+                base.Code = value;
+                OnPropertyChanged("AircraftTypeCode");
+            }
+        }
+        public string AircraftTypeName
+        {
+            get { return base.Name; }
+            set
+            {
+                base.Name = value;
+                OnPropertyChanged("AircraftTypeName");
+            }
+        }
+        public string Status
+        {
+            get { return base.Status; }
+            set
+            {
+                base.Status = value;
+                OnPropertyChanged("Status");
+            }
+        }
+    }
+    public class AircraftConfiguration : Reference
+    {
+        private Guid _id;
+        private string _airlineCode;
+        private AircraftType _aircraftType;
+        private int _aisleX;
+        private bool _frontDoorBoardingFlag;
+        private bool _rearDoorBoardingFlag;
+        private int _frontDoorX;
+        private int _frontDoorY;
+        private int _rearDoorX;
+        private int _rearDoorY;
+        public Guid AircraftConfigurationId
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                OnPropertyChanged("AircraftConfigurationId");
+            }
+        }
+        public AircraftType AircraftType
+        {
+            get { return _aircraftType; }
+            set
+            {
+                _aircraftType = value;
+                OnPropertyChanged("AircraftType");
+            }
+        }
+        public string AirlineCode
+        {
+            get { return _airlineCode; }
+            set
+            {
+                _airlineCode = value;
+            }
+        }
+        public string AircraftConfigurationCode
+        {
+            get { return base.Code; }
+            set
+            {
+                base.Code = value;
+                OnPropertyChanged("AircraftConfigurationCode");
+            }
+        }
+        public string AircraftConfigurationName
+        {
+            get { return base.Name; }
+            set
+            {
+                base.Name = value;
+                OnPropertyChanged("AircraftConfigurationName");
+            }
+        }
+        public int AisleX
+        {
+            get { return _aisleX; }
+            set
+            {
+                _aisleX = value;
+                OnPropertyChanged("AisleX");
+            }
+        }
+        public bool FrontDoorBoardingFlag
+        {
+            get { return _frontDoorBoardingFlag; }
+            set
+            {
+                _frontDoorBoardingFlag = value;
+                OnPropertyChanged("FrontDoorBoardingFlag");
+            }
+        }
+        public bool RearDoorBoardingFlag
+        {
+            get { return _rearDoorBoardingFlag; }
+            set
+            {
+                _rearDoorBoardingFlag = value;
+                OnPropertyChanged("RearDoorBoardingFlag");
+            }
+        }
+        public int FrontDoorX
+        {
+            get { return _frontDoorX; }
+            set
+            {
+                _frontDoorX = value;
+                OnPropertyChanged("FrontDoorX");
+            }
+        }
+        public int FrontDoorY
+        {
+            get { return _frontDoorY; }
+            set
+            {
+                _frontDoorY = value;
+                OnPropertyChanged("FrontDoorY");
+            }
+        }
+        public int RearDoorX
+        {
+            get { return _rearDoorX; }
+            set
+            {
+                _rearDoorX = value;
+                OnPropertyChanged("RearDoorX");
+            }
+        }
+        public int RearDoorY
+        {
+            get { return _rearDoorY; }
+            set
+            {
+                _rearDoorY = value;
+                OnPropertyChanged("RearDoorY");
             }
         }
     }

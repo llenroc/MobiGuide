@@ -16,15 +16,10 @@
             <MenuItem Header="Airline" Height="25">
                 <MenuItem x:Name="EditAirlineReferenceMenuItem" Header="Edit Airline Reference" Click="EditAirlineReferenceMenuItem_Click"/>
             </MenuItem>
-            <MenuItem x:Name="AirportMenuItem" Header="Airports" Click="AirportMenuItem_Click">
-                <!--<MenuItem x:Name="AirportReferenceMenuItem" Header="Reference">
-                    <MenuItem x:Name="AddAirportReferenceMenuItem" Header="Add" Click="AddAirportReferenceMenuItem_Click"/>
-                    <MenuItem x:Name="EditAirportReferenceMenuItem" Header="Edit" Click="EditAirportReferenceMenuItem_Click"/>
-                </MenuItem>
-                <MenuItem x:Name="AirportTranslation" Header="Translation">
-                    <MenuItem x:Name="AddAirportTranslationMenuItem" Header="Add" Click="AddAirportTranslationMenuItem_Click"/>
-                    <MenuItem x:Name="EditAirportTranslationMenuItem" Header="Edit" Click="EditAirportTranslationMenuItem_Click"/>
-                </MenuItem>-->
+            <MenuItem x:Name="AirportMenuItem" Header="Airports" Click="AirportMenuItem_Click"/>
+            <MenuItem x:Name="Aircraft" Header="Aircraft">
+                <MenuItem x:Name="AircraftConfiguration" Header="Aircraft Configuration" Click="AircraftConfiguration_Click"/>
+                <MenuItem x:Name="AircraftType" Header="Aircraft Type" Click="AircraftType_Click"/>
             </MenuItem>
             <MenuItem x:Name="TextTemplate" Header="Text Template" Click="TextTemplate_Click"/>
         </Menu>

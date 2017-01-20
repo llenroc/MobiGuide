@@ -67,3 +67,9 @@ C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuid
 C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\MobiGuide.csprojResolveAssemblyReference.cache
 C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\TextDisplayWindow.g.cs
 C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\TextDisplayWindow.baml
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\AircraftTypeWindow.g.cs
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\AircraftTypeWindow.baml
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\NewEditAircraftTypeWindow.g.cs
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\NewEditAircraftTypeWindow.baml
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\AircraftConfigurationWindow.g.cs
+C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\obj\Debug\Windows\AircraftConfigurationWindow.baml
