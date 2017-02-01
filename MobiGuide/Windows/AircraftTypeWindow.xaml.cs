@@ -58,7 +58,7 @@ namespace MobiGuide
                     {
                         AircraftTypeCode = row.Get("AircraftTypeCode").ToString(),
                         AircraftTypeName = row.Get("AircraftTypeName").ToString(),
-                        Status = row.Get("StatusCode").ToString()
+                        StatusCode = row.Get("StatusCode").ToString()
                     };
                     _itemSource.Add(aircraftType);
                 }

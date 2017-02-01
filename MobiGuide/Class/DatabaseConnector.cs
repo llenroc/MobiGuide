@@ -177,6 +177,43 @@ namespace DatabaseConnector
         {
             connectionString = ConfigurationManager.ConnectionStrings["DatabaseConnectionString"].ConnectionString;
         }
+        public async Task<DataRow> GetDataRow(string Query)
+        {
+            DataRow result = await Task.Run(() =>
+            {
+                try
+                {
+                    using (SqlConnection con = new SqlConnection(connectionString))
+                    {
+                        SqlCommand cmd = new SqlCommand(Query, con);
+                        con.Open();
+                        DataRow row = new DataRow();
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.HasRows)
+                            {
+                                while (reader.Read())
+                                {
+                                    for (int i = 0; i < reader.FieldCount; i++)
+                                    {
+                                        row.Set(reader.GetName(i), reader.GetValue(i));
+                                    }
+                                }
+                            }
+                        }
+                        row.Error = ERROR.NoError;
+                        return row;
+                    }
+                }
+                catch (Exception)
+                {
+                    DataRow row = new DataRow();
+                    row.Error = ERROR.HasError;
+                    return row;
+                }
+            });
+            return result;
+        }
         public async Task<DataRow> GetDataRow(string tableName, DataRow conditions)
         {
             return await GetDataRow(tableName, conditions, null);
@@ -221,7 +258,7 @@ namespace DatabaseConnector
                         return row;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     DataRow row = new DataRow();
                     row.Error = ERROR.HasError;
@@ -279,7 +316,7 @@ namespace DatabaseConnector
                         return dataList;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     DataList list = new DataList();
                     list.Error = ERROR.HasError;
@@ -333,7 +370,7 @@ namespace DatabaseConnector
                         cmd.ExecuteNonQuery();
                         return true;
                     }
-                } catch (Exception ex)
+                } catch (Exception)
                 {
                     return false;
                 }
@@ -368,7 +405,7 @@ namespace DatabaseConnector
                         con.Close();
                     }
                     return true;
-                } catch (Exception ex)
+                } catch (Exception)
                 {
                     return false;
                 }
@@ -428,7 +465,7 @@ namespace DatabaseConnector
                         con.Close();
                         return true;
                     }
-                } catch (Exception ex)
+                } catch (Exception)
                 {
                     return false;
                 }
@@ -493,7 +530,7 @@ namespace DatabaseConnector
                         return res;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     DataRow error = new DataRow();
                     error.Error = ERROR.HasError;
@@ -540,6 +577,17 @@ namespace DatabaseConnector
                                     DataList error = new DataList();
                                     error.Error = ERROR.HasError;
                                     return error;
+                                }
+                            case (SQLStatementType.DELETE):
+                                try
+                                {
+                                    cmd.ExecuteNonQuery();
+                                    con.Close();
+                                    return true;
+                                }
+                                catch (Exception)
+                                {
+                                    return false;
                                 }
                             default:
                                 return true;

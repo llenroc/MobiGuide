@@ -72,7 +72,7 @@ namespace CustomExtensions
                     return imgSrc;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }

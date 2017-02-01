@@ -42,7 +42,7 @@ namespace MobiGuide
             try
             {
                 displayInfo();
-            } catch (Exception ex){
+            } catch (Exception){
                 MessageBox.Show("Unexpected Error Occurred! Please contact Administator.", "Error");
                 this.Close();
             }

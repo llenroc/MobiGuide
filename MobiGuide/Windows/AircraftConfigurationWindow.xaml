@@ -24,33 +24,31 @@
             <TextBlock x:Name="textBlock1" TextWrapping="Wrap" Text="Status" VerticalAlignment="Center" FontSize="14" Margin="30,8.19,0,8.19"/>
             <ComboBox x:Name="statusComboBox" Width="130" SelectedIndex="0" VerticalAlignment="Center" FontSize="14" Margin="10,5.19,0,5.19" SelectedValuePath="Value"/>
         </StackPanel>
-        <Grid ScrollViewer.VerticalScrollBarVisibility="Auto" Height="330" Margin="10,10,10,0">
-            <DataGrid x:Name="aircraftConfigDataGrid" AutoGenerateColumns="False" d:LayoutOverrides="Width" VerticalAlignment="Top" SelectionUnit="FullRow" 
+        <Border BorderBrush="{DynamicResource {x:Static SystemColors.MenuBrushKey}}" BorderThickness="1" HorizontalAlignment="Left" Height="330" d:LayoutOverrides="LeftPosition, RightPosition, TopPosition, BottomPosition" Margin="10,10,10,0">
+            <Grid ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="0" Width="674">
+                <DataGrid x:Name="aircraftConfigDataGrid" AutoGenerateColumns="False" d:LayoutOverrides="Width" VerticalAlignment="Top" SelectionUnit="FullRow" 
                       Padding="0" SelectionMode="Single" CanUserAddRows="False" 
-                      HorizontalGridLinesBrush="#FFD1D1D1" VerticalGridLinesBrush="#FFD1D1D1" AlternationCount="2" AlternatingRowBackground="#FFEEFFA2" BorderBrush="{x:Null}" BorderThickness="0" IsReadOnly="True" 
-                      HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalScrollBarVisibility="Disabled">
-                <DataGrid.CellStyle>
-                    <Style TargetType="{x:Type DataGridCell}">
-                        <Style.Triggers>
-                            <Trigger Property="DataGridCell.IsSelected" Value="True">
-                                <Setter Property="BorderBrush">
-                                    <Setter.Value>
-                                        <SolidColorBrush Color="Transparent"/>
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter Property="BorderThickness" Value="0"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </DataGrid.CellStyle>
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Code" Binding="{Binding AircraftConfigurationCode}" Width="80" FontSize="14"/>
-                    <DataGridTextColumn Header="Configuration Name" Binding="{Binding AircraftConfigurationName}" Width="*" FontSize="14"/>
-                    <DataGridTextColumn Header="Aircraft Type" Binding="{Binding Path=AircraftType.AircraftTypeName}" Width="150" FontSize="14"/>
-                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100" FontSize="14" CanUserResize="False"/>
-                </DataGrid.Columns>
-            </DataGrid>
-        </Grid>
+                      HorizontalGridLinesBrush="#FFD1D1D1" VerticalGridLinesBrush="#FFD1D1D1" AlternationCount="2" AlternatingRowBackground="#FFEEFFA2" BorderThickness="0" IsReadOnly="True" 
+                      HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalScrollBarVisibility="Disabled" SelectionChanged="aircraftConfigDataGrid_SelectionChanged" MouseDoubleClick="aircraftConfigDataGrid_MouseDoubleClick">
+                    <DataGrid.CellStyle>
+                        <Style TargetType="{x:Type DataGridCell}">
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="BorderBrush" Value="Transparent"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.CellStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Code" Binding="{Binding AircraftConfigurationCode}" Width="80" FontSize="14"/>
+                        <DataGridTextColumn Header="Configuration Name" Binding="{Binding AircraftConfigurationName}" Width="*" FontSize="14"/>
+                        <DataGridTextColumn Header="Aircraft Type" Binding="{Binding AircraftType.AircraftTypeName}" Width="150" FontSize="14"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100" FontSize="14" CanUserResize="False"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
         <StackPanel Height="45" Orientation="Horizontal">
             <Button x:Name="newBtn" Content="New" Width="75" FontSize="14" VerticalAlignment="Center" Margin="10,0,0,0" Click="newBtn_Click"/>
             <Button x:Name="editBtn" Content="Edit" Width="75" FontSize="14" VerticalAlignment="Center" Margin="10,0,0,0" Click="editBtn_Click" IsEnabled="False"/>

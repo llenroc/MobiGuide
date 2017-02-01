@@ -1,0 +1,156 @@
+﻿<Page
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:MobiGuide"
+      xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit" x:Class="MobiGuide.NewEditAircraftConfigurationPage3"
+      mc:Ignorable="d"
+      Title="NewEditAircraftConfigurationPage1" Loaded="Page_Loaded" >
+
+    <StackPanel Margin="0">
+        <GroupBox Margin="10,0" FontSize="14" FontWeight="Bold" d:LayoutOverrides="LeftPosition, RightPosition" VerticalAlignment="Top">
+            <GroupBox.Header>Seat Map Design</GroupBox.Header>
+            <StackPanel Margin="0">
+                <TextBlock x:Name="editingDetailTextBlock" FontWeight="Normal" Foreground="Red" Margin="10,10,0,0" Visibility="Hidden"/>
+                <StackPanel Orientation="Horizontal">
+                    <Grid x:Name="imgMainGrid" Margin="0" VerticalAlignment="Top" HorizontalAlignment="Left">
+                        <Border x:Name="imgBorder" BorderThickness="1" BorderBrush="#FFD1D0D0" HorizontalAlignment="Left" d:LayoutOverrides="Height" Margin="0,10,0,0" VerticalAlignment="Top">
+                            <Canvas x:Name="imgCanvas" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                <Image x:Name="seatMapImage" Canvas.Left="0" Canvas.Top="0"/>
+                            </Canvas>
+                        </Border>
+                    </Grid>
+                    <StackPanel x:Name="detailGrid" Margin="10,10,0,0">
+                        <GroupBox x:Name="groupBox1" Header="Row" Margin="0">
+                            <StackPanel Margin="10,5,0,0" Orientation="Horizontal" d:LayoutOverrides="Width">
+                                <TextBlock x:Name="textBlock" TextWrapping="Wrap" Text="Number of Row(s)" FontWeight="Normal" Margin="0" d:LayoutOverrides="Width"/>
+                                <xctk:IntegerUpDown x:Name="numOfRowsUpDown" Margin="10,0,0,0"  Minimum="1" Maximum="99"  FontWeight="Normal" ValueChanged="numOfRowsUpDown_ValueChanged" GotFocus="numOfRowsUpDown_GotFocus"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox x:Name="groupBox2" Header="Column" Margin="0,10,0,0">
+                            <StackPanel>
+                                <StackPanel Margin="10,10,0,0" Orientation="Horizontal" d:LayoutOverrides="Width">
+                                    <TextBlock x:Name="textBlock_Copy1" TextWrapping="Wrap" Text="Number of Column(s) on the left of Aisle X" FontWeight="Normal" Margin="3,0,0,0"/>
+                                    <xctk:IntegerUpDown x:Name="numOfColLeftUpDown" Margin="20,0,0,0" Minimum="1" Maximum="99"  FontWeight="Normal" GotFocus="numOfColLeftUpDown_GotFocus"/>
+                                </StackPanel>
+                                <StackPanel Margin="10,10,0,0" Orientation="Horizontal" d:LayoutOverrides="Width">
+                                    <TextBlock x:Name="textBlock_Copy2" TextWrapping="Wrap" Text="Number of Column(s) on the right of Aisle X" FontWeight="Normal" Margin="3,0,0,0"/>
+                                    <xctk:IntegerUpDown x:Name="numOfColRightUpDown" Margin="10,0,0,0" Minimum="1" Maximum="99"  FontWeight="Normal" GotFocus="numOfColRightUpDown_GotFocus"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox x:Name="groupBox" Header="Aisle X" Margin="0,10,0,0">
+                            <StackPanel Margin="10,5,0,0" Orientation="Horizontal">
+                                <TextBlock x:Name="textBlock1" TextWrapping="Wrap" Text="Position" FontWeight="Normal" Margin="0" d:LayoutOverrides="Width"/>
+                                <xctk:DoubleUpDown x:Name="aisleXPosUpDown" Margin="10,0,0,0" FontWeight="Normal" Minimum="0" Increment="0.1" FormatString="F1" ValueChanged="aisleXPosUpDown_ValueChanged" Width="66" GotFocus="AisleAdjust_GotFocus" LostFocus="AisleAdjust_LostFocus" Focusable="True"/>
+                                <TextBlock x:Name="textBlock1_Copy" TextWrapping="Wrap" Text="Width" FontWeight="Normal" Margin="20,0,0,0"/>
+                                <xctk:DoubleUpDown x:Name="aisleXWidthUpDown" Margin="10,0,0,0" FontWeight="Normal" Minimum="0.1" Increment="0.1" FormatString="F1" ValueChanged="aisleXWidthUpDown_ValueChanged" Width="60" GotFocus="AisleAdjust_GotFocus" LostFocus="AisleAdjust_LostFocus" Focusable="True"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox x:Name="groupBox_Copy" Header="Main Exit" Margin="0,10,0,0">
+                            <StackPanel Margin="0">
+                                <StackPanel Margin="10,5,0,0" Orientation="Horizontal">
+                                    <TextBlock x:Name="textBlock11" TextWrapping="Wrap" Text="Front   X :" FontWeight="Normal" Margin="0" d:LayoutOverrides="Width"/>
+                                    <xctk:DoubleUpDown x:Name="frontDoorXPosUpDown" Margin="10,0,0,0" FontWeight="Normal" Minimum="0" Increment="0.1" FormatString="F1" ValueChanged="frontDoorXPosUpDown_ValueChanged" Width="66" GotFocus="frontDoor_GotFocus" LostFocus="frontDoor_LostFocus" Focusable="True"/>
+                                    <TextBlock x:Name="textBlock11_Copy" TextWrapping="Wrap" Text="Y : " FontWeight="Normal" Margin="20,0,0,0"/>
+                                    <xctk:DoubleUpDown x:Name="frontDoorYPosUpDown" Margin="10,0,0,0" FontWeight="Normal" Minimum="0" Increment="0.1" FormatString="F1" ValueChanged="frontDoorYPosUpDown_ValueChanged" Width="66" GotFocus="frontDoor_GotFocus" LostFocus="frontDoor_LostFocus"  Focusable="True"/>
+                                    <TextBlock x:Name="textBlock1_Copy12" TextWrapping="Wrap" Text="Width" FontWeight="Normal" Margin="20,0,0,0"/>
+                                    <xctk:DoubleUpDown x:Name="frontDoorWidthUpDown" Margin="10,0,0,0" FontWeight="Normal" Minimum="0.1" Increment="0.1" FormatString="F1" ValueChanged="frontDoorWidthUpDown_ValueChanged" Width="60" GotFocus="frontDoor_GotFocus" LostFocus="frontDoor_LostFocus"  Focusable="True"/>
+                                </StackPanel>
+                                <StackPanel Margin="10,10,0,0" Orientation="Horizontal">
+                                    <TextBlock x:Name="textBlock12" TextWrapping="Wrap" Text="Rear    X :" FontWeight="Normal" Margin="0" d:LayoutOverrides="Width"/>
+                                    <xctk:DoubleUpDown x:Name="rearDoorXPosUpDown" Margin="11,0,0,0" FontWeight="Normal" Minimum="0" Increment="0.1" FormatString="F1" ValueChanged="rearDoorXPosUpDown_ValueChanged" Width="66" GotFocus="rearDoor_GotFocus" LostFocus="rearDoor_LostFocus" Focusable="True"/>
+                                    <TextBlock x:Name="textBlock11_Copy1" TextWrapping="Wrap" Text="Y : " FontWeight="Normal" Margin="20,0,0,0"/>
+                                    <xctk:DoubleUpDown x:Name="rearDoorYPosUpDown" Margin="10,0,0,0" FontWeight="Normal" Minimum="0" Increment="0.1" FormatString="F1" ValueChanged="rearDoorYPosUpDown_ValueChanged" Width="66" GotFocus="rearDoor_GotFocus" LostFocus="rearDoor_LostFocus" Focusable="True"/>
+                                    <TextBlock x:Name="textBlock1_Copy13" TextWrapping="Wrap" Text="Width" FontWeight="Normal" Margin="20,0,0,0"/>
+                                    <xctk:DoubleUpDown x:Name="rearDoorWidthUpDown" Margin="10,0,0,0" FontWeight="Normal" Minimum="0.1" Increment="0.1" FormatString="F1" ValueChanged="rearDoorWidthUpDown_ValueChanged" Width="60" GotFocus="rearDoor_GotFocus" LostFocus="rearDoor_LostFocus" Focusable="True"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox x:Name="aisleYGroupBox" Header="Aisle Y" Margin="0,10,0,0">
+                            <StackPanel>
+                                <StackPanel Margin="10,5,0,0" Orientation="Horizontal" d:LayoutOverrides="Width">
+                                    <TextBlock x:Name="textBlock4" TextWrapping="Wrap" Text="Number of Aisle Y" FontWeight="Normal" Margin="0" d:LayoutOverrides="Width"/>
+                                    <xctk:IntegerUpDown x:Name="numOfAisleYUpDown" Margin="10,0,0,0" Value="0" Minimum="0" Maximum="0"  FontWeight="Normal" ValueChanged="numOfAisleYUpDown_ValueChanged"/>
+                                    <TextBlock x:Name="textBlock10" TextWrapping="Wrap" Text="* excepts main exits (front and rear)" FontWeight="Normal" Foreground="Red" Margin="10,0,0,0"/>
+                                </StackPanel>
+                                <StackPanel x:Name="aisleY1" Margin="10,10,10,0" Orientation="Horizontal" d:LayoutOverrides="Width" Visibility="Collapsed">
+                                    <TextBlock x:Name="textBlock5" TextWrapping="Wrap" Text="1 : Position" FontWeight="Normal" Margin="0" d:LayoutOverrides="Width"/>
+                                    <xctk:DoubleUpDown x:Name="aisleY1PosUpDown" Margin="10,0,0,0" FontWeight="Normal" Value="0" Minimum="0" Increment="0.1" FormatString="F1" Width="66" Focusable="True" GotFocus="ExitAdjust_GotFocus" LostFocus="ExitAdjust_LostFocus" ValueChanged="exitPosChanged"/>
+                                    <TextBlock x:Name="textBlock1_Copy2" TextWrapping="Wrap" Text="Width" FontWeight="Normal" Margin="20,0,0,0"/>
+                                    <xctk:DoubleUpDown x:Name="aisleY1WidthUpDown" Margin="10,0,0,0" FontWeight="Normal" Value="10" Minimum="0.1" Increment="0.1" FormatString="F1" Width="60" Focusable="True" GotFocus="ExitAdjust_GotFocus" LostFocus="ExitAdjust_LostFocus" ValueChanged="exitWidthChanged"/>
+                                    <TextBlock x:Name="textBlock1_Copy7" TextWrapping="Wrap" Text="Locate After Row" FontWeight="Normal" Margin="20,0,0,0"/>
+                                    <ComboBox x:Name="locateY1ComboBox" Width="50" Margin="10,0,0,0" FontWeight="Normal" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Focusable="True" GotFocus="ExitAdjust_GotFocus" LostFocus="ExitAdjust_LostFocus" SelectedValuePath="Value"/>
+                                </StackPanel>
+                                <StackPanel x:Name="aisleY2" Margin="10,10,-12,0" Orientation="Horizontal" d:LayoutOverrides="Width" Visibility="Collapsed">
+                                    <TextBlock x:Name="textBlock6" TextWrapping="Wrap" Text="2 : Position" FontWeight="Normal" Margin="0" d:LayoutOverrides="Width"/>
+                                    <xctk:DoubleUpDown x:Name="aisleY2PosUpDown" Margin="10,0,0,0" FontWeight="Normal" Value="0" Minimum="0" Increment="0.1" FormatString="F1" Width="66" Focusable="True" GotFocus="ExitAdjust_GotFocus" LostFocus="ExitAdjust_LostFocus" ValueChanged="exitPosChanged"/>
+                                    <TextBlock x:Name="textBlock1_Copy3" TextWrapping="Wrap" Text="Width" FontWeight="Normal" Margin="20,0,0,0"/>
+                                    <xctk:DoubleUpDown x:Name="aisleY2WidthUpDown" Margin="10,0,0,0" FontWeight="Normal" Value="10" Minimum="0.1" Increment="0.1" FormatString="F1" Width="60" Focusable="True" GotFocus="ExitAdjust_GotFocus" LostFocus="ExitAdjust_LostFocus" ValueChanged="exitWidthChanged"/>
+                                    <TextBlock x:Name="textBlock1_Copy8" TextWrapping="Wrap" Text="Locate After Row" FontWeight="Normal" Margin="20,0,0,0"/>
+                                    <ComboBox x:Name="locateY2ComboBox" Width="50" Margin="10,0,0,0" FontWeight="Normal" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Focusable="True" GotFocus="ExitAdjust_GotFocus" LostFocus="ExitAdjust_LostFocus" SelectedValuePath="Value"/>
+                                </StackPanel>
+                                <StackPanel x:Name="aisleY3" Margin="10,10,-12,0" Orientation="Horizontal" d:LayoutOverrides="Width" Visibility="Collapsed">
+                                    <TextBlock x:Name="textBlock7" TextWrapping="Wrap" Text="3 : Position" FontWeight="Normal" Margin="0" d:LayoutOverrides="Width"/>
+                                    <xctk:DoubleUpDown x:Name="aisleY3PosUpDown" Margin="10,0,0,0" FontWeight="Normal" Value="0" Minimum="0" Increment="0.1" FormatString="F1" Width="66" Focusable="True" GotFocus="ExitAdjust_GotFocus" LostFocus="ExitAdjust_LostFocus" ValueChanged="exitPosChanged"/>
+                                    <TextBlock x:Name="textBlock1_Copy4" TextWrapping="Wrap" Text="Width" FontWeight="Normal" Margin="20,0,0,0"/>
+                                    <xctk:DoubleUpDown x:Name="aisleY3WidthUpDown" Margin="10,0,0,0" FontWeight="Normal" Value="10" Minimum="0.1" Increment="0.1" FormatString="F1" Width="60" Focusable="True" GotFocus="ExitAdjust_GotFocus" LostFocus="ExitAdjust_LostFocus" ValueChanged="exitWidthChanged"/>
+                                    <TextBlock x:Name="textBlock1_Copy9" TextWrapping="Wrap" Text="Locate After Row" FontWeight="Normal" Margin="20,0,0,0"/>
+                                    <ComboBox x:Name="locateY3ComboBox" Width="50" Margin="10,0,0,0" FontWeight="Normal" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Focusable="True" GotFocus="ExitAdjust_GotFocus" LostFocus="ExitAdjust_LostFocus" SelectedValuePath="Value"/>
+                                </StackPanel>
+                                <StackPanel x:Name="aisleY4" Margin="10,10,-12,0" Orientation="Horizontal" d:LayoutOverrides="Width" Visibility="Collapsed">
+                                    <TextBlock x:Name="textBlock8" TextWrapping="Wrap" Text="4 : Position" FontWeight="Normal" Margin="0" d:LayoutOverrides="Width"/>
+                                    <xctk:DoubleUpDown x:Name="aisleY4PosUpDown" Margin="10,0,0,0" FontWeight="Normal" Value="0" Minimum="0" Increment="0.1" FormatString="F1" Width="66" Focusable="True" GotFocus="ExitAdjust_GotFocus" LostFocus="ExitAdjust_LostFocus" ValueChanged="exitPosChanged"/>
+                                    <TextBlock x:Name="textBlock1_Copy5" TextWrapping="Wrap" Text="Width" FontWeight="Normal" Margin="20,0,0,0"/>
+                                    <xctk:DoubleUpDown x:Name="aisleY4WidthUpDown" Margin="10,0,0,0" FontWeight="Normal" Value="10" Minimum="0.1" Increment="0.1" FormatString="F1" Width="60" Focusable="True" GotFocus="ExitAdjust_GotFocus" LostFocus="ExitAdjust_LostFocus" ValueChanged="exitWidthChanged"/>
+                                    <TextBlock x:Name="textBlock1_Copy10" TextWrapping="Wrap" Text="Locate After Row" FontWeight="Normal" Margin="20,0,0,0"/>
+                                    <ComboBox x:Name="locateY4ComboBox" Width="50" Margin="10,0,0,0" FontWeight="Normal" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Focusable="True" GotFocus="ExitAdjust_GotFocus" LostFocus="ExitAdjust_LostFocus" SelectedValuePath="Value"/>
+                                </StackPanel>
+                                <StackPanel x:Name="aisleY5" Margin="10,10,-12,0" Orientation="Horizontal" d:LayoutOverrides="Width" Visibility="Collapsed">
+                                    <TextBlock x:Name="textBlock9" TextWrapping="Wrap" Text="5 : Position" FontWeight="Normal" Margin="0" d:LayoutOverrides="Width"/>
+                                    <xctk:DoubleUpDown x:Name="aisleY5PosUpDown" Margin="10,0,0,0" FontWeight="Normal" Value="0" Minimum="0" Increment="0.1" FormatString="F1" Width="66" Focusable="True" GotFocus="ExitAdjust_GotFocus" LostFocus="ExitAdjust_LostFocus" ValueChanged="exitPosChanged"/>
+                                    <TextBlock x:Name="textBlock1_Copy6" TextWrapping="Wrap" Text="Width" FontWeight="Normal" Margin="20,0,0,0"/>
+                                    <xctk:DoubleUpDown x:Name="aisleY5WidthUpDown" Margin="10,0,0,0" FontWeight="Normal" Value="10" Minimum="0.1" Increment="0.1" FormatString="F1" Width="60" Focusable="True" GotFocus="ExitAdjust_GotFocus" LostFocus="ExitAdjust_LostFocus" ValueChanged="exitWidthChanged"/>
+                                    <TextBlock x:Name="textBlock1_Copy11" TextWrapping="Wrap" Text="Locate After Row" FontWeight="Normal" Margin="20,0,0,0"/>
+                                    <ComboBox x:Name="locateY5ComboBox" Width="50" Margin="10,0,0,0" FontWeight="Normal" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Focusable="True" GotFocus="ExitAdjust_GotFocus" LostFocus="ExitAdjust_LostFocus" SelectedValuePath="Value"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox x:Name="groupBox3" Header="Seat" Margin="0,10,0,0">
+                            <StackPanel Margin="0,5,0,0">
+                                <StackPanel Margin="10,10,0,0" Orientation="Horizontal" d:LayoutOverrides="Width">
+                                    <TextBlock x:Name="textBlock2" TextWrapping="Wrap" Text="1A Seat Position      X :" FontWeight="Normal" Margin="0" d:LayoutOverrides="Width"/>
+                                    <xctk:DoubleUpDown x:Name="seat1AXPosUpDown" Margin="10,0,0,0" FontWeight="Normal" Minimum="0" Increment="0.1" FormatString="F1" Width="66" ValueChanged="SeatAdjust" GotFocus="SeatAdjust_GotFocus" LostFocus="SeatAdjust_LostFocus"/>
+                                    <TextBlock x:Name="textBlock2_Copy" TextWrapping="Wrap" Text="Y :" FontWeight="Normal" Margin="20,0,0,0"/>
+                                    <xctk:DoubleUpDown x:Name="seat1AYPosUpDown" Margin="10,0,0,0" FontWeight="Normal"  Minimum="0" Increment="0.1" FormatString="F1" Width="66" ValueChanged="SeatAdjust" GotFocus="SeatAdjust_GotFocus" LostFocus="SeatAdjust_LostFocus"/>
+                                </StackPanel>
+                                <StackPanel Margin="10,10,0,0" Orientation="Horizontal" d:LayoutOverrides="Width">
+                                    <TextBlock x:Name="textBlock13" TextWrapping="Wrap" Text="2A Seat Position      X :" FontWeight="Normal" Margin="0" d:LayoutOverrides="Width"/>
+                                    <xctk:DoubleUpDown x:Name="seat2AXPosUpDown" Margin="10,0,0,0" FontWeight="Normal" Minimum="0" Increment="0.1" FormatString="F1" Width="66" ValueChanged="SeatAdjust" GotFocus="SeatAdjust_GotFocus" LostFocus="SeatAdjust_LostFocus"/>
+                                    <TextBlock x:Name="textBlock2_Copy1" TextWrapping="Wrap" Text="Y :" FontWeight="Normal" Margin="20,0,0,0"/>
+                                    <xctk:DoubleUpDown x:Name="seat2AYPosUpDown" Margin="10,0,0,0" FontWeight="Normal" Minimum="0" Increment="0.1" FormatString="F1" Width="66" ValueChanged="SeatAdjust" GotFocus="SeatAdjust_GotFocus" LostFocus="SeatAdjust_LostFocus"/>
+                                </StackPanel>
+                                <StackPanel Margin="10,10,0,0" Orientation="Horizontal" d:LayoutOverrides="Width">
+                                    <TextBlock x:Name="textBlock3" TextWrapping="Wrap" Text="Seat Width" FontWeight="Normal" Margin="0" d:LayoutOverrides="Width"/>
+                                    <xctk:DoubleUpDown x:Name="seatWidthUpDown" Margin="10,0,0,0" FontWeight="Normal" Minimum="0" Increment="0.1" FormatString="F1" ValueChanged="SeatAdjust" Width="66" GotFocus="SeatAdjust_GotFocus" LostFocus="SeatAdjust_LostFocus"/>
+                                    <TextBlock x:Name="textBlock1_Copy1" TextWrapping="Wrap" Text="Seat Height" FontWeight="Normal" Margin="20,0,0,0"/>
+                                    <xctk:DoubleUpDown x:Name="seatHeightUpDown" Margin="10,0,0,0" FontWeight="Normal" Minimum="0" Increment="0.1" FormatString="F1" ValueChanged="SeatAdjust" Width="66" GotFocus="SeatAdjust_GotFocus" LostFocus="SeatAdjust_LostFocus"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        <Grid Margin="10" Height="22.62">
+            <StackPanel x:Name="saveCloseStackPanel" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0" d:LayoutOverrides="Height">
+                <Button x:Name="backBtn" Content="&lt; Back" Width="75" FontSize="14" VerticalAlignment="Center" Margin="0" HorizontalAlignment="Right" Visibility="Hidden" Click="backBtn_Click"/>
+                <Button x:Name="editBtn" Content="Edit" Width="75" FontSize="14" VerticalAlignment="Center" Margin="10,0,0,0" IsDefault="True" HorizontalAlignment="Right" Click="editBtn_Click" Visibility="Collapsed"/>
+                <Button x:Name="nextBtn" Content="Generate" Width="75" FontSize="14" VerticalAlignment="Center" Margin="10,0,0,0" IsDefault="True" HorizontalAlignment="Right" Click="nextBtn_Click"/>
+                <Button x:Name="finishBtn" Content="Finish" Width="75" FontSize="14" VerticalAlignment="Center" Margin="10,0,0,0" IsDefault="True" HorizontalAlignment="Right" Click="finishBtn_Click" Visibility="Collapsed"/>
+                <Button x:Name="cancelBtn" Content="Cancel" Width="75" FontSize="14" VerticalAlignment="Center" Margin="10,0,0,0" IsCancel="True" HorizontalAlignment="Right"/>
+            </StackPanel>
+        </Grid>
+    </StackPanel>
+</Page>

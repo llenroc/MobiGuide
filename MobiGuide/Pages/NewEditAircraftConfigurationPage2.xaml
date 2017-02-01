@@ -1,0 +1,32 @@
+﻿<Page x:Class="MobiGuide.NewEditAircraftConfigurationPage2"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:MobiGuide"
+      mc:Ignorable="d"
+      Title="NewEditAircraftConfigurationPage1" Loaded="Page_Loaded" Height="660.4" >
+
+    <StackPanel Margin="0">
+        <GroupBox Margin="10,0" FontSize="14" FontWeight="Bold" d:LayoutOverrides="LeftPosition, RightPosition" VerticalAlignment="Top" Height="616.64">
+            <GroupBox.Header>Seat Map Image</GroupBox.Header>
+            <StackPanel Margin="0">
+                <Border BorderThickness="1" BorderBrush="#FFD1D0D0" Height="500" Margin="0,10,0,0" d:LayoutOverrides="TopPosition, BottomPosition" HorizontalAlignment="Center">
+                    <Image x:Name="seatMapImage" Source="/MobiGuide;component/NoImg.jpg" Margin="0" Width="281.25" Height="500"/>
+                </Border>
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Center">
+                    <TextBlock x:Name="textBlock" TextWrapping="Wrap" Text="Path :" VerticalAlignment="Center" FontWeight="Normal"/>
+                    <TextBox x:Name="sourcePathTextBox" Height="23" Margin="10,0,0,0" FontWeight="Normal" FontSize="14" IsEnabled="False" HorizontalAlignment="Center" Width="283.25" FlowDirection="RightToLeft"/>
+                    <Button x:Name="browseBtn" Content="Browse" Margin="10,0,0,0" FontWeight="Normal" HorizontalAlignment="Center" Width="75" Click="browseBtn_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        <Grid Margin="10" Height="22.62">
+            <StackPanel x:Name="saveCloseStackPanel" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0" d:LayoutOverrides="Height">
+                <Button x:Name="backBtn" Content="&lt; Back" Width="75" FontSize="14" VerticalAlignment="Center" Margin="0" HorizontalAlignment="Right" Visibility="Hidden" Click="backBtn_Click"/>
+                <Button x:Name="nextBtn" Content="Next &gt;" Width="75" FontSize="14" VerticalAlignment="Center" Margin="10,0,0,0" IsDefault="True" HorizontalAlignment="Right" Click="nextBtn_Click" IsEnabled="False"/>
+                <Button x:Name="cancelBtn" Content="Cancel" Width="75" FontSize="14" VerticalAlignment="Center" Margin="10,0,0,0" IsCancel="True" HorizontalAlignment="Right"/>
+            </StackPanel>
+        </Grid>
+    </StackPanel>
+</Page>

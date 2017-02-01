@@ -61,14 +61,14 @@ namespace MobiGuide
                         AirlineCode = row.Get("AirlineCode").ToString(),
                         AircraftConfigurationCode = row.Get("AircraftConfigurationCode").ToString(),
                         AircraftConfigurationName = row.Get("AircraftConfigurationName").ToString(),
-                        AisleX = (int)row.Get("AisleX"),
-                        FrontDoorX = (int)row.Get("FrontDoorX"),
-                        FrontDoorY = (int)row.Get("FrontDoorY"),
-                        RearDoorX = (int)row.Get("RearDoorX"),
-                        RearDoorY = (int)row.Get("RearDoorY"),
+                        AisleX = (double)row.Get("AisleX"),
+                        FrontDoorX = (double)row.Get("FrontDoorX"),
+                        FrontDoorY = (double)row.Get("FrontDoorY"),
+                        RearDoorX = (double)row.Get("RearDoorX"),
+                        RearDoorY = (double)row.Get("RearDoorY"),
                         FrontDoorBoardingFlag = (bool)row.Get("FrontDoorBoardingFlag"),
                         RearDoorBoardingFlag = (bool)row.Get("RearDoorBoardingFlag"),
-                        Status = row.Get("StatusCode").ToString()
+                        StatusCode = row.Get("StatusCode").ToString()
                     };
                     DataRow aircraftTypeData = await dbCon.GetDataRow("AircraftTypeReference", new DataRow("AircraftTypeCode", row.Get("AircraftTypeCode")));
                     if(aircraftTypeData.HasData && aircraftTypeData.Error == ERROR.NoError)
@@ -77,7 +77,7 @@ namespace MobiGuide
                         {
                             AircraftTypeCode = aircraftTypeData.Get("AircraftTypeCode").ToString(),
                             AircraftTypeName = aircraftTypeData.Get("AircraftTypeName").ToString(),
-                            Status = aircraftTypeData.Get("StatusCode").ToString()
+                            StatusCode = aircraftTypeData.Get("StatusCode").ToString()
                         };
                         aircraftConfiguration.AircraftType = aircraftType;
                     }
@@ -94,10 +94,23 @@ namespace MobiGuide
 
         private void newBtn_Click(object sender, RoutedEventArgs e)
         {
+            NewEditAircraftConfigurationWindow newAircraftConfiguration = new NewEditAircraftConfigurationWindow();
+            newAircraftConfiguration.ShowDialog();
         }
 
         private void editBtn_Click(object sender, RoutedEventArgs e)
         {
+            DataGrid acDataGrid = aircraftConfigDataGrid;
+            if (acDataGrid.SelectedIndex > -1)
+            {
+                AircraftConfiguration selectedItem = acDataGrid.SelectedItem as AircraftConfiguration;
+                NewEditAircraftConfigurationWindow editACWindow = new NewEditAircraftConfigurationWindow(selectedItem.AircraftConfigurationId);
+                editACWindow.ShowDialog();
+                if (editACWindow.DialogResult.HasValue && editACWindow.DialogResult.Value)
+                {
+                    DoSearch();
+                }
+            }
         }
 
         private void textTemplateDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -125,6 +138,31 @@ namespace MobiGuide
                 foreach(DataRow row in aircraftTypeList)
                 {
                     aircraftTypeComboBox.Items.Add(new CustomComboBoxItem { Text = row.Get("AircraftTypeCode").ToString(), Value = row.Get("AircraftTypeCode").ToString() });
+                }
+            }
+        }
+
+        private void aircraftConfigDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DataGrid acDataGrid = sender as DataGrid;
+            if (acDataGrid.SelectedIndex > -1)
+            {
+                editBtn.IsEnabled = true;
+            }
+            else editBtn.IsEnabled = false;
+        }
+
+        private void aircraftConfigDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            DataGrid acDataGrid = sender as DataGrid;
+            if(acDataGrid.SelectedIndex > -1)
+            {
+                AircraftConfiguration selectedItem = acDataGrid.SelectedItem as AircraftConfiguration;
+                NewEditAircraftConfigurationWindow editACWindow = new NewEditAircraftConfigurationWindow(selectedItem.AircraftConfigurationId);
+                editACWindow.ShowDialog();
+                if(editACWindow.DialogResult.HasValue && editACWindow.DialogResult.Value)
+                {
+                    DoSearch();
                 }
             }
         }

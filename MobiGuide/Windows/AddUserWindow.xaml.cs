@@ -139,7 +139,7 @@ namespace MobiGuide
                     return uLogon.Exist;
                 }
                 else return uLogon.NoExist;
-            } catch (Exception ex)
+            } catch (Exception)
             {
                 return uLogon.Error;
             }

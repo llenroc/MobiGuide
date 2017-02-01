@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CustomExtensions;
+using System.Reflection;
+using System.Diagnostics;
 
 namespace Properties
 {
@@ -15,7 +17,8 @@ namespace Properties
         private string _code;
         private string _name;
         private string _status;
-        public string Code
+        private string _statusCode;
+        protected virtual string Code
         {
             get { return _code; }
             set
@@ -24,7 +27,7 @@ namespace Properties
                 OnPropertyChanged("Code");
             }
         }
-        public string Name
+        protected virtual string Name
         {
             get { return _name; }
             set
@@ -33,11 +36,16 @@ namespace Properties
                 OnPropertyChanged("Name");
             }
         }
-        public string Status
+        protected virtual string Status
         {
             get { return _status; }
+        }
+        protected virtual string StatusCode
+        {
+            get { return _statusCode; }
             set
             {
+                _statusCode = value;
                 switch (value)
                 {
                     case "A":
@@ -47,7 +55,7 @@ namespace Properties
                         _status = "Inactive";
                         break;
                 }
-                OnPropertyChanged("Status");
+                OnPropertyChanged("StatusCode");
             }
         }
         protected void OnPropertyChanged(string name)
@@ -151,7 +159,7 @@ namespace Properties
         {
             base.Code = airportCode;
             base.Name = airportName;
-            base.Status = statusCode;
+            base.StatusCode = statusCode;
         }
         public string AirportCode
         {
@@ -162,6 +170,10 @@ namespace Properties
         {
             get { return base.Name; }
             set { base.Name = value; }
+        }
+        public new string Status
+        {
+            get { return base.Status; }
         }
 
         public string SeletedLanguageCode { get; internal set; }
@@ -335,13 +347,17 @@ namespace Properties
                 OnPropertyChanged("AircraftTypeName");
             }
         }
-        public string Status
+        public new string Status
         {
             get { return base.Status; }
+        }
+        public new string StatusCode
+        {
+            get { return base.StatusCode; }
             set
             {
-                base.Status = value;
-                OnPropertyChanged("Status");
+                base.StatusCode = value;
+                OnPropertyChanged("StatusCode");
             }
         }
     }
@@ -350,13 +366,16 @@ namespace Properties
         private Guid _id;
         private string _airlineCode;
         private AircraftType _aircraftType;
-        private int _aisleX;
+        private double _aisleX;
         private bool _frontDoorBoardingFlag;
         private bool _rearDoorBoardingFlag;
-        private int _frontDoorX;
-        private int _frontDoorY;
-        private int _rearDoorX;
-        private int _rearDoorY;
+        private double _frontDoorX;
+        private double _frontDoorY;
+        private double _frontDoorWidth;
+        private double _rearDoorX;
+        private double _rearDoorY;
+        private double _rearDoorWidth;
+        private string _seatMapImagePath;
         public Guid AircraftConfigurationId
         {
             get { return _id; }
@@ -401,7 +420,7 @@ namespace Properties
                 OnPropertyChanged("AircraftConfigurationName");
             }
         }
-        public int AisleX
+        public double AisleX
         {
             get { return _aisleX; }
             set
@@ -428,7 +447,7 @@ namespace Properties
                 OnPropertyChanged("RearDoorBoardingFlag");
             }
         }
-        public int FrontDoorX
+        public double FrontDoorX
         {
             get { return _frontDoorX; }
             set
@@ -437,7 +456,7 @@ namespace Properties
                 OnPropertyChanged("FrontDoorX");
             }
         }
-        public int FrontDoorY
+        public double FrontDoorY
         {
             get { return _frontDoorY; }
             set
@@ -446,7 +465,16 @@ namespace Properties
                 OnPropertyChanged("FrontDoorY");
             }
         }
-        public int RearDoorX
+        public double FrontDoorWidth
+        {
+            get { return _frontDoorWidth; }
+            set
+            {
+                _frontDoorWidth = value;
+                OnPropertyChanged("FrontDoorWidth");
+            }
+        }
+        public double RearDoorX
         {
             get { return _rearDoorX; }
             set
@@ -455,13 +483,46 @@ namespace Properties
                 OnPropertyChanged("RearDoorX");
             }
         }
-        public int RearDoorY
+        public double RearDoorY
         {
             get { return _rearDoorY; }
             set
             {
                 _rearDoorY = value;
                 OnPropertyChanged("RearDoorY");
+            }
+        }
+        public double RearDoorWidth
+        {
+            get { return _rearDoorWidth; }
+            set
+            {
+                _rearDoorWidth = value;
+                OnPropertyChanged("RearDoorWidth");
+            }
+        }
+        public string SeatMapImagePath
+        {
+            get { return _seatMapImagePath; }
+            set
+            {
+                _seatMapImagePath = value;
+                OnPropertyChanged("SeatMapImagePath");
+            }
+        }
+
+        public new string Status
+        {
+            get { return base.Status; }
+        }
+        public new string StatusCode
+        {
+            get { return base.StatusCode; }
+            set
+            {
+                base.StatusCode = value;
+                OnPropertyChanged("Status");
+                OnPropertyChanged("StatusCode");
             }
         }
     }
@@ -477,6 +538,63 @@ namespace Properties
         public override string ToString()
         {
             return Text;
+        }
+    }
+    public abstract class Shape
+    {
+        private double _x;
+        private double _y;
+        private double _width;
+        private double _height;
+
+        public double X
+        {
+            get { return _x; }
+            set
+            {
+                _x = value;
+            }
+        }
+
+        public double Y
+        {
+            get { return _y; }
+            set
+            {
+                _y = value;
+            }
+        }
+
+        public double Width
+        {
+            get { return _width; }
+            set
+            {
+                _width = value;
+            }
+        }
+
+        public double Height
+        {
+            get { return _height; }
+            set
+            {
+                _height = value;
+            }
+        }
+    }
+
+    public class Seat : Shape { }
+    public class AisleY : Shape
+    {
+        private int _afterRow;
+        public int AfterRow
+        {
+            get { return _afterRow; }
+            set
+            {
+                _afterRow = value;
+            }
         }
     }
 }
