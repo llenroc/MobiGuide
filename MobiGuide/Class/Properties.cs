@@ -531,6 +531,12 @@ namespace Properties
         NEW,
         EDIT
     }
+    public enum DISPLAY_TYPE
+    {
+        LOGO,
+        SEATMAPS,
+        TEXT
+    }
     public class CustomComboBoxItem
     {
         public string Text { get; set; }

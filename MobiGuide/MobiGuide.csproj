@@ -50,6 +50,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MahApps.Metro.IconPacks, Version=1.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.1.7.0\lib\net45\MahApps.Metro.IconPacks.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Expression.Drawing, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
@@ -60,6 +64,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -104,6 +109,9 @@
     </ApplicationDefinition>
     <Compile Include="Class\Properties.cs" />
     <Compile Include="Helper\EventHelper.cs" />
+    <Compile Include="Pages\LogoPage.xaml.cs">
+      <DependentUpon>LogoPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\NewEditAircraftConfigurationPage3.xaml.cs">
       <DependentUpon>NewEditAircraftConfigurationPage3.xaml</DependentUpon>
     </Compile>
@@ -115,6 +123,9 @@
     </Compile>
     <Compile Include="Windows\AircraftConfigurationWindow.xaml.cs">
       <DependentUpon>AircraftConfigurationWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\DisplayWindow.xaml.cs">
+      <DependentUpon>DisplayWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\NewEditAircraftConfiguration.xaml.cs">
       <DependentUpon>NewEditAircraftConfiguration.xaml</DependentUpon>
@@ -170,6 +181,10 @@
     <Compile Include="Windows\NewEditAirportReferenceWindow.xaml.cs">
       <DependentUpon>NewEditAirportReferenceWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Pages\LogoPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\NewEditAircraftConfigurationPage3.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -185,6 +200,10 @@
     <Page Include="Windows\AircraftConfigurationWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\DisplayWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\NewEditAircraftConfiguration.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -334,6 +353,9 @@
     <Resource Include="SampleData\PGBigLogo.png" />
     <Resource Include="SampleData\PGSmallLogo.png" />
     <Resource Include="MayUseCode.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Images\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
