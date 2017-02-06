@@ -14,13 +14,13 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using System.Drawing;
 using System.ComponentModel;
 using DatabaseConnector;
 using CustomExtensions;
 using System.Diagnostics;
 using Properties;
 using MobiGuide.Helper;
+using Xceed.Wpf.Toolkit;
 
 namespace MobiGuide
 {
@@ -47,7 +47,7 @@ namespace MobiGuide
                 displayInfo();
                 InitializeControl();
             } catch (Exception){
-                MessageBox.Show("Unexpected Error Occurred! Please contact Administator.", "Error");
+                System.Windows.MessageBox.Show("Unexpected Error Occurred! Please contact Administator.", "Error");
                 this.Close();
             }
         }
@@ -86,7 +86,7 @@ namespace MobiGuide
 
         private void LogoutMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            if (MessageBox.Show("Do you want to logout?", "Confirm", MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+            if (System.Windows.MessageBox.Show("Do you want to logout?", "Confirm", System.Windows.MessageBoxButton.OKCancel) == System.Windows.MessageBoxResult.OK)
             {
                 //clear everything and do logout
                 Application.Current.Resources.Clear();
@@ -318,30 +318,39 @@ namespace MobiGuide
                 textTemplateComboBox.Items.Add(new CustomComboBoxItem { Text = "No Data", Value = String.Empty });
                 textTemplateComboBox.SelectedIndex = 0;
             }
+
+            if(departureTimePicker.Value == null) departureTimePicker.Value = DateTime.Now;
+            if(displayMessageTimePicker.Value == null) displayMessageTimePicker.Value = DateTime.Now;
         }
 
         private void showLogoBtn_Click(object sender, RoutedEventArgs e)
         {
-            if(System.Windows.Forms.Screen.AllScreens.Count() > 1)
+            ShowWindow(DISPLAY_TYPE.LOGO);
+        }
+
+        private void ShowWindow(DISPLAY_TYPE type, object param = null)
+        {
+            if (System.Windows.Forms.Screen.AllScreens.Count() > 1)
             {
-                foreach(System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
+                foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
                 {
-                    if(screen != System.Windows.Forms.Screen.AllScreens[0])
+                    if (screen != System.Windows.Forms.Screen.AllScreens[0])
                     {
                         if (!EventHelper.IsWindowOpen<DisplayWindow>())
                         {
-                            DisplayWindow displayWindow = new DisplayWindow();
+                            DisplayWindow displayWindow = new DisplayWindow(type, param);
                             displayWindow.Show();
                             displayWindow.MaximizeToSecondaryMonitor();
-                        }else
+                        }
+                        else
                         {
-                            foreach(Window window in Application.Current.Windows)
+                            foreach (Window window in Application.Current.Windows)
                             {
-                                if(window is DisplayWindow)
+                                if (window is DisplayWindow)
                                 {
                                     window.Close();
 
-                                    DisplayWindow displayWindow = new DisplayWindow();
+                                    DisplayWindow displayWindow = new DisplayWindow(type, param);
                                     displayWindow.Show();
                                     displayWindow.MaximizeToSecondaryMonitor();
                                 }
@@ -349,16 +358,125 @@ namespace MobiGuide
                         }
                     }
                 }
-            } else
+            }
+            else
             {
-                DisplayWindow displayWindow = new DisplayWindow
+                foreach (Window window in Application.Current.Windows)
                 {
-                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                    WindowState = WindowState.Maximized,
+                    if (window is DisplayWindow)
+                    {
+                        window.Close();
+                    }
+                }
+
+                DisplayWindow displayWindow = new DisplayWindow(type, param)
+                {
+                    WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner,
+                    WindowState = System.Windows.WindowState.Maximized,
                     ResizeMode = ResizeMode.NoResize
                 };
                 displayWindow.Show();
             }
+        }
+
+        private void textTemplateComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox textTemplate = sender as ComboBox;
+            if(textTemplate.SelectedIndex > -1)
+            {
+                ShowTextDisplay((textTemplate.SelectedItem as CustomComboBoxItem).Value);
+            }
+        }
+
+        private async void ShowTextDisplay(object selectedValue)
+        {
+            if (selectedValue != null)
+            {
+                DataRow textTemplateData = await dbCon.GetDataRow("TextTemplate", new DatabaseConnector.DataRow("TextTemplateId", selectedValue));
+                if (textTemplateData.HasData && textTemplateData.Error == ERROR.NoError)
+                {
+                    textDisplayedTextBox.Text = textTemplateData.Get("TextTemplate").ToString();
+                }
+            }
+        }
+
+        private void showTextBtn_Click(object sender, RoutedEventArgs e)
+        {
+            bool IsFulfill = true;
+            if (String.IsNullOrWhiteSpace(flightNoTextBox.Text))
+            {
+                flightNoTextBox.BorderBrush = Brushes.Red;
+                flightNoTextBox.GotFocus += FlightNoTextBox_GotFocus;
+                IsFulfill = false;
+            }
+            if(departureDatePicker.SelectedDate == null)
+            {
+                departureDatePicker.BorderBrush = Brushes.Red;
+                departureDatePicker.GotFocus += DepartureDatePicker_GotFocus;
+                IsFulfill = false;
+            }
+            if(departureTimePicker.Value == null)
+            {
+                departureTimePicker.BorderBrush = Brushes.Red;
+                departureTimePicker.GotFocus += DepartureTimePicker_GotFocus;
+                IsFulfill = false;
+            }
+            if(displayMessageTimePicker.Value == null)
+            {
+                displayMessageTimePicker.BorderBrush = Brushes.Red;
+                displayMessageTimePicker.GotFocus += DisplayMessageTimePicker_GotFocus;
+                IsFulfill = false;
+            }
+            if (String.IsNullOrWhiteSpace(textDisplayedTextBox.Text))
+            {
+                textDisplayedTextBox.BorderBrush = Brushes.Red;
+                textDisplayedTextBox.GotFocus += TextDisplayedTextBox_GotFocus;
+                IsFulfill = false;
+            }
+            if (!IsFulfill) return;
+            ShowText showText = new ShowText
+            {
+                FlightNo = flightNoTextBox.Text,
+                OriginCode = (originComboBox.SelectedItem as CustomComboBoxItem).Value.ToString(),
+                DestinationCode = (destinationComboBox.SelectedItem as CustomComboBoxItem).Value.ToString(),
+                OriginName = (originComboBox.SelectedItem as CustomComboBoxItem).Text,
+                DestinationName = (destinationComboBox.SelectedItem as CustomComboBoxItem).Text,
+                DepartureDate = (DateTime)departureDatePicker.SelectedDate,
+                DepartureTime = ((DateTime)departureTimePicker.Value).TimeOfDay,
+                ShowMessageTime = ((DateTime)displayMessageTimePicker.Value).TimeOfDay,
+                TextTemplate = textDisplayedTextBox.Text
+            };
+            ShowWindow(DISPLAY_TYPE.TEXT, showText);
+        }
+
+        private void TextDisplayedTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            (sender as TextBox).ClearValue(BorderBrushProperty);
+            (sender as TextBox).GotFocus -= TextDisplayedTextBox_GotFocus;
+        }
+
+        private void DisplayMessageTimePicker_GotFocus(object sender, RoutedEventArgs e)
+        {
+            (sender as TimePicker).ClearValue(BorderBrushProperty);
+            (sender as TimePicker).GotFocus -= DisplayMessageTimePicker_GotFocus;
+        }
+
+        private void DepartureTimePicker_GotFocus(object sender, RoutedEventArgs e)
+        {
+            (sender as TimePicker).ClearValue(TimePicker.BorderBrushProperty);
+            (sender as TimePicker).GotFocus -= DepartureTimePicker_GotFocus;
+        }
+
+        private void DepartureDatePicker_GotFocus(object sender, RoutedEventArgs e)
+        {
+            (sender as DatePicker).ClearValue(TimePicker.BorderBrushProperty);
+            (sender as DatePicker).GotFocus -= DepartureDatePicker_GotFocus;
+        }
+
+        private void FlightNoTextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            (sender as TextBox).ClearValue(BorderBrushProperty);
+            (sender as TextBox).GotFocus -= FlightNoTextBox_GotFocus;
         }
     }
 }

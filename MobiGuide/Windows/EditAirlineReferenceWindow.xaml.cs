@@ -89,7 +89,7 @@ namespace MobiGuide
             DataRow data = new DataRow();
             data.Set("AirlineName", alNameTxtBox.Text);
             data.Set("FontName", fontNameComboBox.SelectedValue.ToString());
-            data.Set("FontSize", fontSizeComboBox.SelectedValue);
+            data.Set("FontSize", fontSizeUpDown.Value);
             data.Set("FontColor", ((Color)fontColorPicker.SelectedColor).GetInteger());
             data.Set("BackGroundColor", ((Color)backgroundColorPicker.SelectedColor).GetInteger());
             data.Set("LineColor", ((Color)lineColorPicker.SelectedColor).GetInteger());
@@ -179,11 +179,6 @@ namespace MobiGuide
             alCodeTxtBlock.Text = airlineCode;
 
             /// setup default UIs
-            int[] fontSizeStep = { 6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 36, 48, 72 };
-            foreach (int fontSize in fontSizeStep)
-            {
-                fontSizeComboBox.Items.Add(new CustomComboBoxItem { Text = fontSize + " px", Value = fontSize });
-            }
 
             statusCodeComboBox.Items.Add(new CustomComboBoxItem { Text = "Active", Value = "A" });
             statusCodeComboBox.Items.Add(new CustomComboBoxItem { Text = "Inactive", Value = "I" });
@@ -223,7 +218,7 @@ namespace MobiGuide
             //font size combobox
             if (!String.IsNullOrEmpty(airlineRef.Get("FontSize").ToString()))
             {
-                fontSizeComboBox.SelectedValue = (int)airlineRef.Get("FontSize");
+                fontSizeUpDown.Value = (int)airlineRef.Get("FontSize");
             }
 
             //colors

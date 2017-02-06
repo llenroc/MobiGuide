@@ -603,4 +603,107 @@ namespace Properties
             }
         }
     }
+    public class ShowText : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+        private string _flightNo;
+        private string _origin;
+        private string _dest;
+        private string _originCode;
+        private string _destCode;
+        private DateTime _depDate;
+        private TimeSpan _depTime;
+        private TimeSpan _showMsgTime;
+        private string _textTemplate;
+        
+        public string FlightNo
+        {
+            get { return _flightNo; }
+            set
+            {
+                _flightNo = value;
+                OnPropertyChanged("FlightNo");
+            }
+        }
+        public string OriginName
+        {
+            get { return _origin; }
+            set
+            {
+                _origin = value;
+                OnPropertyChanged("OriginName");
+            }
+        }
+        public string DestinationName
+        {
+            get { return _dest; }
+            set
+            {
+                _dest = value;
+                OnPropertyChanged("DestinationName");
+            }
+        }
+        public string OriginCode
+        {
+            get { return _originCode; }
+            set
+            {
+                _originCode = value;
+                OnPropertyChanged("OriginCode");
+            }
+        }
+        public string DestinationCode
+        {
+            get { return _destCode; }
+            set
+            {
+                _destCode = value;
+                OnPropertyChanged("DestinationCode");
+            }
+        }
+        public DateTime DepartureDate
+        {
+            get { return _depDate.Date; }
+            set
+            {
+                _depDate = value;
+                OnPropertyChanged("DepartureDate");
+            }
+        }
+        public TimeSpan DepartureTime
+        {
+            get { return _depTime; }
+            set
+            {
+                _depTime = value;
+                OnPropertyChanged("DepartureTime");
+            }
+        }
+        public TimeSpan ShowMessageTime
+        {
+            get { return _showMsgTime; }
+            set
+            {
+                _showMsgTime = value;
+                OnPropertyChanged("ShowMessageTime");
+            }
+        }
+        public string TextTemplate
+        {
+            get { return _textTemplate; }
+            set
+            {
+                _textTemplate = value;
+                OnPropertyChanged("TextTemplate");
+            }
+        }
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+    }
 }

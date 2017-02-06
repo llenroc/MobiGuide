@@ -109,6 +109,9 @@
     </ApplicationDefinition>
     <Compile Include="Class\Properties.cs" />
     <Compile Include="Helper\EventHelper.cs" />
+    <Compile Include="Pages\TextPage.xaml.cs">
+      <DependentUpon>TextPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\LogoPage.xaml.cs">
       <DependentUpon>LogoPage.xaml</DependentUpon>
     </Compile>
@@ -181,6 +184,10 @@
     <Compile Include="Windows\NewEditAirportReferenceWindow.xaml.cs">
       <DependentUpon>NewEditAirportReferenceWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Pages\TextPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Pages\LogoPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

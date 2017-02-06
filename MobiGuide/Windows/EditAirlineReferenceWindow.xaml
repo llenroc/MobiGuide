@@ -72,7 +72,7 @@
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
-                        <ComboBox x:Name="fontSizeComboBox" Margin="10,0,0,3" SelectedIndex="0" HorizontalAlignment="Left" FontSize="14" SelectedValuePath="Value"/>
+                        <xctk:IntegerUpDown x:Name="fontSizeUpDown" HorizontalAlignment="Left" Margin="10,4,0,3" Value="100" Minimum="10" Maximum="100"/>
                         <xctk:ColorPicker x:Name="fontColorPicker" Margin="10,0,0,4" DisplayColorAndName="True" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" MinWidth="100" Padding="0,0,3,0" FontSize="14"/>
                         <xctk:ColorPicker x:Name="backgroundColorPicker" Margin="10,0,0,4" DisplayColorAndName="True" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" MinWidth="100" Padding="0,0,3,0" FontSize="14"/>
                         <xctk:ColorPicker x:Name="lineColorPicker" Margin="10,0,0,3" DisplayColorAndName="True" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" MinWidth="100" Padding="0,0,3,0" FontSize="14"/>

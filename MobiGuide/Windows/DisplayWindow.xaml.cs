@@ -20,14 +20,20 @@ namespace MobiGuide
     /// </summary>
     public partial class DisplayWindow : Window
     {
-        private DISPLAY_TYPE DisplayType { get; set; }
+        public DISPLAY_TYPE DisplayType { get; set; }
+        private ShowText showText { get; set; }
         public DisplayWindow()
         {
             InitializeComponent();
         }
-        public DisplayWindow(DISPLAY_TYPE type) : this()
+        public DisplayWindow(DISPLAY_TYPE type, object param = null) : this()
         {
             this.DisplayType = type;
+            if(type == DISPLAY_TYPE.TEXT)
+            {
+                if(param != null)
+                    showText = param as ShowText;
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -36,6 +42,9 @@ namespace MobiGuide
             {
                 case DISPLAY_TYPE.LOGO:
                     DisplayFrame.Navigate(new LogoPage());
+                    break;
+                case DISPLAY_TYPE.TEXT:
+                    DisplayFrame.Navigate(new TextPage(showText));
                     break;
             }
         }
