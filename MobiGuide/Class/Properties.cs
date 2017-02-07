@@ -606,6 +606,7 @@ namespace Properties
     public class ShowText : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+        private Guid _textTemplateId;
         private string _flightNo;
         private string _origin;
         private string _dest;
@@ -613,9 +614,18 @@ namespace Properties
         private string _destCode;
         private DateTime _depDate;
         private TimeSpan _depTime;
-        private TimeSpan _showMsgTime;
         private string _textTemplate;
+        private int _rotateSeconds;
         
+        public Guid TextTemplateId
+        {
+            get { return _textTemplateId; }
+            set
+            {
+                _textTemplateId = value;
+                OnPropertyChanged("TextTemplateId");
+            }
+        }
         public string FlightNo
         {
             get { return _flightNo; }
@@ -679,15 +689,6 @@ namespace Properties
                 OnPropertyChanged("DepartureTime");
             }
         }
-        public TimeSpan ShowMessageTime
-        {
-            get { return _showMsgTime; }
-            set
-            {
-                _showMsgTime = value;
-                OnPropertyChanged("ShowMessageTime");
-            }
-        }
         public string TextTemplate
         {
             get { return _textTemplate; }
@@ -695,6 +696,15 @@ namespace Properties
             {
                 _textTemplate = value;
                 OnPropertyChanged("TextTemplate");
+            }
+        }
+        public int RotateInSeconds
+        {
+            get { return _rotateSeconds; }
+            set
+            {
+                _rotateSeconds = value;
+                OnPropertyChanged("RotateInSeconds");
             }
         }
         protected void OnPropertyChanged(string name)

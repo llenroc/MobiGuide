@@ -320,7 +320,6 @@ namespace MobiGuide
             }
 
             if(departureTimePicker.Value == null) departureTimePicker.Value = DateTime.Now;
-            if(displayMessageTimePicker.Value == null) displayMessageTimePicker.Value = DateTime.Now;
         }
 
         private void showLogoBtn_Click(object sender, RoutedEventArgs e)
@@ -396,6 +395,7 @@ namespace MobiGuide
                 if (textTemplateData.HasData && textTemplateData.Error == ERROR.NoError)
                 {
                     textDisplayedTextBox.Text = textTemplateData.Get("TextTemplate").ToString();
+                    rotateSecondsUpDown.Value = (int)textTemplateData.Get("RotateInSeconds");
                 }
             }
         }
@@ -421,10 +421,10 @@ namespace MobiGuide
                 departureTimePicker.GotFocus += DepartureTimePicker_GotFocus;
                 IsFulfill = false;
             }
-            if(displayMessageTimePicker.Value == null)
+            if(rotateSecondsUpDown.Value == null)
             {
-                displayMessageTimePicker.BorderBrush = Brushes.Red;
-                displayMessageTimePicker.GotFocus += DisplayMessageTimePicker_GotFocus;
+                rotateSecondsUpDown.BorderBrush = Brushes.Red;
+                rotateSecondsUpDown.GotFocus += RotateSecondsUpDown_GotFocus;
                 IsFulfill = false;
             }
             if (String.IsNullOrWhiteSpace(textDisplayedTextBox.Text))
@@ -436,6 +436,7 @@ namespace MobiGuide
             if (!IsFulfill) return;
             ShowText showText = new ShowText
             {
+                TextTemplateId = new Guid(textTemplateComboBox.SelectedValue.ToString()),
                 FlightNo = flightNoTextBox.Text,
                 OriginCode = (originComboBox.SelectedItem as CustomComboBoxItem).Value.ToString(),
                 DestinationCode = (destinationComboBox.SelectedItem as CustomComboBoxItem).Value.ToString(),
@@ -443,10 +444,16 @@ namespace MobiGuide
                 DestinationName = (destinationComboBox.SelectedItem as CustomComboBoxItem).Text,
                 DepartureDate = (DateTime)departureDatePicker.SelectedDate,
                 DepartureTime = ((DateTime)departureTimePicker.Value).TimeOfDay,
-                ShowMessageTime = ((DateTime)displayMessageTimePicker.Value).TimeOfDay,
+                RotateInSeconds = (int)rotateSecondsUpDown.Value,
                 TextTemplate = textDisplayedTextBox.Text
             };
             ShowWindow(DISPLAY_TYPE.TEXT, showText);
+        }
+
+        private void RotateSecondsUpDown_GotFocus(object sender, RoutedEventArgs e)
+        {
+            (sender as IntegerUpDown).ClearValue(IntegerUpDown.BorderBrushProperty);
+            (sender as IntegerUpDown).GotFocus -= RotateSecondsUpDown_GotFocus;
         }
 
         private void TextDisplayedTextBox_GotFocus(object sender, RoutedEventArgs e)

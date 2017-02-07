@@ -145,12 +145,12 @@
                     <xctk:TimePicker x:Name="departureTimePicker" Margin="68,0,0,0" Width="100" Format="Custom" FormatString="HH:mm" AllowTextInput="False"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="50,10,0,0" HorizontalAlignment="Left">
-                    <TextBlock x:Name="textBlock9" TextWrapping="Wrap" Text="Display Message" FontSize="14" Margin="20,0,0,0"/>
-                    <xctk:TimePicker x:Name="displayMessageTimePicker" Margin="61,0,0,0" Width="100" Format="Custom" FormatString="HH:mm" AllowTextInput="False"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="50,10,0,0" HorizontalAlignment="Left">
                     <TextBlock x:Name="textBlock10" TextWrapping="Wrap" Text="Text Template" FontSize="14" Margin="20,0,0,0"/>
                     <ComboBox x:Name="textTemplateComboBox" Margin="80,0,0,0" MinWidth="150" SelectedValuePath="Value" SelectionChanged="textTemplateComboBox_SelectionChanged"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="50,10,0,0" HorizontalAlignment="Left">
+                    <TextBlock x:Name="textBlock9" TextWrapping="Wrap" Text="Display Duration (s)" FontSize="14" Margin="20,0,0,0"/>
+                    <xctk:IntegerUpDown x:Name="rotateSecondsUpDown" Margin="44,0,0,0" Width="50" Value="10"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="50,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <TextBlock x:Name="textBlock11" TextWrapping="Wrap" Text="Text Displayed" FontSize="14" Margin="20,0,0,0"/>
