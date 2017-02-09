@@ -22,17 +22,26 @@ namespace MobiGuide
     {
         public DISPLAY_TYPE DisplayType { get; set; }
         private ShowText showText { get; set; }
+        private Guid aircraftConfigurationId { get; set; }
+        private bool frontDoorUsingFlag { get; set; }
+        private bool rearDoorUsingFlag { get; set; }
         public DisplayWindow()
         {
             InitializeComponent();
         }
-        public DisplayWindow(DISPLAY_TYPE type, object param = null) : this()
+        public DisplayWindow(DISPLAY_TYPE type, params object[] param) : this()
         {
             this.DisplayType = type;
             if(type == DISPLAY_TYPE.TEXT)
             {
                 if(param != null)
-                    showText = param as ShowText;
+                    showText = param[0] as ShowText;
+            }
+            if(type == DISPLAY_TYPE.SEATMAPS)
+            {
+                aircraftConfigurationId = new Guid(param[0].ToString());
+                frontDoorUsingFlag = (bool)param[1];
+                rearDoorUsingFlag = (bool)param[2];
             }
         }
 
@@ -45,6 +54,9 @@ namespace MobiGuide
                     break;
                 case DISPLAY_TYPE.TEXT:
                     DisplayFrame.Navigate(new TextPage(showText));
+                    break;
+                case DISPLAY_TYPE.SEATMAPS:
+                    DisplayFrame.Navigate(new SeatMapPage(aircraftConfigurationId, frontDoorUsingFlag, rearDoorUsingFlag));
                     break;
             }
         }

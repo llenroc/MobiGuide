@@ -109,6 +109,9 @@
     </ApplicationDefinition>
     <Compile Include="Class\Properties.cs" />
     <Compile Include="Helper\EventHelper.cs" />
+    <Compile Include="Pages\SeatMapPage.xaml.cs">
+      <DependentUpon>SeatMapPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\TextPage.xaml.cs">
       <DependentUpon>TextPage.xaml</DependentUpon>
     </Compile>
@@ -184,6 +187,10 @@
     <Compile Include="Windows\NewEditAirportReferenceWindow.xaml.cs">
       <DependentUpon>NewEditAirportReferenceWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Pages\SeatMapPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\TextPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -590,7 +590,11 @@ namespace Properties
         }
     }
 
-    public class Seat : Shape { }
+    public class Seat : Shape
+    {
+        public int Row { get; set; }
+        public string Column { get; set; }
+    }
     public class AisleY : Shape
     {
         private int _afterRow;
