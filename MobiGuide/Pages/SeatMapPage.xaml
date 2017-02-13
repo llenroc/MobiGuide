@@ -20,5 +20,10 @@
         <Viewbox x:Name="seatNumberViewBox" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,20,0">
             <TextBlock x:Name="textBlock1" TextWrapping="Wrap"/>
         </Viewbox>
+        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Orientation="Horizontal" Margin="10,40,0,0">
+            <TextBlock x:Name="textBlock2" TextWrapping="Wrap" Text="Barcode"/>
+            <TextBox x:Name="barCodeTextBox" Height="100" TextWrapping="Wrap" Width="200" Margin="23,0,0,0"/>
+            <Button x:Name="extractBtn" Content="Extract" Width="75" Margin="10,0,0,0" Click="extractBtn_Click" VerticalAlignment="Top"/>
+        </StackPanel>
     </Grid>
 </Page>

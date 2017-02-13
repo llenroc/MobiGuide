@@ -107,6 +107,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Class\BarcodeExtractor.cs" />
     <Compile Include="Class\Properties.cs" />
     <Compile Include="Helper\EventHelper.cs" />
     <Compile Include="Pages\SeatMapPage.xaml.cs">

@@ -17,6 +17,7 @@ using Properties;
 using System.Reflection;
 using CustomExtensions;
 using System.Timers;
+using MobiGuide;
 
 namespace MobiGuide
 {
@@ -188,6 +189,7 @@ namespace MobiGuide
             Dispatcher.Invoke(new Action(() =>
             {
                 seatComboBox.SelectedIndex = 0;
+                HideSeatAndLine();
             }));
         }
 
@@ -273,42 +275,61 @@ namespace MobiGuide
             }
         }
 
+        private void ShowSeat(string selectedSeat)
+        {
+            foreach (UIElement child in imageCanvas.Children)
+            {
+                if (child is Grid)
+                {
+                    Grid grid = child as Grid;
+                    grid.Visibility = grid.Name == selectedSeat ? Visibility.Visible : Visibility.Hidden;
+                }
+            }
+        }
+
+        private void HideSeatAndLine()
+        {
+            List<UIElement> toRemoveList = new List<UIElement>();
+            foreach (UIElement child in imageCanvas.Children)
+            {
+                if (child is Grid)
+                {
+                    Grid grid = child as Grid;
+                    grid.Visibility = Visibility.Hidden;
+                }
+                if (child is Line || child is Polygon)
+                {
+                    toRemoveList.Add(child);
+                }
+            }
+            foreach (UIElement toRemove in toRemoveList)
+            {
+                imageCanvas.Children.Remove(toRemove);
+            }
+                (seatNumberViewBox.Child as TextBlock).Text = String.Empty;
+        }
+
         private void seatComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if(seatComboBox.SelectedItem != null && seatComboBox.SelectedValue.ToString() != "")
             {
                 string selectedSeat = (seatComboBox.SelectedItem as CustomComboBoxItem).Value.ToString();
-                foreach (UIElement child in imageCanvas.Children)
-                {
-                    if(child is Grid)
-                    {
-                        Grid grid = child as Grid;
-                        grid.Visibility = grid.Name == selectedSeat ? Visibility.Visible : Visibility.Hidden;
-                    }
-                }
+                ShowSeat(selectedSeat);
                 DrawLine(selectedSeat);
             }
             else
             {
-                List<UIElement> toRemoveList = new List<UIElement>();
-                foreach (UIElement child in imageCanvas.Children)
-                {
-                    if (child is Grid)
-                    {
-                        Grid grid = child as Grid;
-                        grid.Visibility = Visibility.Hidden;
-                    }
-                    if(child is Line || child is Polygon)
-                    {
-                        toRemoveList.Add(child);
-                    }
-                }
-                foreach(UIElement toRemove in toRemoveList)
-                {
-                    imageCanvas.Children.Remove(toRemove);
-                }
-                (seatNumberViewBox.Child as TextBlock).Text = String.Empty;
+                HideSeatAndLine();
             }
+        }
+
+        private void extractBtn_Click(object sender, RoutedEventArgs e)
+        {
+            string barcode = barCodeTextBox.Text;
+            BarcodeExtractor barcodeExtractor = new BarcodeExtractor(barcode);
+            string seatName = barcodeExtractor.GetSeatColumn() + "_" + barcodeExtractor.GetSeatRow();
+            ShowSeat(seatName);
+            DrawLine(seatName);
         }
     }
 }
