@@ -132,7 +132,7 @@ namespace MobiGuide
         {
             aircraftTypeComboBox.Items.Add(new CustomComboBoxItem { Text = "Any", Value = "" });
 
-            DataList aircraftTypeList = await dbCon.GetDataList("AircraftTypeReference", null);
+            DataList aircraftTypeList = await dbCon.GetDataList("AircraftTypeReference", new DatabaseConnector.DataRow("StatusCode", "A"), "ORDER BY AircraftTypeCode");
             if(aircraftTypeList.HasData && aircraftTypeList.Error == ERROR.NoError)
             {
                 foreach(DataRow row in aircraftTypeList)

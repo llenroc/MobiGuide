@@ -40,8 +40,20 @@
                     </Style>
                 </DataGrid.CellStyle>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Text Name" Binding="{Binding TextName}" Width="120" FontSize="14"/>
-                    <DataGridTextColumn Header="Text Template" Binding="{Binding TextDisplay}" Width="*" FontSize="14"/>
+                    <DataGridTextColumn Header="Text Name" Binding="{Binding TextName}" Width="120" FontSize="14">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis"></Setter>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Text Template" Binding="{Binding TextDisplay}" Width="*" FontSize="14">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis"></Setter>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
                     <DataGridTextColumn Header="Rotate In (s)" Binding="{Binding RotateInSeconds}" Width="80" FontSize="14" CanUserResize="False"/>
                     <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100" FontSize="14" CanUserResize="False"/>
                 </DataGrid.Columns>

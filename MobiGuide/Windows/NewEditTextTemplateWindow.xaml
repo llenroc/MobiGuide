@@ -82,7 +82,13 @@
                         </DataGridTemplateColumn.CellEditingTemplate>
                     </DataGridTemplateColumn>
                     <DataGridTextColumn Header="Language Name" Binding="{Binding LanguageName}" FontSize="14" MinWidth="120" IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Display Text" Binding="{Binding DisplayText}" FontSize="14" Width="*" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Display Text" Binding="{Binding DisplayText}" FontSize="14" Width="*" IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis"></Setter>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </GroupBox>

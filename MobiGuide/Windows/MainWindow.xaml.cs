@@ -233,7 +233,7 @@ namespace MobiGuide
                     });
                 }
 
-                if (selectedAircraftConfig != String.Empty)
+                if (selectedAircraftConfig != String.Empty && aircraftConfigComboBox.Items.Cast<CustomComboBoxItem>().Any(item => item.Value.Equals(selectedAircraftConfig)))
                     aircraftConfigComboBox.SelectedValue = selectedAircraftConfig;
                 else
                     aircraftConfigComboBox.SelectedIndex = 0;
@@ -269,12 +269,12 @@ namespace MobiGuide
                     });
                 }
 
-                if (selectedOrigin != String.Empty)
+                if (selectedOrigin != String.Empty && originComboBox.Items.Cast<CustomComboBoxItem>().Any(item => item.Value.Equals(selectedOrigin)))
                     originComboBox.SelectedValue = selectedOrigin;
                 else
                     originComboBox.SelectedIndex = 0;
 
-                if (selectedDestination != String.Empty)
+                if (selectedDestination != String.Empty && destinationComboBox.Items.Cast<CustomComboBoxItem>().Any(item => item.Value.Equals(selectedDestination)))
                     destinationComboBox.SelectedValue = selectedDestination;
                 else
                     destinationComboBox.SelectedIndex = 0;
@@ -309,7 +309,7 @@ namespace MobiGuide
                         Value = textTemplateData.Get("TextTemplateId").ToString()
                     });
                 }
-                if(selectedTextTemplate != String.Empty)
+                if(selectedTextTemplate != String.Empty && textTemplateComboBox.Items.Cast<CustomComboBoxItem>().Any(item => item.Value.Equals(selectedTextTemplate)))
                     textTemplateComboBox.SelectedValue = selectedTextTemplate;
                 else
                     textTemplateComboBox.SelectedIndex = 0;

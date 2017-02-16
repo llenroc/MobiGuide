@@ -139,7 +139,7 @@ CREATE TABLE AirportTranslation
 	AirportTranslationId  GUID  NOT NULL ,
 	AirportCode  CODE  ,
 	LanguageCode  CODE  ,
-	AirportName  USR_NAME  ,
+	AirportName  nvarchar(MAX)  ,
 	CommitBy  GUID  ,
 	CommitDateTime  datetime  NULL 
 )
