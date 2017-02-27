@@ -108,7 +108,9 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="50,20,0,0" HorizontalAlignment="Left">
                     <TextBlock x:Name="textBlock1" TextWrapping="Wrap" Text="Aircraft Configuration" FontSize="14" Margin="20,0,0,0"/>
-                    <ComboBox x:Name="aircraftConfigComboBox" Margin="30,0,0,0" MinWidth="150" SelectedValuePath="Value" SelectionChanged="aircraftConfigComboBox_SelectionChanged"/>
+                    <Border BorderThickness="0.7" Margin="30,0,0,0">
+                        <ComboBox x:Name="aircraftConfigComboBox" MinWidth="150" SelectedValuePath="Value" SelectionChanged="aircraftConfigComboBox_SelectionChanged"/>
+                    </Border>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="50,10,0,0" HorizontalAlignment="Left">
                     <TextBlock x:Name="textBlock2" TextWrapping="Wrap" Text="Boarding Location" FontSize="14" Margin="20,0,0,0"/>
@@ -130,11 +132,16 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="50,10,0,0" HorizontalAlignment="Left">
                     <TextBlock x:Name="textBlock5" TextWrapping="Wrap" Text="Origin" FontSize="14" Margin="20,0,0,0"/>
-                    <ComboBox x:Name="originComboBox" Margin="126,0,0,0" MinWidth="150" SelectedValuePath="Value"/>
+                    <Border BorderThickness="0.7" Margin="126,0,0,0">
+                        <ComboBox x:Name="originComboBox" Margin="0,0,0,0" MinWidth="150" SelectedValuePath="Value"/>
+                    </Border>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="50,10,0,0" HorizontalAlignment="Left">
                     <TextBlock x:Name="textBlock6" TextWrapping="Wrap" Text="Destination" FontSize="14" Margin="20,0,0,0"/>
-                    <ComboBox x:Name="destinationComboBox" Margin="94,0,0,0" MinWidth="150" SelectedValuePath="Value"/>
+                    <Border BorderThickness="0.7" Margin="94,0,0,0">
+                        <ComboBox x:Name="destinationComboBox" Margin="0,0,0,0" MinWidth="150" SelectedValuePath="Value"/>
+                    </Border>
+                    
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="50,10,0,0" HorizontalAlignment="Left">
                     <TextBlock x:Name="textBlock7" TextWrapping="Wrap" Text="Departure Date" FontSize="14" Margin="20,0,0,0"/>
@@ -146,7 +153,9 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="50,10,0,0" HorizontalAlignment="Left">
                     <TextBlock x:Name="textBlock10" TextWrapping="Wrap" Text="Text Template" FontSize="14" Margin="20,0,0,0"/>
-                    <ComboBox x:Name="textTemplateComboBox" Margin="80,0,0,0" MinWidth="150" SelectedValuePath="Value" SelectionChanged="textTemplateComboBox_SelectionChanged"/>
+                    <Border BorderThickness="0.7" Margin="80,0,0,0">
+                        <ComboBox x:Name="textTemplateComboBox" Margin="0,0,0,0" MinWidth="150" SelectedValuePath="Value" SelectionChanged="textTemplateComboBox_SelectionChanged"/>
+                    </Border>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="50,10,0,0" HorizontalAlignment="Left">
                     <TextBlock x:Name="textBlock9" TextWrapping="Wrap" Text="Display Duration (s)" FontSize="14" Margin="20,0,0,0"/>
@@ -154,7 +163,7 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="50,10,0,0" HorizontalAlignment="Left" VerticalAlignment="Top">
                     <TextBlock x:Name="textBlock11" TextWrapping="Wrap" Text="Text Displayed" FontSize="14" Margin="20,0,0,0"/>
-                    <TextBox x:Name="textDisplayedTextBox" TextWrapping="Wrap" Width="260" Margin="76,0,0,20" VerticalScrollBarVisibility="Auto" Height="90"/>
+                    <TextBox x:Name="textDisplayedTextBox" TextWrapping="Wrap" Width="260" Margin="76,0,0,20" VerticalScrollBarVisibility="Auto" Height="90" IsEnabled="False"/>
                 </StackPanel>
             </StackPanel>
         </GroupBox>

@@ -359,8 +359,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Database_log.ldf">
-      <DependentUpon>Database.mdf</DependentUpon>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <DependentUpon>Database.mdf</DependentUpon>
     </Content>
     <Content Include="GenerateDB_20161126.SQL" />
     <Resource Include="SampleData\Bangkok_Airways_Airbus_A319_V2.jpg" />

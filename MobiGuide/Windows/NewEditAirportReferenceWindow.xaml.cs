@@ -189,7 +189,13 @@ namespace MobiGuide
             else
             {
                 AirportTranslation at = new AirportTranslation();
-                foreach (DataRow row in await LoadLanguageList())
+                DataList LanguageList = await LoadLanguageList();
+                if(LanguageList.Count == 0)
+                {
+                    MessageBox.Show("Language Reference Not Found.", "ERROR");
+                    this.Close();
+                }
+                foreach (DataRow row in LanguageList)
                 {
                     at.LanguageList.Add(row.Get("LanguageCode").ToString());
                 }

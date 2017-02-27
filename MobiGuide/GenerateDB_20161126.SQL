@@ -17,11 +17,6 @@ go
 exec sp_addtype GUID, "uniqueidentifier", "NULL"
 go
 
-
-exec sp_addtype LARGE_TEXT, "nvarchar(MAX)", "NULL"
-go
-
-
 exec sp_addtype LONG_NAME, "nvarchar(450)", "NULL"
 go
 
@@ -214,7 +209,7 @@ CREATE TABLE TextTemplate
 	TextTemplateId  GUID  NOT NULL ,
 	AirlineCode  CODE  ,
 	TextName  USR_NAME  ,
-	TextTemplate  LARGE_TEXT  ,
+	TextTemplate  NVARCHAR(MAX)  ,
 	RotateInSeconds  integer  NULL ,
 	StatusCode  STATUS_CODE  ,
 	CommitBy  GUID  ,
@@ -240,7 +235,7 @@ CREATE TABLE TextTranslation
 	TextTranslationId  GUID  NOT NULL ,
 	TextTemplateId  GUID  ,
 	LanguageCode  CODE  ,
-	TextTemplate  LARGE_TEXT  ,
+	TextTemplate  NVARCHAR(MAX)  ,
 	CommitBy  GUID  ,
 	CommitDateTime  datetime  NULL 
 )
@@ -296,6 +291,7 @@ INSERT INTO AirlineReference (
 	AirlineCode,
 	AirlineName,
 	FontName,
+	FontSize,
 	FontColor,
 	BackGroundColor,
 	LineColor,
@@ -308,13 +304,14 @@ INSERT INTO AirlineReference (
 (
 	'PG',
 	'Bangkok Airways',
-	'Tahoma',
-	21156,
-	21156,
-	21156,
-	21156,
+	'Segoe WP',
+	65,
+	16777215,
+	10407935,
+	3978097,
+	16711680,
 	5,
-	NULL,
+	'A',
 	NULL,
 	GETDATE()
 );
@@ -358,10 +355,12 @@ VALUES
 	NULL,
 	GETDATE()
 );
+
+insert into LanguageReference values ('THA', 'Thai', 'A' , @sysId, GETDATE());
 go
 
-DECLARE @sysId uniqueidentifier  
-SET @sysId = NEWID() 
+DECLARE @adminId uniqueidentifier  
+SET @adminId = NEWID() 
 INSERT INTO UserAccount 
 (
 	UserAccountId,
@@ -376,7 +375,7 @@ INSERT INTO UserAccount
 )
 VALUES
 (
-	@sysId,
+	@adminId,
 	'PG',
 	'dome',
 	'test',

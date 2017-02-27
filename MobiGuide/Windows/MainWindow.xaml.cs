@@ -433,10 +433,25 @@ namespace MobiGuide
                 textDisplayedTextBox.GotFocus += TextDisplayedTextBox_GotFocus;
                 IsFulfill = false;
             }
+            //if (originComboBox.SelectedValue == null || originComboBox.SelectedValue.Equals(string.Empty))
+            //{
+            //    (originComboBox.Parent as Border).BorderBrush = Brushes.Red;
+            //    originComboBox.GotFocus += OriginComboBox_GotFocus;
+            //    IsFulfill = false;
+            //}
+            //if (destinationComboBox.SelectedValue == null || destinationComboBox.SelectedValue.Equals(string.Empty))
+            //{
+            //    (destinationComboBox.Parent as Border).BorderBrush = Brushes.Red;
+            //    destinationComboBox.GotFocus += DestinationComboBox_GotFocus;
+            //    IsFulfill = false;
+            //}
             if (!IsFulfill) return;
+            Guid TextTemplateId = (textTemplateComboBox.SelectedValue == null || 
+                !textTemplateComboBox.SelectedValue.Equals(String.Empty)) ? 
+                new Guid(textTemplateComboBox.SelectedValue.ToString()) : Guid.Empty;
             ShowText showText = new ShowText
             {
-                TextTemplateId = new Guid(textTemplateComboBox.SelectedValue.ToString()),
+                TextTemplateId = TextTemplateId,
                 FlightNo = flightNoTextBox.Text,
                 OriginCode = (originComboBox.SelectedItem as CustomComboBoxItem).Value.ToString(),
                 DestinationCode = (destinationComboBox.SelectedItem as CustomComboBoxItem).Value.ToString(),
@@ -448,6 +463,18 @@ namespace MobiGuide
                 TextTemplate = textDisplayedTextBox.Text
             };
             ShowWindow(DISPLAY_TYPE.TEXT, showText);
+        }
+
+        private void DestinationComboBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            ((sender as ComboBox).Parent as Border).ClearValue(BorderBrushProperty);
+            (sender as ComboBox).GotFocus -= DestinationComboBox_GotFocus;
+        }
+
+        private void OriginComboBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            ((sender as ComboBox).Parent as Border).ClearValue(BorderBrushProperty);
+            (sender as ComboBox).GotFocus -= OriginComboBox_GotFocus;
         }
 
         private void RotateSecondsUpDown_GotFocus(object sender, RoutedEventArgs e)
@@ -503,17 +530,18 @@ namespace MobiGuide
 
         private void AircraftConfigComboBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            (sender as ComboBox).ClearValue(ComboBox.BorderBrushProperty);
+            ((sender as ComboBox).Parent as Border).ClearValue(ComboBox.BorderBrushProperty);
             (sender as ComboBox).GotFocus -= AircraftConfigComboBox_GotFocus;
         }
 
         private void showSeatMapBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (aircraftConfigComboBox.SelectedValue == null)
+            bool isReturn = false;
+            if (aircraftConfigComboBox.SelectedValue == null || aircraftConfigComboBox.SelectedValue.Equals(String.Empty))
             {
-                aircraftConfigComboBox.BorderBrush = Brushes.Red;
+                (aircraftConfigComboBox.Parent as Border).BorderBrush = Brushes.Red;
                 aircraftConfigComboBox.GotFocus += AircraftConfigComboBox_GotFocus;
-                return;
+                isReturn = true;
             }
             if (frontDoorCheckBox.IsChecked == false && rearDoorCheckBox.IsChecked == false)
             {
@@ -521,8 +549,9 @@ namespace MobiGuide
                 rearDoorCheckBox.BorderBrush = Brushes.Red;
                 frontDoorCheckBox.GotFocus += FrontDoorCheckBox_GotFocus;
                 rearDoorCheckBox.GotFocus += RearDoorCheckBox_GotFocus;
-                return;
+                isReturn = true;
             }
+            if (isReturn) return;
             Guid aircraftConfigId = new Guid(aircraftConfigComboBox.SelectedValue.ToString());
             ShowWindow(DISPLAY_TYPE.SEATMAPS, aircraftConfigId, frontDoorCheckBox.IsChecked, rearDoorCheckBox.IsChecked);
         }
