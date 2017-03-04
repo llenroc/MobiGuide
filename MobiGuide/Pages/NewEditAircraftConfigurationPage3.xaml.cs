@@ -243,6 +243,8 @@ namespace MobiGuide
                     seatWidthUpDown.Value = toWidthRatio((double)seatMapList.GetListAt(0).Get("SeatWidth"));
                     seatHeightUpDown.Value = toHeightRatio((double)seatMapList.GetListAt(0).Get("SeatHeight"));
 
+                    if (this.AircraftConfiguration.MiddleRow > -1) middleRowUpDown.Value = this.AircraftConfiguration.MiddleRow;
+
                     DataRow airlineRef = await dbCon.GetDataRow("AirlineReference", new DataRow("AirlineCode", Application.Current.Resources["AirlineCode"]));
                     SolidColorBrush lineBrush = null, seatBrush = null;
                     if (airlineRef.HasData && airlineRef.Error == ERROR.NoError)
@@ -541,6 +543,11 @@ namespace MobiGuide
                         }
                         AddItemToLocateComboBox(i, selectingIndex, (int)numOfRowsUpDown.Value, new List<int>().ToArray());
                     }
+                }
+                if(numOfRowsUpDown.Value != null)
+                {
+                    middleRowUpDown.Maximum = numOfRowsUpDown.Value - 1;
+                    middleRowUpDown.Value = (int)(numOfRowsUpDown.Value / 2);
                 }
                 
             }
@@ -1117,6 +1124,11 @@ namespace MobiGuide
                 numOfRowsUpDown.BorderBrush = Brushes.Red;
                 result = false;
             }
+            if(middleRowUpDown.Value == null)
+            {
+                middleRowUpDown.BorderBrush = Brushes.Red;
+                result = false;
+            }
             if (numOfColLeftUpDown.Value == null)
             {
                 numOfColLeftUpDown.BorderBrush = Brushes.Red;
@@ -1275,6 +1287,7 @@ namespace MobiGuide
                 this.AircraftConfiguration.RearDoorY = rearDoorY;
                 this.AircraftConfiguration.FrontDoorWidth = toDefaultHeight((double)frontDoorWidthUpDown.Value);
                 this.AircraftConfiguration.RearDoorWidth = toDefaultHeight((double)rearDoorWidthUpDown.Value);
+                this.AircraftConfiguration.MiddleRow = (int)middleRowUpDown.Value;
 
                 DataRow aircraftConfiguration = new DataRow();
                 PropertyInfo[] acProps = this.AircraftConfiguration.GetType().GetProperties();
@@ -1425,6 +1438,17 @@ namespace MobiGuide
             (sender as Button).Visibility = Visibility.Collapsed;
             nextBtn.Visibility = Visibility.Visible;
             finishBtn.Visibility = Visibility.Collapsed;
+        }
+
+        private void middleRowUpDown_GotFocus(object sender, RoutedEventArgs e)
+        {
+            ClearSeat();
+            IntegerUpDown middleRowUpDown = sender as IntegerUpDown;
+            if (middleRowUpDown.Value == null)
+            {
+                middleRowUpDown.ClearValue(IntegerUpDown.BorderBrushProperty);
+                middleRowUpDown.Value = 0;
+            }
         }
     }
 }

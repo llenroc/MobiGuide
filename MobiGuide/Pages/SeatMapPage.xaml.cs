@@ -38,6 +38,7 @@ namespace MobiGuide
         private SolidColorBrush fontBrush { get; set; }
         private Timer DisplayGuidanceTimer;
         private int DisplayGuidanceTime { get; set; }
+        private bool isFlipped { get; set; }
         public SeatMapPage()
         {
             InitializeComponent();
@@ -61,6 +62,7 @@ namespace MobiGuide
             if(FrontDoorUsingFlag == true)
             {
                 imageCanvas.LayoutTransform = new RotateTransform(180);
+                isFlipped = false;
             }
         }
 
@@ -98,7 +100,7 @@ namespace MobiGuide
                 TextBlock text = new TextBlock();
                 text.Text = String.Format("{0}{1}", seat.Row, seat.Column);
                 text.Foreground = Brightness(seatBrush.Color) < 130 ? Brushes.White : Brushes.Black;
-                if (FrontDoorUsingFlag) text.LayoutTransform = new RotateTransform(180);
+                if ((FrontDoorUsingFlag && !RearDoorUsingFlag) || (FrontDoorUsingFlag && RearDoorUsingFlag && (seat.Row < this.AircraftConfiguration.MiddleRow))) text.LayoutTransform = new RotateTransform(180);
                 Viewbox viewBox = new Viewbox();
                 viewBox.Child = text;
                 grid.Name = String.Format("{1}_{0}", seat.Row, seat.Column);
@@ -133,8 +135,19 @@ namespace MobiGuide
                 imageCanvas.Children.Remove(line);
             }
 
-            double startPositionX = FrontDoorUsingFlag ? this.AircraftConfiguration.FrontDoorX : this.AircraftConfiguration.RearDoorX;
-            double startPositionY = FrontDoorUsingFlag ? this.AircraftConfiguration.FrontDoorY : this.AircraftConfiguration.RearDoorY;
+
+            double startPositionX = -1;
+            double startPositionY = -1;
+
+            if(FrontDoorUsingFlag && RearDoorUsingFlag)
+            {
+                startPositionX = seatRow < this.AircraftConfiguration.MiddleRow ? this.AircraftConfiguration.FrontDoorX : this.AircraftConfiguration.RearDoorX;
+                startPositionY = seatRow < this.AircraftConfiguration.MiddleRow ? this.AircraftConfiguration.FrontDoorY : this.AircraftConfiguration.RearDoorY;
+            } else
+            {
+                startPositionX = FrontDoorUsingFlag ? this.AircraftConfiguration.FrontDoorX : this.AircraftConfiguration.RearDoorX;
+                startPositionY = FrontDoorUsingFlag ? this.AircraftConfiguration.FrontDoorY : this.AircraftConfiguration.RearDoorY;
+            }
 
             startPositionX -= 50;
 
@@ -148,7 +161,7 @@ namespace MobiGuide
 
             Line aisleLine = new Line();
             aisleLine.X1 = this.AircraftConfiguration.AisleX;
-            aisleLine.Y1 = FrontDoorUsingFlag ? startPositionY - (AisleXWidth / 2) : startPositionY + (AisleXWidth / 2);
+            aisleLine.Y1 = (FrontDoorUsingFlag && !RearDoorUsingFlag) || (FrontDoorUsingFlag && RearDoorUsingFlag && (seatRow < this.AircraftConfiguration.MiddleRow)) ? startPositionY - (AisleXWidth / 2) : startPositionY + (AisleXWidth / 2);
             aisleLine.X2 = this.AircraftConfiguration.AisleX;
             aisleLine.Y2 = seat.Y + (seat.Height / 2);
             aisleLine.StrokeThickness = AisleXWidth;
@@ -178,6 +191,12 @@ namespace MobiGuide
             imageCanvas.Children.Add(aisleToSeatLine);
             imageCanvas.Children.Add(arrow);
 
+            if (seatRow >= this.AircraftConfiguration.MiddleRow && (FrontDoorUsingFlag && RearDoorUsingFlag))
+            {
+                imageCanvas.LayoutTransform = new RotateTransform(0);
+                isFlipped = true;
+            }
+
             DisplayGuidanceTimer = new Timer(DisplayGuidanceTime * 1000);
             DisplayGuidanceTimer.AutoReset = false;
             DisplayGuidanceTimer.Elapsed += DisplayGuidanceTimer_Elapsed;
@@ -190,6 +209,11 @@ namespace MobiGuide
             {
                 seatComboBox.SelectedIndex = 0;
                 HideSeatAndLine();
+                if (isFlipped)
+                {
+                    imageCanvas.LayoutTransform = new RotateTransform(180);
+                    isFlipped = false;
+                }
             }));
         }
 

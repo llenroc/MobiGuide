@@ -26,6 +26,8 @@
                             <StackPanel Margin="10,5,0,0" Orientation="Horizontal" d:LayoutOverrides="Width">
                                 <TextBlock x:Name="textBlock" TextWrapping="Wrap" Text="Number of Row(s)" FontWeight="Normal" Margin="0" d:LayoutOverrides="Width"/>
                                 <xctk:IntegerUpDown x:Name="numOfRowsUpDown" Margin="10,0,0,0"  Minimum="1" Maximum="99"  FontWeight="Normal" ValueChanged="numOfRowsUpDown_ValueChanged" GotFocus="numOfRowsUpDown_GotFocus"/>
+                                <TextBlock x:Name="textBlock_Copy" TextWrapping="Wrap" Text="Middle Row" FontWeight="Normal" Margin="40,0,0,0"/>
+                                <xctk:IntegerUpDown x:Name="middleRowUpDown" Margin="10,0,0,0"  Minimum="2" Maximum="99"  FontWeight="Normal" GotFocus="middleRowUpDown_GotFocus"/>
                             </StackPanel>
                         </GroupBox>
                         <GroupBox x:Name="groupBox2" Header="Column" Margin="0,10,0,0">

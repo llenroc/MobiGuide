@@ -214,15 +214,6 @@
         </GuideModel>
       </GuideModels>
     </ProjectItemGuide>
-    <ProjectItemGuide TargetFile="Pages\NewEditAircraftConfigurationPage3.xaml">
-      <GuideModels>
-        <GuideModel>
-          <Guides>
-            <Guide Alignment="Top" Position="59" />
-          </Guides>
-        </GuideModel>
-      </GuideModels>
-    </ProjectItemGuide>
     <ProjectItemGuide TargetFile="Windows\AircraftConfigurationWindow.xaml">
       <GuideModels>
         <GuideModel>
@@ -257,6 +248,15 @@
         <GuideModel>
           <Guides>
             <Guide Alignment="Left" Position="75" />
+          </Guides>
+        </GuideModel>
+      </GuideModels>
+    </ProjectItemGuide>
+    <ProjectItemGuide TargetFile="Pages\NewEditAircraftConfigurationPage3.xaml">
+      <GuideModels>
+        <GuideModel>
+          <Guides>
+            <Guide Alignment="Top" Position="59" />
           </Guides>
         </GuideModel>
       </GuideModels>

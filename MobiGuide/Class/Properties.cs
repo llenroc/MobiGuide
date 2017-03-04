@@ -376,6 +376,7 @@ namespace Properties
         private double _rearDoorY;
         private double _rearDoorWidth;
         private string _seatMapImagePath;
+        private int _middleRow;
         public Guid AircraftConfigurationId
         {
             get { return _id; }
@@ -508,6 +509,19 @@ namespace Properties
             {
                 _seatMapImagePath = value;
                 OnPropertyChanged("SeatMapImagePath");
+            }
+        }
+
+        public int MiddleRow
+        {
+            get
+            {
+                return _middleRow;
+            }
+            set
+            {
+                _middleRow = value;
+                OnPropertyChanged("MiddleRow");
             }
         }
 

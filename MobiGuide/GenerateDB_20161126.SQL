@@ -46,6 +46,7 @@ CREATE TABLE AircraftConfiguration
 	RearDoorY  float  NULL ,
 	RearDoorWidth float NULL ,
 	RearDoorBoardingFlag  FLAG  ,
+	MiddleRow	integer NULL,
 	StatusCode  STATUS_CODE  ,
 	CommitBy  GUID  ,
 	CommitDateTime  datetime  NULL 

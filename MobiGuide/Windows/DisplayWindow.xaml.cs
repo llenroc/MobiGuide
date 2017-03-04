@@ -28,6 +28,14 @@ namespace MobiGuide
         public DisplayWindow()
         {
             InitializeComponent();
+
+            this.PreviewKeyDown += new KeyEventHandler(HandleEsc);
+        }
+
+        private void HandleEsc(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+                Close();
         }
         public DisplayWindow(DISPLAY_TYPE type, params object[] param) : this()
         {
