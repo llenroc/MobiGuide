@@ -18,6 +18,7 @@ using System.Reflection;
 using CustomExtensions;
 using System.Timers;
 using MobiGuide;
+using System.Diagnostics;
 
 namespace MobiGuide
 {
@@ -39,6 +40,7 @@ namespace MobiGuide
         private Timer DisplayGuidanceTimer;
         private int DisplayGuidanceTime { get; set; }
         private bool isFlipped { get; set; }
+        private string selectedSeat { get; set; }
         public SeatMapPage()
         {
             InitializeComponent();
@@ -52,18 +54,18 @@ namespace MobiGuide
             RearDoorUsingFlag = rearDoorUsingFlag;
         }
 
+        public SeatMapPage(Guid aircraftConfigId, bool frontDoorUsingFlag, bool rearDoorUsingFlag, string seatName) : this(aircraftConfigId, frontDoorUsingFlag, rearDoorUsingFlag)
+        {
+            this.selectedSeat = seatName;
+        }
+
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             UIElementSizeAdjust();
             await LoadAirlineReferenceData();
-            LoadSeatMapImage();
-            LoadSeatMapPosition();
-
-            if(FrontDoorUsingFlag == true)
-            {
-                imageCanvas.LayoutTransform = new RotateTransform(180);
-                isFlipped = false;
-            }
+            await LoadSeatMapImage();
+            await LoadSeatMapPosition();
+            isFlipped = false;
         }
 
         private void UIElementSizeAdjust()
@@ -113,6 +115,12 @@ namespace MobiGuide
                 seatComboBox.Items.Add(new CustomComboBoxItem { Text = String.Format("{0}{1}", seat.Row, seat.Column), Value = String.Format("{1}_{0}", seat.Row, seat.Column) });
             }
             seatComboBox.SelectedIndex = 0;
+
+            if (this.selectedSeat != null)
+            {
+                ShowSeat(this.selectedSeat);
+                DrawLine(this.selectedSeat);
+            }
         }
 
         private void DrawLine(string seatName)
@@ -150,6 +158,11 @@ namespace MobiGuide
             }
 
             startPositionX -= 50;
+
+            Debug.WriteLine("Start X : " + startPositionX);
+            Debug.WriteLine("Start Y : " + startPositionY);
+
+            Debug.WriteLine("--------------------------");
 
             Line doorToAisleXLine = new Line();
             doorToAisleXLine.X1 = startPositionX;
@@ -197,6 +210,7 @@ namespace MobiGuide
                 isFlipped = true;
             }
 
+            if (DisplayGuidanceTimer != null && DisplayGuidanceTimer.Enabled) DisplayGuidanceTimer.Enabled = false;
             DisplayGuidanceTimer = new Timer(DisplayGuidanceTime * 1000);
             DisplayGuidanceTimer.AutoReset = false;
             DisplayGuidanceTimer.Elapsed += DisplayGuidanceTimer_Elapsed;
@@ -225,7 +239,7 @@ namespace MobiGuide
                c.B * c.B * .068);
         }
 
-        private async void LoadSeatMapPosition()
+        private async Task LoadSeatMapPosition()
         {
             DataList seatMapDataList = await dbCon.GetDataList("SeatMap", new DataRow("AircraftConfigurationId", this.AircraftConfigurationId), "ORDER BY SeatRow, SeatColumn");
             if(seatMapDataList.HasData && seatMapDataList.Error == ERROR.NoError)
@@ -256,7 +270,7 @@ namespace MobiGuide
             return isWidth ? seatMapImg.Width * oldVal / 1080 : seatMapImg.Height * oldVal / 1920;
         }
 
-        private async void LoadSeatMapImage()
+        private async Task LoadSeatMapImage()
         {
             DataRow aircraftConfigData = await dbCon.GetDataRow("AircraftConfiguration", new DatabaseConnector.DataRow("AircraftConfigurationId", AircraftConfigurationId));
             if(aircraftConfigData.HasData && aircraftConfigData.Error == ERROR.NoError)
@@ -286,16 +300,35 @@ namespace MobiGuide
                     this.AircraftConfiguration.AircraftType = aircraftType;
                 }
 
-                this.AircraftConfiguration.AisleX = AdjustRatio(this.AircraftConfiguration.AisleX);
-                this.AircraftConfiguration.FrontDoorX = AdjustRatio(this.AircraftConfiguration.FrontDoorX);
-                this.AircraftConfiguration.FrontDoorY = AdjustRatio(this.AircraftConfiguration.FrontDoorY, false);
-                this.AircraftConfiguration.FrontDoorWidth = AdjustRatio(this.AircraftConfiguration.FrontDoorWidth, false);
+                double AisleX = AdjustRatio(this.AircraftConfiguration.AisleX);
+                double FrontDoorX = AdjustRatio(this.AircraftConfiguration.FrontDoorX);
+                double FrontDoorY = AdjustRatio(this.AircraftConfiguration.FrontDoorY, false);
+                double FrontDoorWidth = AdjustRatio(this.AircraftConfiguration.FrontDoorWidth, false);
 
-                this.AircraftConfiguration.RearDoorX = AdjustRatio(this.AircraftConfiguration.RearDoorX);
-                this.AircraftConfiguration.RearDoorY = AdjustRatio(this.AircraftConfiguration.RearDoorY, false);
-                this.AircraftConfiguration.RearDoorWidth = AdjustRatio(this.AircraftConfiguration.RearDoorWidth, false);
+                double RearDoorX = AdjustRatio(this.AircraftConfiguration.RearDoorX);
+                double RearDoorY = AdjustRatio(this.AircraftConfiguration.RearDoorY, false);
+                double RearDoorWidth = AdjustRatio(this.AircraftConfiguration.RearDoorWidth, false);
+
+                this.AircraftConfiguration.AisleX = AisleX;
+                this.AircraftConfiguration.FrontDoorX = FrontDoorX;
+                this.AircraftConfiguration.FrontDoorY = FrontDoorY;
+                this.AircraftConfiguration.FrontDoorWidth = FrontDoorWidth;
+
+                this.AircraftConfiguration.RearDoorX = RearDoorX;
+                this.AircraftConfiguration.RearDoorY = RearDoorY;
+                this.AircraftConfiguration.RearDoorWidth = RearDoorWidth;
 
                 seatMapImg.Source = ((object)aircraftConfigData.Get("SeatMapImage")).BlobToSource();
+                if (this.selectedSeat != null && FrontDoorUsingFlag && RearDoorUsingFlag)
+                {
+                    int selectedRow = Int32.Parse(this.selectedSeat.Split('_')[1]);
+                    if (selectedRow < this.AircraftConfiguration.MiddleRow)
+                        imageCanvas.LayoutTransform = new RotateTransform(180);
+                }
+                else if (FrontDoorUsingFlag)
+                {
+                    imageCanvas.LayoutTransform = new RotateTransform(180);
+                }
             }
         }
 
@@ -335,15 +368,19 @@ namespace MobiGuide
 
         private void seatComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(seatComboBox.SelectedItem != null && seatComboBox.SelectedValue.ToString() != "")
+            try
             {
-                string selectedSeat = (seatComboBox.SelectedItem as CustomComboBoxItem).Value.ToString();
-                ShowSeat(selectedSeat);
-                DrawLine(selectedSeat);
-            }
-            else
-            {
-                HideSeatAndLine();
+                if (seatComboBox.SelectedItem != null && seatComboBox.SelectedValue.ToString() != "")
+                {
+                    string selectedSeat = (seatComboBox.SelectedItem as CustomComboBoxItem).Value.ToString();
+                    ShowSeat(selectedSeat);
+                    DrawLine(selectedSeat);
+                }
+                else
+                {
+                    HideSeatAndLine();
+                }
+            } catch (Exception) {
             }
         }
 

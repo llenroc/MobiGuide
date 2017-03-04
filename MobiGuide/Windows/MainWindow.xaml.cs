@@ -324,7 +324,24 @@ namespace MobiGuide
 
         private void showLogoBtn_Click(object sender, RoutedEventArgs e)
         {
-            ShowWindow(DISPLAY_TYPE.LOGO);
+            bool IsFulfill = true;
+            if (aircraftConfigComboBox.SelectedValue == null || aircraftConfigComboBox.SelectedValue.Equals(String.Empty))
+            {
+                (aircraftConfigComboBox.Parent as Border).BorderBrush = Brushes.Red;
+                aircraftConfigComboBox.GotFocus += AircraftConfigComboBox_GotFocus;
+                IsFulfill = false;
+            }
+            if (frontDoorCheckBox.IsChecked == false && rearDoorCheckBox.IsChecked == false)
+            {
+                frontDoorCheckBox.BorderBrush = Brushes.Red;
+                rearDoorCheckBox.BorderBrush = Brushes.Red;
+                frontDoorCheckBox.GotFocus += FrontDoorCheckBox_GotFocus;
+                rearDoorCheckBox.GotFocus += RearDoorCheckBox_GotFocus;
+                IsFulfill = false;
+            }
+            if (!IsFulfill) return;
+            Guid aircraftConfigId = new Guid(aircraftConfigComboBox.SelectedValue.ToString());
+            ShowWindow(DISPLAY_TYPE.LOGO, null, aircraftConfigId, frontDoorCheckBox.IsChecked, rearDoorCheckBox.IsChecked);
         }
 
         private void ShowWindow(DISPLAY_TYPE type, params object[] param)
@@ -433,6 +450,20 @@ namespace MobiGuide
                 textDisplayedTextBox.GotFocus += TextDisplayedTextBox_GotFocus;
                 IsFulfill = false;
             }
+            if (aircraftConfigComboBox.SelectedValue == null || aircraftConfigComboBox.SelectedValue.Equals(String.Empty))
+            {
+                (aircraftConfigComboBox.Parent as Border).BorderBrush = Brushes.Red;
+                aircraftConfigComboBox.GotFocus += AircraftConfigComboBox_GotFocus;
+                IsFulfill = false;
+            }
+            if (frontDoorCheckBox.IsChecked == false && rearDoorCheckBox.IsChecked == false)
+            {
+                frontDoorCheckBox.BorderBrush = Brushes.Red;
+                rearDoorCheckBox.BorderBrush = Brushes.Red;
+                frontDoorCheckBox.GotFocus += FrontDoorCheckBox_GotFocus;
+                rearDoorCheckBox.GotFocus += RearDoorCheckBox_GotFocus;
+                IsFulfill = false;
+            }
             //if (originComboBox.SelectedValue == null || originComboBox.SelectedValue.Equals(string.Empty))
             //{
             //    (originComboBox.Parent as Border).BorderBrush = Brushes.Red;
@@ -462,7 +493,8 @@ namespace MobiGuide
                 RotateInSeconds = (int)rotateSecondsUpDown.Value,
                 TextTemplate = textDisplayedTextBox.Text
             };
-            ShowWindow(DISPLAY_TYPE.TEXT, showText);
+            Guid aircraftConfigId = new Guid(aircraftConfigComboBox.SelectedValue.ToString());
+            ShowWindow(DISPLAY_TYPE.TEXT, showText, aircraftConfigId, frontDoorCheckBox.IsChecked, rearDoorCheckBox.IsChecked);
         }
 
         private void DestinationComboBox_GotFocus(object sender, RoutedEventArgs e)
@@ -553,7 +585,7 @@ namespace MobiGuide
             }
             if (isReturn) return;
             Guid aircraftConfigId = new Guid(aircraftConfigComboBox.SelectedValue.ToString());
-            ShowWindow(DISPLAY_TYPE.SEATMAPS, aircraftConfigId, frontDoorCheckBox.IsChecked, rearDoorCheckBox.IsChecked);
+            ShowWindow(DISPLAY_TYPE.SEATMAPS, null, aircraftConfigId, frontDoorCheckBox.IsChecked, rearDoorCheckBox.IsChecked);
         }
 
         private async void aircraftConfigComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
