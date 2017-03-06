@@ -75,7 +75,30 @@ namespace MobiGuide
                 {
                     try
                     {
-                        mainGrid.Background = new SolidColorBrush(((int)airlineRef.Get("BackGroundColor")).GetColor());
+                        if (airlineRef.Get("BackGroundColor2") != null)
+                        {
+                            Color backgroundColor2 = ((int)airlineRef.Get("BackGroundColor2")).GetColor();
+                            if (backgroundColor2.A != 0)
+                            {
+                                LinearGradientBrush gradiantBrush =
+                                new LinearGradientBrush();
+                                gradiantBrush.StartPoint = new Point(0, 0);
+                                gradiantBrush.EndPoint = new Point(1, 1);
+                                gradiantBrush.GradientStops.Add(
+                                    new GradientStop(((int)airlineRef.Get("BackGroundColor")).GetColor(), 0.3));
+                                gradiantBrush.GradientStops.Add(
+                                    new GradientStop(backgroundColor2, 1.0));
+                                mainGrid.Background = gradiantBrush;
+                            }
+                            else
+                            {
+                                mainGrid.Background = new SolidColorBrush(((int)airlineRef.Get("BackGroundColor")).GetColor());
+                            }
+                        }
+                        else
+                        {
+                            mainGrid.Background = new SolidColorBrush(((int)airlineRef.Get("BackGroundColor")).GetColor());
+                        }
                     }
                     catch (Exception)
                     {

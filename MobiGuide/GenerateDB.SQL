@@ -99,6 +99,7 @@ CREATE TABLE AirlineReference
 	FontSize  integer  NULL ,
 	FontColor  integer  NULL ,
 	BackGroundColor  integer  NULL ,
+	BackGroundColor2  integer  NULL ,
 	LineColor  integer  NULL ,
 	SeatColor  integer  NULL ,
 	ShowGuidanceInSeconds  integer  NULL ,

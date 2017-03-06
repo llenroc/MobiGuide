@@ -363,7 +363,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <DependentUpon>Database.mdf</DependentUpon>
     </Content>
-    <Content Include="GenerateDB_20161126.SQL" />
+    <Content Include="GenerateDB.SQL" />
     <Resource Include="SampleData\Bangkok_Airways_Airbus_A319_V2.jpg" />
     <Resource Include="NoImg.jpg" />
     <Resource Include="SampleData\PGBigLogo.png" />

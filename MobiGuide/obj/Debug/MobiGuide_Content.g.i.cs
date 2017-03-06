@@ -10,6 +10,6 @@
 
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("database.mdf")]
 [assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("database_log.ldf")]
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("generatedb_20161126.sql")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("generatedb.sql")]
 
 

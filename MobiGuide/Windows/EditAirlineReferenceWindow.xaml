@@ -11,9 +11,25 @@
         SizeToContent="Width" Loaded="Window_Loaded">
     <Window.Resources>
         <CollectionViewSource Source="{Binding Source={x:Static Fonts.SystemFontFamilies}}" x:Key="sysFonts"/>
+        <ControlTemplate x:Key="savedScrollViewer" TargetType="{x:Type ScrollViewer}">
+            <Grid x:Name="Grid" Background="{TemplateBinding Background}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Rectangle x:Name="Corner" Grid.Column="1" Fill="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Grid.Row="1"/>
+                <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" CanContentScroll="{TemplateBinding CanContentScroll}" CanHorizontallyScroll="False" CanVerticallyScroll="False" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Grid.Column="0" Margin="{TemplateBinding Padding}" Grid.Row="0"/>
+                <ScrollBar x:Name="PART_VerticalScrollBar" AutomationProperties.AutomationId="VerticalScrollBar" Cursor="Arrow" Grid.Column="1" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0" Grid.Row="0" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportHeight}"/>
+                <ScrollBar x:Name="PART_HorizontalScrollBar" AutomationProperties.AutomationId="HorizontalScrollBar" Cursor="Arrow" Grid.Column="0" Maximum="{TemplateBinding ScrollableWidth}" Minimum="0" Orientation="Horizontal" Grid.Row="1" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportWidth}"/>
+            </Grid>
+        </ControlTemplate>
     </Window.Resources>
     <StackPanel>
-        <ScrollViewer d:LayoutOverrides="LeftPosition, RightPosition" Margin="0,0,0,10" Height="450">
+        <ScrollViewer d:LayoutOverrides="LeftPosition, RightPosition" Margin="0,0,0,10" Height="450" Template="{DynamicResource savedScrollViewer}" >
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <StackPanel x:Name="stackTitle" d:LayoutOverrides="Width">
@@ -73,8 +89,12 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
                         <xctk:IntegerUpDown x:Name="fontSizeUpDown" HorizontalAlignment="Left" Margin="10,4,0,3" Value="100" Minimum="10" Maximum="100"/>
-                        <xctk:ColorPicker x:Name="fontColorPicker" Margin="10,0,0,4" DisplayColorAndName="True" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" MinWidth="100" Padding="0,0,3,0" FontSize="14"/>
-                        <xctk:ColorPicker x:Name="backgroundColorPicker" Margin="10,0,0,4" DisplayColorAndName="True" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" MinWidth="100" Padding="0,0,3,0" FontSize="14"/>
+                        <xctk:ColorPicker x:Name="fontColorPicker" Margin="10,0,0,6" DisplayColorAndName="True" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" MinWidth="100" Padding="0,0,3,0" FontSize="14"/>
+                        <StackPanel Orientation="Horizontal" Margin="10,0,0,3" HorizontalAlignment="Left">
+                            <xctk:ColorPicker x:Name="backgroundColorPicker" DisplayColorAndName="True" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" MinWidth="100" Padding="0,0,3,0" FontSize="14" Margin="0" SelectedColorChanged="backgroundColorPicker_SelectedColorChanged"/>
+                            <xctk:ColorPicker x:Name="backgroundColorPicker2" SelectedColor="Transparent" DisplayColorAndName="True" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" MinWidth="100" Padding="0,0,3,0" FontSize="14" Margin="10,0,0,0" SelectedColorChanged="backgroundColorPicker_SelectedColorChanged"/>
+                            <Rectangle x:Name="backgroundPreview" Stroke="Gray" Height="22" Margin="10,0,0,0" Width="22" StrokeThickness="0.2" ToolTip="Preview"/>
+                        </StackPanel>
                         <xctk:ColorPicker x:Name="lineColorPicker" Margin="10,0,0,3" DisplayColorAndName="True" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" MinWidth="100" Padding="0,0,3,0" FontSize="14"/>
                         <xctk:ColorPicker x:Name="seatColorPicker" Margin="10,0,0,6" DisplayColorAndName="True" HorizontalAlignment="Left" HorizontalContentAlignment="Stretch" MinWidth="100" Padding="0,0,3,3" FontSize="14"/>
                         <xctk:IntegerUpDown x:Name="dispGuideTimeIntUpDown" Margin="10,0,0,0" HorizontalAlignment="Left" Width="45" Value="1" DefaultValue="1" Minimum="1" Maximum="999" FontSize="14"/>

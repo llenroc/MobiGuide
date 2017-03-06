@@ -32,7 +32,7 @@ namespace CustomExtensions
     {
         public static Color GetColor(this int i)
         {
-            string hex = i.ToString("X6");
+            string hex = i.ToString("X8");
             Color color = (Color)ColorConverter.ConvertFromString("#" + hex);
             return color;
         }
@@ -42,7 +42,7 @@ namespace CustomExtensions
     {
         public static int GetInteger(this Color color)
         {
-            string colorString = string.Format("{0:X2}{1:X2}{2:X2}", color.R, color.G, color.B);
+            string colorString = string.Format("{0:X2}{1:X2}{2:X2}{3:X2}", color.A, color.R, color.G, color.B);
             int i = int.Parse(colorString, System.Globalization.NumberStyles.HexNumber);
             return i;
         }

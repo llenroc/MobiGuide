@@ -92,6 +92,7 @@ namespace MobiGuide
             data.Set("FontSize", fontSizeUpDown.Value);
             data.Set("FontColor", ((Color)fontColorPicker.SelectedColor).GetInteger());
             data.Set("BackGroundColor", ((Color)backgroundColorPicker.SelectedColor).GetInteger());
+            data.Set("BackGroundColor2", ((Color)backgroundColorPicker2.SelectedColor).GetInteger());
             data.Set("LineColor", ((Color)lineColorPicker.SelectedColor).GetInteger());
             data.Set("SeatColor", ((Color)seatColorPicker.SelectedColor).GetInteger());
             data.Set("ShowGuidanceInSeconds", dispGuideTimeIntUpDown.Value);
@@ -224,6 +225,7 @@ namespace MobiGuide
             //colors
             fontColorPicker.SelectedColor = ((int)airlineRef.Get("FontColor")).GetColor();
             backgroundColorPicker.SelectedColor = ((int)airlineRef.Get("BackGroundColor")).GetColor();
+            backgroundColorPicker2.SelectedColor = ((int)airlineRef.Get("BackGroundColor2")).GetColor();
             lineColorPicker.SelectedColor = ((int)airlineRef.Get("LineColor")).GetColor();
             seatColorPicker.SelectedColor = ((int)airlineRef.Get("SeatColor")).GetColor();
 
@@ -292,6 +294,28 @@ namespace MobiGuide
                 case ImageUploadStatus.New:
                     smallLogoStatus = ImageUploadStatus.Remain;
                     break;
+            }
+        }
+
+        private void backgroundColorPicker_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
+        {
+            if(backgroundColorPicker.SelectedColor != null)
+            {
+                if(backgroundColorPicker2.SelectedColor != null && backgroundColorPicker2.SelectedColor != Colors.Transparent)
+                {
+                    LinearGradientBrush gradiantBrush =
+                        new LinearGradientBrush();
+                    gradiantBrush.StartPoint = new Point(0, 0);
+                    gradiantBrush.EndPoint = new Point(1, 1);
+                    gradiantBrush.GradientStops.Add(
+                        new GradientStop((Color)backgroundColorPicker.SelectedColor, 0.3));
+                    gradiantBrush.GradientStops.Add(
+                        new GradientStop((Color)backgroundColorPicker2.SelectedColor, 1.0));
+                    backgroundPreview.Fill = gradiantBrush;
+                } else
+                {
+                    backgroundPreview.Fill = new SolidColorBrush((Color)backgroundColorPicker.SelectedColor);
+                }
             }
         }
     }
