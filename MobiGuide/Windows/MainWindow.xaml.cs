@@ -1,23 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data.SqlClient;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.ComponentModel;
 using DatabaseConnector;
 using CustomExtensions;
-using System.Diagnostics;
 using Properties;
 using MobiGuide.Helper;
 using Xceed.Wpf.Toolkit;
@@ -66,6 +54,7 @@ namespace MobiGuide
 
             ImageSource logoSource = ((object)airlineRef.Get("AirlineLogoSmall")).BlobToSource();
             if (logoSource != null) logoImg.Source = logoSource;
+            else logoImg.Source = new BitmapImage(new Uri(@"..\NoImg.jpg", UriKind.RelativeOrAbsolute));
         }
         private void AddNewUserMenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -464,18 +453,6 @@ namespace MobiGuide
                 rearDoorCheckBox.GotFocus += RearDoorCheckBox_GotFocus;
                 IsFulfill = false;
             }
-            //if (originComboBox.SelectedValue == null || originComboBox.SelectedValue.Equals(string.Empty))
-            //{
-            //    (originComboBox.Parent as Border).BorderBrush = Brushes.Red;
-            //    originComboBox.GotFocus += OriginComboBox_GotFocus;
-            //    IsFulfill = false;
-            //}
-            //if (destinationComboBox.SelectedValue == null || destinationComboBox.SelectedValue.Equals(string.Empty))
-            //{
-            //    (destinationComboBox.Parent as Border).BorderBrush = Brushes.Red;
-            //    destinationComboBox.GotFocus += DestinationComboBox_GotFocus;
-            //    IsFulfill = false;
-            //}
             if (!IsFulfill) return;
             Guid TextTemplateId = (textTemplateComboBox.SelectedValue == null || 
                 !textTemplateComboBox.SelectedValue.Equals(String.Empty)) ? 

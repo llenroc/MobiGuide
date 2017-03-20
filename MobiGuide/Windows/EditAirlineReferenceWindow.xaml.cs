@@ -1,19 +1,10 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using CustomExtensions;
-using System.IO;
 using DatabaseConnector;
 using Properties;
 
@@ -244,7 +235,7 @@ namespace MobiGuide
             }
             else
             {
-                alLargeLogoImg.Source = new BitmapImage(new Uri(@"NoImg.jpg", UriKind.RelativeOrAbsolute));
+                alLargeLogoImg.Source = new BitmapImage(new Uri(@"..\NoImg.jpg", UriKind.RelativeOrAbsolute));
             }
             if (airlineRef.Get("AirlineLogoSmall") != DBNull.Value)
             {
@@ -253,7 +244,7 @@ namespace MobiGuide
             }
             else
             {
-                alSmallLogoImg.Source = new BitmapImage(new Uri(@"NoImg.jpg", UriKind.RelativeOrAbsolute));
+                alSmallLogoImg.Source = new BitmapImage(new Uri(@"..\NoImg.jpg", UriKind.RelativeOrAbsolute));
             }
         }
 
@@ -267,7 +258,7 @@ namespace MobiGuide
         private void removeLargeLogoBtn_Click(object sender, RoutedEventArgs e)
         {
             removeLargeLogoBtn.Visibility = Visibility.Hidden;
-            alLargeLogoImg.Source = new BitmapImage(new Uri(@"NoImg.jpg", UriKind.RelativeOrAbsolute));
+            alLargeLogoImg.Source = new BitmapImage(new Uri(@"..\NoImg.jpg", UriKind.RelativeOrAbsolute));
             srcLargeLogoTxtBox.Text = String.Empty;
             switch (largeLogoStatus)
             {
@@ -284,7 +275,7 @@ namespace MobiGuide
         private void removeSmallLogoBtn_Click(object sender, RoutedEventArgs e)
         {
             removeSmallLogoBtn.Visibility = Visibility.Hidden;
-            alSmallLogoImg.Source = new BitmapImage(new Uri(@"NoImg.jpg", UriKind.RelativeOrAbsolute));
+            alSmallLogoImg.Source = new BitmapImage(new Uri(@"..\NoImg.jpg", UriKind.RelativeOrAbsolute));
             srcSmallLogoTxtBox.Text = String.Empty;
             switch (smallLogoStatus)
             {

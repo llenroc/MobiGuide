@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MobiGuide"
         mc:Ignorable="d"
-        Title="Add New User" Height="300" Width="300"
+        Title="Add New User" Height="310"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
-        Loaded="Window_Loaded" SizeToContent="Width">
+        Loaded="Window_Loaded" SizeToContent="Width" Width="300" MinWidth="380">
     <StackPanel>
         <StackPanel Orientation="Horizontal">
             <StackPanel x:Name="stackTitle" d:LayoutOverrides="Width">
@@ -19,7 +19,7 @@
                 <TextBlock x:Name="textBlock_Copy3" TextWrapping="Wrap" Text="Password" FontSize="14" Margin="10,0,0,10"/>
                 <TextBlock x:Name="textBlock_Copy4" TextWrapping="Wrap" Text="Confirm Password" FontSize="14" Margin="10,0,0,10"/>
             </StackPanel>
-            <StackPanel x:Name="stackDetail" d:LayoutOverrides="Width" Margin="0,0,10,0">
+            <StackPanel x:Name="stackDetail" Margin="0,0,10,0" MinWidth="230">
                 <TextBox x:Name="uNameTxtBox" Height="20" TextWrapping="Wrap" FontSize="14" Margin="10,9,0,10"/>
                 <TextBlock x:Name="alNameTxtBlock" TextWrapping="Wrap" FontSize="14" Margin="10,0,0,8" FontWeight="Bold"/>
                 <TextBox x:Name="firstNameTxtBox" Height="20" TextWrapping="Wrap" FontSize="14" Margin="10,0,0,9"/>

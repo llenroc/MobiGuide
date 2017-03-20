@@ -1,17 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using DatabaseConnector;
 using CustomExtensions;
 
@@ -45,7 +36,8 @@ namespace MobiGuide
             if(airlineReferenceData.HasData && airlineReferenceData.Error == ERROR.NoError)
             {
                 logoImg.Source = (airlineReferenceData.Get("AirlineLogoLarge") as object).BlobToSource();
-                if(airlineReferenceData.Get("BackGroundColor2") != null)
+                if(logoImg.Source == null) logoImg.Source = new BitmapImage(new Uri(@"..\NoImg.jpg", UriKind.RelativeOrAbsolute));
+                if (airlineReferenceData.Get("BackGroundColor2") != null)
                 {
                     Color backgroundColor2 = ((int)airlineReferenceData.Get("BackGroundColor2")).GetColor();
                     if (backgroundColor2.A != 0)
@@ -69,7 +61,7 @@ namespace MobiGuide
                 }
             } else
             {
-                logoImg.Source = new BitmapImage(new Uri(@"NoImg.jpg", UriKind.RelativeOrAbsolute));
+                logoImg.Source = new BitmapImage(new Uri(@"..\NoImg.jpg", UriKind.RelativeOrAbsolute));
             }
         }
     }

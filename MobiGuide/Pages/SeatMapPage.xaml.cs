@@ -1,23 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 using DatabaseConnector;
 using Properties;
 using System.Reflection;
 using CustomExtensions;
 using System.Timers;
-using MobiGuide;
 using System.Diagnostics;
 
 namespace MobiGuide
@@ -158,11 +150,6 @@ namespace MobiGuide
             }
 
             startPositionX -= 50;
-
-            Debug.WriteLine("Start X : " + startPositionX);
-            Debug.WriteLine("Start Y : " + startPositionY);
-
-            Debug.WriteLine("--------------------------");
 
             Line doorToAisleXLine = new Line();
             doorToAisleXLine.X1 = startPositionX;

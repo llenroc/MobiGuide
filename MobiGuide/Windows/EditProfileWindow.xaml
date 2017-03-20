@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MobiGuide"
         mc:Ignorable="d"
-        Title="Edit User Profile" Height="360" Width="300"
+        Title="Edit User Profile" Height="370" Width="300"
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
-        SizeToContent="Width" Loaded="Window_Loaded">
+        SizeToContent="Width" Loaded="Window_Loaded" MinWidth="380">
     <StackPanel>
         <StackPanel Orientation="Horizontal">
             <StackPanel x:Name="stackTitle" d:LayoutOverrides="Width">
@@ -21,7 +21,7 @@
                 <TextBlock x:Name="textBlock_Copy6" TextWrapping="Wrap" Text="Commit By" FontSize="14" Margin="10,0,0,10"/>
                 <TextBlock x:Name="textBlock_Copy7" TextWrapping="Wrap" Text="Commit Time" FontSize="14" Margin="10,0,0,10"/>
             </StackPanel>
-            <StackPanel x:Name="stackDetail" d:LayoutOverrides="Width" Margin="0,0,10,0">
+            <StackPanel x:Name="stackDetail" Margin="0,0,10,0" MinWidth="230">
                 <TextBlock x:Name="uNameTxtBlock" TextWrapping="Wrap" FontSize="14" Margin="10,10,0,10" FontWeight="Bold"/>
                 <TextBlock x:Name="alNameTxtBlock" TextWrapping="Wrap" FontSize="14" Margin="10,0,0,10" FontWeight="Bold"/>
                 <TextBox x:Name="firstNameTxtBox" Height="20" TextWrapping="Wrap" FontSize="14" Margin="10,0,0,8"/>
