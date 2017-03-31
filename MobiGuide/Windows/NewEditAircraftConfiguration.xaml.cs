@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using DatabaseConnector;
+using MobiGuide.Class;
 using Properties;
 
 namespace MobiGuide
@@ -10,15 +11,9 @@ namespace MobiGuide
     /// </summary>
     public partial class NewEditAircraftConfigurationWindow : Window
     {
-        private STATUS Status { get; set; }
-        private Guid AircraftConfigurationId { get; set; }
-        private AircraftConfiguration AircraftConfiguration { get; set; }
-        DBConnector dbCon = new DBConnector();
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            IconHelper.RemoveIcon(this);
-        }
+        private DBConnector dbCon = new DBConnector();
         public NewEditAircraftConfigurationWindow() : this(Guid.Empty) { }
+
         public NewEditAircraftConfigurationWindow(Guid aircraftConfigId)
         {
             InitializeComponent();
@@ -26,19 +21,28 @@ namespace MobiGuide
             if (aircraftConfigId != Guid.Empty)
             {
                 Status = STATUS.EDIT;
-                this.Title = "Edit Aircraft Configuration";
+                Title = Messages.TITLE_EDIT_AIRCRAFT_CONFIG;
             }
             else
             {
                 Status = STATUS.NEW;
-                this.Title = "New Aircraft Configuration";
+                Title = Messages.TITLE_NEW_AIRCRAFT_CONFIG;
             }
             AircraftConfigurationId = aircraftConfigId;
         }
 
+        private STATUS Status;
+        private Guid AircraftConfigurationId { get; }
+        private AircraftConfiguration AircraftConfiguration;
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            IconHelper.RemoveIcon(this);
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.Left = (SystemParameters.PrimaryScreenWidth / 2) - (this.ActualWidth / 2);
+            Left = SystemParameters.PrimaryScreenWidth / 2 - ActualWidth / 2;
             mainFrame.Navigate(new NewEditAircraftConfigurationPage1(AircraftConfigurationId));
         }
     }

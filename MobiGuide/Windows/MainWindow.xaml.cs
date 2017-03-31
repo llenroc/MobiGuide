@@ -6,6 +6,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using DatabaseConnector;
 using CustomExtensions;
+using MobiGuide.Class;
 using Properties;
 using MobiGuide.Helper;
 using Xceed.Wpf.Toolkit;
@@ -17,12 +18,14 @@ namespace MobiGuide
     /// </summary>
     public partial class MainWindow : Window
     {
-        ResourceDictionary res = Application.Current.Resources;
-        DBConnector dbCon = new DBConnector();
+        private readonly DBConnector dbCon = new DBConnector();
+        private readonly ResourceDictionary res = Application.Current.Resources;
+
         public MainWindow()
         {
             InitializeComponent();
         }
+
         protected override void OnSourceInitialized(EventArgs e)
         {
             IconHelper.RemoveIcon(this);
@@ -35,8 +38,8 @@ namespace MobiGuide
                 displayInfo();
                 InitializeControl();
             } catch (Exception){
-                System.Windows.MessageBox.Show("Unexpected Error Occurred! Please contact Administator.", "Error");
-                this.Close();
+                System.Windows.MessageBox.Show(Messages.ERROR_UNKNOWN, Captions.ERROR);
+                Close();
             }
         }
 
@@ -52,10 +55,11 @@ namespace MobiGuide
             DataRow airlineRef = await dbCon.GetDataRow("AirlineReference", airlineRefCondi);
             airlineNameTxtBlock.Text = airlineRef.Get("AirlineName").ToString();
 
-            ImageSource logoSource = ((object)airlineRef.Get("AirlineLogoSmall")).BlobToSource();
+            ImageSource logoSource = airlineRef.Get("AirlineLogoSmall").BlobToSource();
             if (logoSource != null) logoImg.Source = logoSource;
             else logoImg.Source = new BitmapImage(new Uri(@"..\NoImg.jpg", UriKind.RelativeOrAbsolute));
         }
+
         private void AddNewUserMenuItem_Click(object sender, RoutedEventArgs e)
         {
             AddUserWindow addUserWindow = new AddUserWindow();
@@ -75,14 +79,14 @@ namespace MobiGuide
 
         private void LogoutMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            if (System.Windows.MessageBox.Show("Do you want to logout?", "Confirm", System.Windows.MessageBoxButton.OKCancel) == System.Windows.MessageBoxResult.OK)
+            if (System.Windows.MessageBox.Show(Messages.INFO_CONFIRM_LOGOUT, Captions.CONFIRM_QUESTION, MessageBoxButton.OKCancel) == MessageBoxResult.OK)
             {
                 //clear everything and do logout
                 Application.Current.Resources.Clear();
-                nameTxtBlock.Text = String.Empty;
+                nameTxtBlock.Text = string.Empty;
                 LoginWindow loginWindow = new LoginWindow();
                 loginWindow.Show();
-                this.Close();
+                Close();
             }
         }
 
@@ -162,6 +166,7 @@ namespace MobiGuide
                 InitializeControl();
             }
         }
+
         private void AirportMenuItem_Click(object sender, RoutedEventArgs e)
         {
             AirportReferenceWindow airportReferenceWindow = new AirportReferenceWindow();
@@ -209,20 +214,18 @@ namespace MobiGuide
         private async void InitializeControl()
         {
             DataList aircraftConfigurationDatas = await dbCon.GetDataList("AircraftConfiguration", new DataRow("StatusCode", "A"), "ORDER BY AircraftConfigurationCode");
-            string selectedAircraftConfig = aircraftConfigComboBox.SelectedValue != null ? aircraftConfigComboBox.SelectedValue.ToString() : String.Empty;
+            string selectedAircraftConfig = aircraftConfigComboBox.SelectedValue != null ? aircraftConfigComboBox.SelectedValue.ToString() : string.Empty;
             aircraftConfigComboBox.Items.Clear();
             if (aircraftConfigurationDatas.HasData && aircraftConfigurationDatas.Error == ERROR.NoError)
             {
                 foreach(DataRow aircraftConfigData in aircraftConfigurationDatas)
-                {
                     aircraftConfigComboBox.Items.Add(new CustomComboBoxItem
                     {
                         Text = aircraftConfigData.Get("AircraftConfigurationCode").ToString(),
                         Value = aircraftConfigData.Get("AircraftConfigurationId").ToString()
                     });
-                }
 
-                if (selectedAircraftConfig != String.Empty && aircraftConfigComboBox.Items.Cast<CustomComboBoxItem>().Any(item => item.Value.Equals(selectedAircraftConfig)))
+                if (selectedAircraftConfig != string.Empty && aircraftConfigComboBox.Items.Cast<CustomComboBoxItem>().Any(item => item.Value.Equals(selectedAircraftConfig)))
                     aircraftConfigComboBox.SelectedValue = selectedAircraftConfig;
                 else
                     aircraftConfigComboBox.SelectedIndex = 0;
@@ -231,14 +234,14 @@ namespace MobiGuide
                 aircraftConfigComboBox.Items.Add(new CustomComboBoxItem
                 {
                     Text = "No Data",
-                    Value = String.Empty
+                    Value = string.Empty
                 });
                 aircraftConfigComboBox.SelectedIndex = 0;
             }
              
             DataList airportReferenceDatas = await dbCon.GetDataList("AirportReference", new DataRow("StatusCode", "A"), "ORDER BY AirportName");
-            string selectedOrigin = originComboBox.SelectedValue != null ? originComboBox.SelectedValue.ToString() : String.Empty;
-            string selectedDestination = destinationComboBox.SelectedValue != null ? destinationComboBox.SelectedValue.ToString() : String.Empty;
+            string selectedOrigin = originComboBox.SelectedValue != null ? originComboBox.SelectedValue.ToString() : string.Empty;
+            string selectedDestination = destinationComboBox.SelectedValue != null ? destinationComboBox.SelectedValue.ToString() : string.Empty;
             originComboBox.Items.Clear();
             destinationComboBox.Items.Clear();
             if(airportReferenceDatas.HasData && airportReferenceDatas.Error == ERROR.NoError)
@@ -258,12 +261,12 @@ namespace MobiGuide
                     });
                 }
 
-                if (selectedOrigin != String.Empty && originComboBox.Items.Cast<CustomComboBoxItem>().Any(item => item.Value.Equals(selectedOrigin)))
+                if (selectedOrigin != string.Empty && originComboBox.Items.Cast<CustomComboBoxItem>().Any(item => item.Value.Equals(selectedOrigin)))
                     originComboBox.SelectedValue = selectedOrigin;
                 else
                     originComboBox.SelectedIndex = 0;
 
-                if (selectedDestination != String.Empty && destinationComboBox.Items.Cast<CustomComboBoxItem>().Any(item => item.Value.Equals(selectedDestination)))
+                if (selectedDestination != string.Empty && destinationComboBox.Items.Cast<CustomComboBoxItem>().Any(item => item.Value.Equals(selectedDestination)))
                     destinationComboBox.SelectedValue = selectedDestination;
                 else
                     destinationComboBox.SelectedIndex = 0;
@@ -272,13 +275,13 @@ namespace MobiGuide
                 originComboBox.Items.Add(new CustomComboBoxItem
                 {
                     Text = "No Data",
-                    Value = String.Empty
+                    Value = string.Empty
                 });
 
                 destinationComboBox.Items.Add(new CustomComboBoxItem
                 {
                     Text = "No Data",
-                    Value = String.Empty
+                    Value = string.Empty
                 });
 
                 originComboBox.SelectedIndex = 0;
@@ -286,25 +289,23 @@ namespace MobiGuide
             }
 
             DataList textTemplateDatas = await dbCon.GetDataList("TextTemplate", new DataRow("StatusCode", "A"), "ORDER BY TextName");
-            string selectedTextTemplate = textTemplateComboBox.SelectedValue != null ? textTemplateComboBox.SelectedValue.ToString() : String.Empty;
+            string selectedTextTemplate = textTemplateComboBox.SelectedValue != null ? textTemplateComboBox.SelectedValue.ToString() : string.Empty;
             textTemplateComboBox.Items.Clear();
             if(textTemplateDatas.HasData && textTemplateDatas.Error == ERROR.NoError)
             {
                 foreach(DataRow textTemplateData in textTemplateDatas)
-                {
                     textTemplateComboBox.Items.Add(new CustomComboBoxItem
                     {
                         Text = textTemplateData.Get("TextName").ToString(),
                         Value = textTemplateData.Get("TextTemplateId").ToString()
                     });
-                }
-                if(selectedTextTemplate != String.Empty && textTemplateComboBox.Items.Cast<CustomComboBoxItem>().Any(item => item.Value.Equals(selectedTextTemplate)))
+                if(selectedTextTemplate != string.Empty && textTemplateComboBox.Items.Cast<CustomComboBoxItem>().Any(item => item.Value.Equals(selectedTextTemplate)))
                     textTemplateComboBox.SelectedValue = selectedTextTemplate;
                 else
                     textTemplateComboBox.SelectedIndex = 0;
             } else
             {
-                textTemplateComboBox.Items.Add(new CustomComboBoxItem { Text = "No Data", Value = String.Empty });
+                textTemplateComboBox.Items.Add(new CustomComboBoxItem { Text = "No Data", Value = string.Empty });
                 textTemplateComboBox.SelectedIndex = 0;
             }
 
@@ -314,7 +315,7 @@ namespace MobiGuide
         private void showLogoBtn_Click(object sender, RoutedEventArgs e)
         {
             bool IsFulfill = true;
-            if (aircraftConfigComboBox.SelectedValue == null || aircraftConfigComboBox.SelectedValue.Equals(String.Empty))
+            if (aircraftConfigComboBox.SelectedValue == null || aircraftConfigComboBox.SelectedValue.Equals(string.Empty))
             {
                 (aircraftConfigComboBox.Parent as Border).BorderBrush = Brushes.Red;
                 aircraftConfigComboBox.GotFocus += AircraftConfigComboBox_GotFocus;
@@ -338,9 +339,7 @@ namespace MobiGuide
             if (System.Windows.Forms.Screen.AllScreens.Count() > 1)
             {
                 foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
-                {
                     if (screen != System.Windows.Forms.Screen.AllScreens[0])
-                    {
                         if (!EventHelper.IsWindowOpen<DisplayWindow>())
                         {
                             DisplayWindow displayWindow = new DisplayWindow(type, param);
@@ -350,7 +349,6 @@ namespace MobiGuide
                         else
                         {
                             foreach (Window window in Application.Current.Windows)
-                            {
                                 if (window is DisplayWindow)
                                 {
                                     window.Close();
@@ -359,20 +357,13 @@ namespace MobiGuide
                                     displayWindow.Show();
                                     displayWindow.MaximizeToSecondaryMonitor();
                                 }
-                            }
                         }
-                    }
-                }
             }
             else
             {
                 foreach (Window window in Application.Current.Windows)
-                {
                     if (window is DisplayWindow)
-                    {
                         window.Close();
-                    }
-                }
 
                 DisplayWindow displayWindow = new DisplayWindow(type, param)
                 {
@@ -388,16 +379,14 @@ namespace MobiGuide
         {
             ComboBox textTemplate = sender as ComboBox;
             if(textTemplate.SelectedIndex > -1)
-            {
                 ShowTextDisplay((textTemplate.SelectedItem as CustomComboBoxItem).Value);
-            }
         }
 
         private async void ShowTextDisplay(object selectedValue)
         {
             if (selectedValue != null)
             {
-                DataRow textTemplateData = await dbCon.GetDataRow("TextTemplate", new DatabaseConnector.DataRow("TextTemplateId", selectedValue));
+                DataRow textTemplateData = await dbCon.GetDataRow("TextTemplate", new DataRow("TextTemplateId", selectedValue));
                 if (textTemplateData.HasData && textTemplateData.Error == ERROR.NoError)
                 {
                     textDisplayedTextBox.Text = textTemplateData.Get("TextTemplate").ToString();
@@ -409,7 +398,7 @@ namespace MobiGuide
         private void showTextBtn_Click(object sender, RoutedEventArgs e)
         {
             bool IsFulfill = true;
-            if (String.IsNullOrWhiteSpace(flightNoTextBox.Text))
+            if (string.IsNullOrWhiteSpace(flightNoTextBox.Text))
             {
                 flightNoTextBox.BorderBrush = Brushes.Red;
                 flightNoTextBox.GotFocus += FlightNoTextBox_GotFocus;
@@ -433,13 +422,13 @@ namespace MobiGuide
                 rotateSecondsUpDown.GotFocus += RotateSecondsUpDown_GotFocus;
                 IsFulfill = false;
             }
-            if (String.IsNullOrWhiteSpace(textDisplayedTextBox.Text))
+            if (string.IsNullOrWhiteSpace(textDisplayedTextBox.Text))
             {
                 textDisplayedTextBox.BorderBrush = Brushes.Red;
                 textDisplayedTextBox.GotFocus += TextDisplayedTextBox_GotFocus;
                 IsFulfill = false;
             }
-            if (aircraftConfigComboBox.SelectedValue == null || aircraftConfigComboBox.SelectedValue.Equals(String.Empty))
+            if (aircraftConfigComboBox.SelectedValue == null || aircraftConfigComboBox.SelectedValue.Equals(string.Empty))
             {
                 (aircraftConfigComboBox.Parent as Border).BorderBrush = Brushes.Red;
                 aircraftConfigComboBox.GotFocus += AircraftConfigComboBox_GotFocus;
@@ -454,8 +443,8 @@ namespace MobiGuide
                 IsFulfill = false;
             }
             if (!IsFulfill) return;
-            Guid TextTemplateId = (textTemplateComboBox.SelectedValue == null || 
-                !textTemplateComboBox.SelectedValue.Equals(String.Empty)) ? 
+            Guid TextTemplateId = textTemplateComboBox.SelectedValue == null || 
+                                  !textTemplateComboBox.SelectedValue.Equals(string.Empty) ? 
                 new Guid(textTemplateComboBox.SelectedValue.ToString()) : Guid.Empty;
             ShowText showText = new ShowText
             {
@@ -488,7 +477,7 @@ namespace MobiGuide
 
         private void RotateSecondsUpDown_GotFocus(object sender, RoutedEventArgs e)
         {
-            (sender as IntegerUpDown).ClearValue(IntegerUpDown.BorderBrushProperty);
+            (sender as IntegerUpDown).ClearValue(BorderBrushProperty);
             (sender as IntegerUpDown).GotFocus -= RotateSecondsUpDown_GotFocus;
         }
 
@@ -506,13 +495,13 @@ namespace MobiGuide
 
         private void DepartureTimePicker_GotFocus(object sender, RoutedEventArgs e)
         {
-            (sender as TimePicker).ClearValue(TimePicker.BorderBrushProperty);
+            (sender as TimePicker).ClearValue(BorderBrushProperty);
             (sender as TimePicker).GotFocus -= DepartureTimePicker_GotFocus;
         }
 
         private void DepartureDatePicker_GotFocus(object sender, RoutedEventArgs e)
         {
-            (sender as DatePicker).ClearValue(TimePicker.BorderBrushProperty);
+            (sender as DatePicker).ClearValue(BorderBrushProperty);
             (sender as DatePicker).GotFocus -= DepartureDatePicker_GotFocus;
         }
 
@@ -521,32 +510,33 @@ namespace MobiGuide
             (sender as TextBox).ClearValue(BorderBrushProperty);
             (sender as TextBox).GotFocus -= FlightNoTextBox_GotFocus;
         }
+
         private void RearDoorCheckBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            (sender as CheckBox).ClearValue(CheckBox.BorderBrushProperty);
+            (sender as CheckBox).ClearValue(BorderBrushProperty);
             (sender as CheckBox).GotFocus -= RearDoorCheckBox_GotFocus;
-            frontDoorCheckBox.ClearValue(CheckBox.BorderBrushProperty);
+            frontDoorCheckBox.ClearValue(BorderBrushProperty);
             frontDoorCheckBox.GotFocus -= FrontDoorCheckBox_GotFocus;
         }
 
         private void FrontDoorCheckBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            (sender as CheckBox).ClearValue(CheckBox.BorderBrushProperty);
+            (sender as CheckBox).ClearValue(BorderBrushProperty);
             (sender as CheckBox).GotFocus -= FrontDoorCheckBox_GotFocus;
-            rearDoorCheckBox.ClearValue(CheckBox.BorderBrushProperty);
+            rearDoorCheckBox.ClearValue(BorderBrushProperty);
             rearDoorCheckBox.GotFocus -= RearDoorCheckBox_GotFocus;
         }
 
         private void AircraftConfigComboBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            ((sender as ComboBox).Parent as Border).ClearValue(ComboBox.BorderBrushProperty);
+            ((sender as ComboBox).Parent as Border).ClearValue(BorderBrushProperty);
             (sender as ComboBox).GotFocus -= AircraftConfigComboBox_GotFocus;
         }
 
         private void showSeatMapBtn_Click(object sender, RoutedEventArgs e)
         {
             bool isReturn = false;
-            if (aircraftConfigComboBox.SelectedValue == null || aircraftConfigComboBox.SelectedValue.Equals(String.Empty))
+            if (aircraftConfigComboBox.SelectedValue == null || aircraftConfigComboBox.SelectedValue.Equals(string.Empty))
             {
                 (aircraftConfigComboBox.Parent as Border).BorderBrush = Brushes.Red;
                 aircraftConfigComboBox.GotFocus += AircraftConfigComboBox_GotFocus;

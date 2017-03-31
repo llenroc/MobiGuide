@@ -8,6 +8,7 @@ using DatabaseConnector;
 using System.Collections.ObjectModel;
 using Properties;
 using CustomExtensions;
+using MobiGuide.Class;
 
 namespace MobiGuide
 {
@@ -16,35 +17,38 @@ namespace MobiGuide
     /// </summary>
     public partial class NewEditTextTemplateWindow : Window
     {
-        private STATUS Status { get; set; }
-        private Guid TextTemplateId { get; set; }
-        public ObservableCollection<TextTranslation> TextTranslationList { get; set; }
-        DBConnector dbCon = new DBConnector();
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            IconHelper.RemoveIcon(this);
-        }
+        private readonly DBConnector dbCon = new DBConnector();
         public NewEditTextTemplateWindow() : this(Guid.Empty) { }
+
         public NewEditTextTemplateWindow(Guid textTemplateId)
         {
             InitializeComponent();
 
             if (textTemplateId != Guid.Empty)
             {
-                this.Status = STATUS.EDIT;
-                this.TextTemplateId = textTemplateId;
-            }
-            else this.Status = STATUS.NEW;
-
-            if (Status == STATUS.NEW)
-            {
-                this.Title = "New Text Template";
+                Status = STATUS.EDIT;
+                TextTemplateId = textTemplateId;
             }
             else
             {
-                this.Title = "Edit Text Template";
+                Status = STATUS.NEW;
             }
+
+            if (Status == STATUS.NEW)
+                Title = Messages.TITLE_NEW_TEXT_TEMPLATE;
+            else
+                Title = Messages.TITLE_EDIT_TEXT_TEMPLATE;
         }
+
+        private STATUS Status { get; }
+        private Guid TextTemplateId { get; }
+        public ObservableCollection<TextTranslation> TextTranslationList;
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            IconHelper.RemoveIcon(this);
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Active", Value = "A" });
@@ -85,9 +89,9 @@ namespace MobiGuide
                 }
             } catch (Exception)
             {
-                MessageBox.Show("Failed to download Text Template Data", "ERROR");
+                MessageBox.Show(Messages.ERROR_GET_TEXT_TEMPLATE, Captions.ERROR);
                 DialogResult = false;
-                this.Close();
+                Close();
             }
         }
 
@@ -101,17 +105,15 @@ namespace MobiGuide
             saveBtn.IsEnabled = false;
             if(textNameTextBox.Text.IsNull() || textTemplateTextBox.Text.IsNull())
             {
-                MessageBox.Show("Please fill Text Name and/or Text Template", "WARNING");
+                MessageBox.Show(Messages.WARNING_NOT_FILLED_FIELDS, Captions.WARNING);
                 return;
             }
             foreach(TextTranslation tt in TextTranslationList)
-            {
                 if(!tt.LanguageCode.IsNull() && tt.TextTemplate.IsNull())
                 {
-                    MessageBox.Show("Please fill Display Text in every added languages", "WARNING");
+                    MessageBox.Show(Messages.WARNING_NOT_FILLED_LANGUAGES, Captions.WARNING);
                     return;
                 }
-            }
             DataRow textTemplate = new DataRow(
                     "AirlineCode", Application.Current.Resources["AirlineCode"],
                     "TextName", textNameTextBox.Text,
@@ -139,13 +141,13 @@ namespace MobiGuide
                                 );
                             await dbCon.CreateNewRow("TextTranslation", textTranslation, "TextTranslationId");
                         }
-                        MessageBox.Show("Create Text Template Successfully.", "SUCCESS");
+                        MessageBox.Show(Messages.SUCCESS_ADD_TEXT_TEMPLATE, Captions.SUCCESS);
                         DialogResult = true;
-                        this.Close();
+                        Close();
                     }
                     else
                     {
-                        MessageBox.Show("Failed to create Text Template.", "ERROR");
+                        MessageBox.Show(Messages.ERROR_ADD_TEXT_TEMPLATE, Captions.ERROR);
                         saveBtn.IsEnabled = true;
                     }
                 }
@@ -155,7 +157,6 @@ namespace MobiGuide
                     if (result)
                     {
                         foreach (TextTranslation tt in TextTranslationList)
-                        {
                             if (tt.TextTranslationId != Guid.Empty)
                             {
                                 DataRow textTranslation = new DataRow(
@@ -177,33 +178,39 @@ namespace MobiGuide
                                 );
                                 await dbCon.CreateNewRow("TextTranslation", textTranslation, "TextTranslationId");
                             }
-                        }
-                        MessageBox.Show("Update Text Template Successfully.", "SUCCESS");
+                        MessageBox.Show(Messages.SUCCESS_UPDATE_TEXT_TEMPLATE, Captions.SUCCESS);
                         DialogResult = true;
-                        this.Close();
+                        Close();
                     }
                     else
                     {
-                        MessageBox.Show("Failed to update Text Template.", "ERROR");
+                        MessageBox.Show(Messages.ERROR_UPDATE_TEXT_TEMPLATE, Captions.ERROR);
                         saveBtn.IsEnabled = true;
                     }
                 }
             } catch (Exception)
             {
-                MessageBox.Show("Failed to create/update Text Template and Translation", "ERROR");
+                if (Status == STATUS.NEW)
+                {
+                    MessageBox.Show(Messages.ERROR_ADD_TEXT_TEMPLATE, Captions.ERROR);
+                }
+                else
+                {
+                    MessageBox.Show(Messages.ERROR_UPDATE_TEXT_TEMPLATE, Captions.ERROR);
+                }
                 DialogResult = false;
-                this.Close();
+                Close();
             }
         }
+
         private async void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox langComboBox = sender as ComboBox;
             if (langComboBox != null && langComboBox.SelectedIndex > -1)
-            {
                 if (textTransDataGrid.SelectedItem != null)
                 {
                     int indexOfItemInTextTranslationList = TextTranslationList.IndexOf(textTransDataGrid.SelectedItem as TextTranslation);
-                    if (TextTranslationList[indexOfItemInTextTranslationList].IsEnabled == true)
+                    if (TextTranslationList[indexOfItemInTextTranslationList].IsEnabled)
                     {
                         string selectedLanguageCode = langComboBox.SelectedItem.ToString();
                         DataRow languageDetail = await dbCon.GetDataRow("LanguageReference", new DataRow("LanguageCode", selectedLanguageCode));
@@ -227,9 +234,7 @@ namespace MobiGuide
                                 TextTranslation tt = new TextTranslation();
                                 List<string> excepts = new List<string>();
                                 foreach(TextTranslation ttData in TextTranslationList)
-                                {
-                                    if (!String.IsNullOrWhiteSpace(ttData.LanguageCode)) excepts.Add(ttData.LanguageCode);
-                                }
+                                    if (!string.IsNullOrWhiteSpace(ttData.LanguageCode)) excepts.Add(ttData.LanguageCode);
                                 tt.LanguageList = await LoadLanguageList(excepts.ToArray());
                                 if(tt.LanguageList.Count > 0) TextTranslationList.Add(tt);
                             } else
@@ -241,17 +246,17 @@ namespace MobiGuide
                         textTransDataGrid.SelectedIndex = -1;
                     }
                 }
-            }
         }
+
         private async Task<List<string>> LoadLanguageList(params string[] excepts)
         {
-            string query = String.Empty;
+            string query = string.Empty;
             if (excepts.Length > 0)
             {
                 query += "WHERE LanguageCode NOT IN (";
                 for (int i = 0; i < excepts.Length; i++)
                 {
-                    query += String.Format("'{0}'", excepts[i]);
+                    query += string.Format("'{0}'", excepts[i]);
                     if (i < excepts.Length - 1) query += ", ";
                 }
                 query += ")";
@@ -262,17 +267,13 @@ namespace MobiGuide
             if (languageList.HasData && languageList.Error == ERROR.NoError)
             {
                 foreach(DataRow row in languageList)
-                {
                     list.Add(row.Get("LanguageCode").ToString());
-                }
                 return list;
             }
-            else
-            {
-                return list;
-            }
+            return list;
         }
-        void TextTranslationList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+
+        private void TextTranslationList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
             {
@@ -283,7 +284,7 @@ namespace MobiGuide
         private async void InitializeTextTranslationList()
         {
             TextTranslationList = new ObservableCollection<TextTranslation>();
-            TextTranslationList.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(TextTranslationList_CollectionChanged);
+            TextTranslationList.CollectionChanged += TextTranslationList_CollectionChanged;
             textTransDataGrid.ItemsSource = TextTranslationList;
 
             //Add existing translation to datagrid
@@ -294,7 +295,6 @@ namespace MobiGuide
             {
                 DataList list = await dbCon.GetDataList("TextTranslation", new DataRow("TextTemplateId", TextTemplateId));
                 if(list.HasData && list.Error == ERROR.NoError)
-                {
                     foreach(DataRow row in list)
                     {
                         tt = new TextTranslation
@@ -310,7 +310,6 @@ namespace MobiGuide
                         TextTranslationList.Add(tt);
                         excepts.Add(row.Get("LanguageCode").ToString());
                     }
-                }
             }
             tt = new TextTranslation();
             tt.LanguageList = await LoadLanguageList(excepts.ToArray());
@@ -331,9 +330,9 @@ namespace MobiGuide
         {
             int indexOfSelectedItem = textTransDataGrid.SelectedIndex;
 
-            if (indexOfSelectedItem > -1 && !String.IsNullOrWhiteSpace((textTransDataGrid.SelectedItem as TextTranslation).LanguageCode))
+            if (indexOfSelectedItem > -1 && !string.IsNullOrWhiteSpace((textTransDataGrid.SelectedItem as TextTranslation).LanguageCode))
             {
-                TextTranslation tt = TextTranslationList[indexOfSelectedItem] as TextTranslation;
+                TextTranslation tt = TextTranslationList[indexOfSelectedItem];
                 TextDisplayWindow textDisplayWindow = new TextDisplayWindow(tt.LanguageCode, tt.LanguageName, tt.TextTemplate);
                 textDisplayWindow.ShowDialog();
                 if (textDisplayWindow.DialogResult.HasValue && textDisplayWindow.DialogResult.Value)
@@ -349,10 +348,8 @@ namespace MobiGuide
 
         private void textTransDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if ((sender as DataGrid).SelectedIndex > -1 && !String.IsNullOrWhiteSpace((textTransDataGrid.SelectedItem as TextTranslation).LanguageCode))
-            {
+            if ((sender as DataGrid).SelectedIndex > -1 && !string.IsNullOrWhiteSpace((textTransDataGrid.SelectedItem as TextTranslation).LanguageCode))
                 editBtn.IsEnabled = true;
-            }
             else editBtn.IsEnabled = false;
         }
     }

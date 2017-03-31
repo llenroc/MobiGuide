@@ -1,295 +1,372 @@
-exec sp_addtype AMOUNT, "decimal(13,2)", "NULL"
-go
+EXEC
+	sp_addtype	AMOUNT,
+				"decimal(13,2)",
+				"NULL"
+GO
 
 
-exec sp_addtype BIGNUMBER, "bigint", "NULL"
-go
+EXEC 
+	sp_addtype	BIGNUMBER,
+				"bigint",
+				"NULL"
+GO
 
 
-exec sp_addtype CODE, "varchar(20)", "NULL"
-go
+EXEC
+	sp_addtype	CODE,
+				"varchar(20)",
+				"NULL"
+GO
 
 
-exec sp_addtype FLAG, "bit", "NULL"
-go
+EXEC
+	sp_addtype	FLAG,
+				"bit",
+				"NULL"
+GO
 
 
-exec sp_addtype GUID, "uniqueidentifier", "NULL"
-go
+EXEC
+	sp_addtype	GUID,
+				"uniqueidentifier",
+				"NULL"
+GO
 
-exec sp_addtype LONG_NAME, "nvarchar(450)", "NULL"
-go
+EXEC
+	sp_addtype	LONG_NAME,
+				"nvarchar(450)",
+				"NULL"
+GO
 
 
-exec sp_addtype STATUS_CODE, "varchar(1)", "NULL"
-go
+EXEC
+	sp_addtype	STATUS_CODE,
+				"varchar(1)",
+				"NULL"
+GO
 
 
-exec sp_addtype USR_NAME, "nvarchar(60)", "NULL"
-go
+EXEC
+	sp_addtype	USR_NAME,
+				"nvarchar(60)",
+				"NULL"
+GO
 
 
 CREATE TABLE AircraftConfiguration
-(
-	AircraftConfigurationId  GUID  NOT NULL ,
-	AirlineCode  CODE  ,
-	AircraftTypeCode  CODE  ,
-	AircraftConfigurationCode  CODE  ,
-	AircraftConfigurationName  USR_NAME  ,
-	SeatMapImage  varbinary(MAX)  NULL ,
-	AisleX  float  NULL ,
-	FrontDoorBoardingFlag  FLAG  ,
-	FrontDoorX  float  NULL ,
-	FrontDoorY  float  NULL ,
-	FrontDoorWidth  float  NULL ,
-	RearDoorX  float  NULL ,
-	RearDoorY  float  NULL ,
-	RearDoorWidth float NULL ,
-	RearDoorBoardingFlag  FLAG  ,
-	MiddleRow	integer NULL,
-	StatusCode  STATUS_CODE  ,
-	CommitBy  GUID  ,
-	CommitDateTime  datetime  NULL 
-)
-go
+	(
+	AircraftConfigurationId		GUID	NOT NULL ,
+	AirlineCode					CODE  ,
+	AircraftTypeCode			CODE  ,
+	AircraftConfigurationCode	CODE  ,
+	AircraftConfigurationName	USR_NAME  ,
+	SeatMapImage				varbinary(MAX)  NULL ,
+	AisleX						float  NULL ,
+	FrontDoorBoardingFlag		FLAG  ,
+	FrontDoorX					float  NULL ,
+	FrontDoorY					float  NULL ,
+	FrontDoorWidth				float  NULL ,
+	RearDoorX					float  NULL ,
+	RearDoorY					float  NULL ,
+	RearDoorWidth				float NULL ,
+	RearDoorBoardingFlag		FLAG  ,
+	MiddleRow					integer	NULL,
+	StatusCode					STATUS_CODE  ,
+	CommitBy					GUID  ,
+	CommitDateTime				datetime  NULL 
+	)
+GO
 
 
 ALTER TABLE AircraftConfiguration
-	ADD CONSTRAINT  XPKAircraftConfiguration PRIMARY KEY   NONCLUSTERED (AircraftConfigurationId  ASC)
-go
+	ADD CONSTRAINT  XPKAircraftConfiguration 
+	PRIMARY KEY   
+	NONCLUSTERED	(
+					AircraftConfigurationId  ASC
+					)
+GO
 
 
-CREATE INDEX XIF1AircraftConfiguration ON AircraftConfiguration
+CREATE INDEX XIF1AircraftConfiguration 
+ON AircraftConfiguration
 (
 	AirlineCode  ASC
 )
-go
+GO
 
 
-CREATE INDEX XIF2AircraftConfiguration ON AircraftConfiguration
+CREATE INDEX XIF2AircraftConfiguration 
+ON AircraftConfiguration
 (
 	AircraftTypeCode  ASC
 )
-go
+GO
 
 
 CREATE TABLE AircraftTypeReference
 (
-	AircraftTypeCode  CODE  NOT NULL ,
-	AircraftTypeName  USR_NAME  ,
-	StatusCode  STATUS_CODE  ,
-	CommitBy  GUID  ,
-	CommitDateTime  datetime  NULL 
+	AircraftTypeCode	CODE  NOT NULL ,
+	AircraftTypeName	USR_NAME  ,
+	StatusCode			STATUS_CODE  ,
+	CommitBy			GUID  ,
+	CommitDateTime		datetime  NULL 
 )
-go
+GO
 
 
 ALTER TABLE AircraftTypeReference
-	ADD CONSTRAINT  XPKAircraftTypeReference PRIMARY KEY   NONCLUSTERED (AircraftTypeCode  ASC)
-go
+	ADD CONSTRAINT  XPKAircraftTypeReference 
+	PRIMARY KEY   
+	NONCLUSTERED	(
+					AircraftTypeCode  ASC
+					)
+GO
 
 
 CREATE TABLE AirlineReference
 (
-	AirlineCode  CODE  NOT NULL ,
-	AirlineName  USR_NAME  ,
-	AirlineLogoSmall  varbinary(MAX)  NULL ,
-	AirlineLogoLarge  varbinary(MAX)  NULL ,
-	FontName  USR_NAME  ,
-	FontSize  integer  NULL ,
-	FontColor  integer  NULL ,
-	BackGroundColor  integer  NULL ,
-	BackGroundColor2  integer  NULL ,
-	LineColor  integer  NULL ,
-	SeatColor  integer  NULL ,
-	ShowGuidanceInSeconds  integer  NULL ,
-	StatusCode  STATUS_CODE  ,
-	CommitBy  GUID  ,
-	CommitDateTime  datetime  NULL 
+	AirlineCode				CODE  NOT NULL ,
+	AirlineName				USR_NAME  ,
+	AirlineLogoSmall		varbinary(MAX)  NULL ,
+	AirlineLogoLarge		varbinary(MAX)  NULL ,
+	FontName				USR_NAME  ,
+	FontSize				integer  NULL ,
+	FontColor				integer  NULL ,
+	BackGroundColor			integer  NULL ,
+	BackGroundColor2		integer  NULL ,
+	LineColor				integer  NULL ,
+	SeatColor				integer  NULL ,
+	ShowGuidanceInSeconds	integer  NULL ,
+	StatusCode				STATUS_CODE  ,
+	CommitBy				GUID  ,
+	CommitDateTime			datetime  NULL 
 )
-go
+GO
 
 
 ALTER TABLE AirlineReference
-	ADD CONSTRAINT  XPKAirlineReference PRIMARY KEY   NONCLUSTERED (AirlineCode  ASC)
-go
+	ADD CONSTRAINT  XPKAirlineReference 
+	PRIMARY KEY   
+	NONCLUSTERED (AirlineCode  ASC)
+GO
 
 
 CREATE TABLE AirportReference
 (
-	AirportCode  CODE  NOT NULL ,
-	AirportName  USR_NAME  ,
-	StatusCode  STATUS_CODE  ,
-	CommitBy  GUID  ,
-	CommitDateTime  datetime  NULL 
+	AirportCode			CODE  NOT NULL ,
+	AirportName			USR_NAME  ,
+	StatusCode			STATUS_CODE  ,
+	CommitBy			GUID  ,
+	CommitDateTime		datetime  NULL 
 )
-go
+GO
 
 
 ALTER TABLE AirportReference
-	ADD CONSTRAINT  XPKAirportReference PRIMARY KEY   NONCLUSTERED (AirportCode  ASC)
-go
+	ADD CONSTRAINT  XPKAirportReference 
+	PRIMARY KEY   
+	NONCLUSTERED	(
+					AirportCode  ASC
+					)
+GO
 
 
 CREATE TABLE AirportTranslation
 (
-	AirportTranslationId  GUID  NOT NULL ,
-	AirportCode  CODE  ,
-	LanguageCode  CODE  ,
-	AirportName  nvarchar(MAX)  ,
-	CommitBy  GUID  ,
-	CommitDateTime  datetime  NULL 
+	AirportTranslationId	GUID  NOT NULL ,
+	AirportCode				CODE  ,
+	LanguageCode			CODE  ,
+	AirportName				nvarchar(MAX)  ,
+	CommitBy				GUID  ,
+	CommitDateTime			datetime  NULL 
 )
-go
+GO
 
 
 ALTER TABLE AirportTranslation
-	ADD CONSTRAINT  XPKAirportTranslation PRIMARY KEY   NONCLUSTERED (AirportTranslationId  ASC)
-go
+	ADD CONSTRAINT  XPKAirportTranslation 
+	PRIMARY KEY   
+	NONCLUSTERED	(
+					AirportTranslationId  ASC
+					)
+GO
 
 
-CREATE INDEX XIF1AirportTranslation ON AirportTranslation
+CREATE INDEX XIF1AirportTranslation 
+ON AirportTranslation
 (
 	AirportCode  ASC
 )
-go
+GO
 
 
-CREATE INDEX XIF2AirportTranslation ON AirportTranslation
+CREATE INDEX XIF2AirportTranslation 
+ON AirportTranslation
 (
 	LanguageCode  ASC
 )
-go
+GO
 
 
 CREATE TABLE LanguageReference
 (
-	LanguageCode  CODE  NOT NULL ,
-	LanguageName  USR_NAME  ,
-	StatusCode  STATUS_CODE  ,
-	CommitBy  GUID  ,
+	LanguageCode	CODE  NOT NULL ,
+	LanguageName	USR_NAME  ,
+	StatusCode		STATUS_CODE  ,
+	CommitBy		GUID  ,
 	CommitDateTime  datetime  NULL 
 )
-go
+GO
 
 
 ALTER TABLE LanguageReference
-	ADD CONSTRAINT  XPKLanguageReference PRIMARY KEY   NONCLUSTERED (LanguageCode  ASC)
-go
+	ADD CONSTRAINT  XPKLanguageReference 
+	PRIMARY KEY   
+	NONCLUSTERED	(
+					LanguageCode  ASC
+					)
+GO
 
 
 CREATE TABLE SeatMap
 (
-	SeatMapId  GUID  NOT NULL ,
-	AircraftConfigurationId  GUID  ,
-	SeatRow  integer  NULL ,
-	SeatColumn  CODE  ,
-	SeatWidth  float  NULL ,
-	SeatHeight float  NULL ,
-	PositionX  float  NULL ,
-	PositionY  float  NULL ,
-	CommitBy  GUID  ,
-	CommitDateTime  datetime  NULL 
+	SeatMapId					GUID  NOT NULL ,
+	AircraftConfigurationId		GUID  ,
+	SeatRow						integer  NULL ,
+	SeatColumn					CODE  ,
+	SeatWidth					float  NULL ,
+	SeatHeight					float  NULL ,
+	PositionX					float  NULL ,
+	PositionY					float  NULL ,
+	CommitBy					GUID  ,
+	CommitDateTime				datetime  NULL 
 )
-go
+GO
 
 
 ALTER TABLE SeatMap
-	ADD CONSTRAINT  XPKSeatMap PRIMARY KEY   NONCLUSTERED (SeatMapId  ASC)
-go
+	ADD CONSTRAINT  XPKSeatMap 
+	PRIMARY KEY   
+	NONCLUSTERED	(
+					SeatMapId  ASC
+					)
+GO
 
 
-CREATE INDEX XIF1SeatMap ON SeatMap
+CREATE INDEX XIF1SeatMap 
+ON SeatMap
 (
 	AircraftConfigurationId  ASC
 )
-go
+GO
 
 
 CREATE TABLE TextTemplate
 (
-	TextTemplateId  GUID  NOT NULL ,
-	AirlineCode  CODE  ,
-	TextName  USR_NAME  ,
-	TextTemplate  NVARCHAR(MAX)  ,
-	RotateInSeconds  integer  NULL ,
-	StatusCode  STATUS_CODE  ,
-	CommitBy  GUID  ,
-	CommitDateTime  datetime  NULL 
+	TextTemplateId			GUID  NOT NULL ,
+	AirlineCode				CODE  ,
+	TextName				USR_NAME  ,
+	TextTemplate			NVARCHAR(MAX)  ,
+	RotateInSeconds			integer  NULL ,
+	StatusCode				STATUS_CODE  ,
+	CommitBy				GUID  ,
+	CommitDateTime			datetime  NULL 
 )
-go
+GO
 
 
 ALTER TABLE TextTemplate
-	ADD CONSTRAINT  XPKTextTemplate PRIMARY KEY   NONCLUSTERED (TextTemplateId  ASC)
-go
+	ADD CONSTRAINT  XPKTextTemplate 
+	PRIMARY KEY   
+	NONCLUSTERED	(
+					TextTemplateId  ASC
+					)
+GO
 
 
-CREATE INDEX XIF1TextTemplate ON TextTemplate
+CREATE INDEX XIF1TextTemplate 
+ON TextTemplate
 (
 	AirlineCode  ASC
 )
-go
+GO
 
 
 CREATE TABLE TextTranslation
 (
-	TextTranslationId  GUID  NOT NULL ,
-	TextTemplateId  GUID  ,
-	LanguageCode  CODE  ,
-	TextTemplate  NVARCHAR(MAX)  ,
-	CommitBy  GUID  ,
-	CommitDateTime  datetime  NULL 
+	TextTranslationId		GUID  NOT NULL ,
+	TextTemplateId			GUID  ,
+	LanguageCode			CODE  ,
+	TextTemplate			NVARCHAR(MAX)  ,
+	CommitBy				GUID  ,
+	CommitDateTime			datetime  NULL 
 )
-go
+GO
 
 
 ALTER TABLE TextTranslation
-	ADD CONSTRAINT  XPKTextTranslation PRIMARY KEY   NONCLUSTERED (TextTranslationId  ASC)
-go
+	ADD CONSTRAINT  XPKTextTranslation 
+	PRIMARY KEY   
+	NONCLUSTERED	(
+					TextTranslationId  ASC
+					)
+GO
 
 
-CREATE INDEX XIF1TextTranslation ON TextTranslation
+CREATE INDEX XIF1TextTranslation 
+ON TextTranslation
 (
 	TextTemplateId  ASC
 )
-go
+GO
 
 
-CREATE INDEX XIF2TextTranslation ON TextTranslation
+CREATE INDEX XIF2TextTranslation 
+ON TextTranslation
 (
 	LanguageCode  ASC
 )
-go
+GO
 
 
 CREATE TABLE UserAccount
 (
-	UserAccountId  GUID  NOT NULL ,
-	AirlineCode  CODE  ,
-	UserLogon  USR_NAME  ,
-	UserPassword  USR_NAME  ,
-	LastName  USR_NAME  ,
-	FirstName  USR_NAME  ,
-	StatusCode  STATUS_CODE  ,
-	CommitBy  GUID  ,
-	CommitDateTime  datetime  NULL 
+	UserAccountId		GUID  NOT NULL ,
+	AirlineCode			CODE  ,
+	UserLogon			USR_NAME  ,
+	UserPassword		USR_NAME  ,
+	LastName			USR_NAME  ,
+	FirstName			USR_NAME  ,
+	StatusCode			STATUS_CODE  ,
+	CommitBy			GUID  ,
+	CommitDateTime		datetime  NULL 
 )
-go
+GO
 
 
 ALTER TABLE UserAccount
-	ADD CONSTRAINT  XPKUserAccount PRIMARY KEY   NONCLUSTERED (UserAccountId  ASC)
-go
+	ADD CONSTRAINT  XPKUserAccount 
+	PRIMARY KEY   
+	NONCLUSTERED	(
+					UserAccountId  ASC
+					)
+GO
 
 
-CREATE INDEX XIF1UserAccount ON UserAccount
+CREATE INDEX XIF1UserAccount 
+ON UserAccount
 (
 	AirlineCode  ASC
 )
-go
+GO
 
-INSERT INTO AirlineReference (
+------------------------------------------
+-- Insert Example Airline
+------------------------------------------
+
+INSERT INTO 
+	AirlineReference 
+	(
 	AirlineCode,
 	AirlineName,
 	FontName,
@@ -302,11 +379,12 @@ INSERT INTO AirlineReference (
 	StatusCode,
 	CommitBy,
 	CommitDateTime
-) VALUES
-(
+	) 
+VALUES
+	(
 	'PG',
 	'Bangkok Airways',
-	'Segoe WP',
+	'SeGOe WP',
 	65,
 	16777215,
 	10407935,
@@ -316,25 +394,51 @@ INSERT INTO AirlineReference (
 	'A',
 	NULL,
 	GETDATE()
-);
-go
+	)
+GO
+
+------------------------------------------
+-- Insert Default Airline Logos
+------------------------------------------
 
 UPDATE AirlineReference
 SET AirlineLogoLarge = 
-    (SELECT  BulkColumn FROM OPENROWSET(BULK  'C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\SampleData\PGBigLogo.png', SINGLE_BLOB) AS x)
+    (
+	SELECT  BulkColumn 
+	FROM OPENROWSET
+		(
+		BULK  'C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\SampleData\PGBigLogo.png',
+		SINGLE_BLOB
+		) 
+		AS x
+	)
 WHERE AirlineCode = 'PG'
-go
+GO
 
 UPDATE AirlineReference
 SET AirlineLogoSmall = 
-    (SELECT  BulkColumn FROM OPENROWSET(BULK  'C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\SampleData\PGSmallLogo.png', SINGLE_BLOB) AS x)
+    (
+	SELECT  BulkColumn 
+	FROM OPENROWSET
+		(
+		BULK  'C:\Users\thawa\OneDrive\Documents\Visual Studio 2015\Projects\MobiGuide\MobiGuide\SampleData\PGSmallLogo.png',
+		SINGLE_BLOB
+		) 
+		AS x
+	)
 WHERE AirlineCode = 'PG'
-go
+GO
 
-DECLARE @sysId uniqueidentifier  
-SET @sysId = NEWID() 
-INSERT INTO UserAccount 
-(
+-------------------------------------------
+-- Insert 'System' User
+-------------------------------------------
+
+DECLARE @sysId			uniqueidentifier  
+SET		@sysId			= NEWID() 
+
+INSERT INTO 
+	UserAccount 
+	(
 	UserAccountId,
 	AirlineCode,
 	UserLogon,
@@ -344,9 +448,9 @@ INSERT INTO UserAccount
 	StatusCode,
 	CommitBy,
 	CommitDateTime
-)
+	)
 VALUES
-(
+	(
 	@sysId,
 	NULL,
 	'system',
@@ -356,15 +460,34 @@ VALUES
 	NULL,
 	NULL,
 	GETDATE()
-);
+	)
 
-insert into LanguageReference values ('THA', 'Thai', 'A' , @sysId, GETDATE());
-go
+-------------------------------------------
+-- Insert Example Language
+-------------------------------------------
 
-DECLARE @adminId uniqueidentifier  
-SET @adminId = NEWID() 
-INSERT INTO UserAccount 
-(
+INSERT INTO 
+	LanguageReference 
+VALUES 
+	(
+	'THA',
+	'Thai',
+	'A' ,
+	@sysId,
+	GETDATE()
+	)
+GO
+
+-------------------------------------------
+-- Insert Example User
+-------------------------------------------
+
+DECLARE @adminId			uniqueidentifier  
+SET		@adminId			= NEWID()
+
+INSERT INTO 
+	UserAccount 
+	(
 	UserAccountId,
 	AirlineCode,
 	UserLogon,
@@ -374,9 +497,9 @@ INSERT INTO UserAccount
 	StatusCode,
 	CommitBy,
 	CommitDateTime
-)
+	)
 VALUES
-(
+	(
 	@adminId,
 	'PG',
 	'dome',
@@ -386,5 +509,5 @@ VALUES
 	NULL,
 	NULL,
 	GETDATE()
-);
-go
+	)
+GO

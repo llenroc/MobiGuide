@@ -4,29 +4,32 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using DatabaseConnector;
+using MobiGuide.Class;
 using Properties;
 
 namespace MobiGuide
 {
     /// <summary>
-    /// Interaction logic for AddLanguageReferenceWindow.xaml
+    ///     Interaction logic for AddLanguageReferenceWindow.xaml
     /// </summary>
     public partial class AddLanguageReferenceWindow : Window
     {
-        DBConnector dbCon = new DBConnector();
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            IconHelper.RemoveIcon(this);
-        }
+        private readonly DBConnector dbCon = new DBConnector();
+
         public AddLanguageReferenceWindow()
         {
             InitializeComponent();
         }
 
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            IconHelper.RemoveIcon(this);
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Active", Value = "A" });
-            statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Inactive", Value = "I" });
+            statusComboBox.Items.Add(new CustomComboBoxItem {Text = "Active", Value = "A"});
+            statusComboBox.Items.Add(new CustomComboBoxItem {Text = "Inactive", Value = "I"});
             languageCodeTextBox.Focus();
         }
 
@@ -35,19 +38,21 @@ namespace MobiGuide
             saveBtn.IsEnabled = false;
             if (!IsLanguageCodeCorrect(languageCodeTextBox.Text))
             {
-                MessageBox.Show("Airline Code Must Contains 2-3 Characters", "WARNING");
+                MessageBox.Show(Messages.WARNING_WRONG_LANGUAGE_CODE, Captions.WARNING);
             }
-            else if(String.IsNullOrWhiteSpace(languageNameTextBox.Text))
+            else if (string.IsNullOrWhiteSpace(languageNameTextBox.Text))
             {
-                MessageBox.Show("Please Enter Airline Name", "WARNING");
-            } else
+                MessageBox.Show(Messages.WARNING_ENTER_LANGUAGE_NAME, Captions.WARNING);
+            }
+            else
             {
                 if (await IsExistingLanguageCode(languageCodeTextBox.Text.ToUpper()))
                 {
-                    MessageBox.Show("Language Code is Existing", "WARNING");
-                } else
+                    MessageBox.Show(Messages.WARNING_EXISTING_LANGUAGE_CODE, Captions.WARNING);
+                }
+                else
                 {
-                    DataRow languageReferenceData = new DataRow(
+                    var languageReferenceData = new DataRow(
                         "LanguageCode", languageCodeTextBox.Text.ToUpper(),
                         "LanguageName", languageNameTextBox.Text,
                         "StatusCode", statusComboBox.SelectedValue.ToString(),
@@ -56,12 +61,12 @@ namespace MobiGuide
                     if (await dbCon.CreateNewRow("LanguageReference", languageReferenceData, null))
                     {
                         DialogResult = true;
-                        MessageBox.Show("Add Language Reference Successfully", "SUCCESS");
-                        this.Close();
+                        MessageBox.Show(Messages.SUCCESS_ADD_LANGUAGE_REF, Captions.SUCCESS);
+                        Close();
                     }
                     else
                     {
-                        MessageBox.Show("Cannot Save Language Reference", "ERROR");
+                        MessageBox.Show(Messages.ERROR_ADD_LANGUAGE_REF, Captions.ERROR);
                     }
                 }
             }
@@ -72,20 +77,21 @@ namespace MobiGuide
         {
             if ((code.Length == 2 || code.Length == 3) && IsTextAllowed(code))
                 return true;
-            else return false;
+            return false;
         }
+
         private async Task<bool> IsExistingLanguageCode(string code)
         {
-            DataRow result = await dbCon.GetDataRow("LanguageReference", new DataRow("LanguageCode", code));
+            var result = await dbCon.GetDataRow("LanguageReference", new DataRow("LanguageCode", code));
             if (result.HasData && result.Error == ERROR.NoError) return true;
-            else if (result.Error == ERROR.HasError) return true;
-            else return false;
+            if (result.Error == ERROR.HasError) return true;
+            return false;
         }
 
         private void cancelBtn_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
-            this.Close();
+            Close();
         }
 
         private void languageCodeTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -95,7 +101,7 @@ namespace MobiGuide
 
         private static bool IsTextAllowed(string text)
         {
-            Regex regex = new Regex("[a-zA-Z]"); //regex that matches disallowed text
+            var regex = new Regex("[a-zA-Z]"); //regex that matches disallowed text
             return regex.IsMatch(text);
         }
     }

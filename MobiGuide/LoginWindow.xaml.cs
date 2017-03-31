@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
 using DatabaseConnector;
+using MobiGuide.Class;
 
 namespace MobiGuide
 {
@@ -12,7 +13,8 @@ namespace MobiGuide
     /// </summary>
     public partial class LoginWindow : Window
     {
-        DBConnector dbCon = new DBConnector();
+        private readonly DBConnector dbCon = new DBConnector();
+
         public LoginWindow()
         {
             InitializeComponent();
@@ -22,16 +24,13 @@ namespace MobiGuide
         {
             IconHelper.RemoveIcon(this);
         }
+
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
             if (e.Key == Key.Space)
-            {
                 e.Handled = true;
-            }
             if(e.Key == Key.Enter)
-            {
                 loginBtn.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
-            }
             base.OnPreviewKeyDown(e);
         }
 
@@ -46,40 +45,37 @@ namespace MobiGuide
             {
                 MainWindow mainWindow = new MainWindow();
                 mainWindow.Show();
-                this.Close();
+                Close();
             }
         }
 
         private async Task<bool> doLogin(string username, string password)
         {
-            if (String.IsNullOrWhiteSpace(username) || String.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
-                MessageBox.Show("Please fill both Username and Password", "Error");
+                MessageBox.Show(Messages.ERROR_EMPTY_UPASS, Captions.ERROR);
                 return false;
             }
-            else
+            DataRow result = await dbCon.GetDataRow("UserAccount", 
+                new DataRow("UserLogon", username, "UserPassword", password));
+            if (result.HasData && result.Error == ERROR.NoError)
             {
-                DataRow result = await dbCon.GetDataRow("UserAccount", 
-                    new DataRow("UserLogon", username, "UserPassword", password));
-                if (result.HasData && result.Error == ERROR.NoError)
-                {
-                    Application.Current.Resources["UserAccountId"] = result.Get("UserAccountId");
-                    Application.Current.Resources["AirlineCode"] = result.Get("AirlineCode");
-                    return true;
-                } else if (!result.HasData && result.Error == ERROR.NoError)
-                {
-                    MessageBox.Show("Username or Password do not match", "WARNING");
-                    return false;
-                } else if (result.Error == ERROR.HasError)
-                {
-                    MessageBox.Show("Failed to login, please contact administrator", "ERROR");
-                    return false;
-                } else
-                {
-                    MessageBox.Show("Failed to login, please contact administrator", "ERROR");
-                    return false;
-                }
+                Application.Current.Resources["UserAccountId"] = result.Get("UserAccountId");
+                Application.Current.Resources["AirlineCode"] = result.Get("AirlineCode");
+                return true;
             }
+            if (!result.HasData && result.Error == ERROR.NoError)
+            {
+                MessageBox.Show(Messages.ERROR_UPASS_NOMATCH, Captions.WARNING);
+                return false;
+            }
+            if (result.Error == ERROR.HasError)
+            {
+                MessageBox.Show(Messages.ERROR_LOGIN_FAILED, Captions.ERROR);
+                return false;
+            }
+            MessageBox.Show(Messages.ERROR_LOGIN_FAILED, Captions.ERROR);
+            return false;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

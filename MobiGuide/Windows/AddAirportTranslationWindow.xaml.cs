@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using DatabaseConnector;
+using MobiGuide.Class;
 using Properties;
 
 namespace MobiGuide
@@ -12,15 +13,17 @@ namespace MobiGuide
     /// </summary>
     public partial class AddAirportTranslationWindow : Window
     {
-        bool isStartUp = true;
-        DBConnector dbCon = new DBConnector();
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            IconHelper.RemoveIcon(this);
-        }
+        private readonly DBConnector dbCon = new DBConnector();
+        private bool isStartUp = true;
+
         public AddAirportTranslationWindow()
         {
             InitializeComponent();
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            IconHelper.RemoveIcon(this);
         }
 
         private async void saveBtn_Click(object sender, RoutedEventArgs e)
@@ -29,11 +32,11 @@ namespace MobiGuide
             if(await saveNameInLanguage())
             {
                 DialogResult = true;
-                MessageBox.Show("Add Airport Translation Successfully", "SUCCESS");
-                this.Close();
+                MessageBox.Show(Messages.SUCCESS_ADD_AIRPORT_TRANSLATION, Captions.SUCCESS);
+                Close();
             } else
             {
-                MessageBox.Show("Error Occurred While Add Airport Translation", "ERROR");
+                MessageBox.Show(Messages.ERROR_ADD_AIRPORT_TRANSLATION, Captions.ERROR);
             }
             saveBtn.IsEnabled = true;
         }
@@ -45,56 +48,52 @@ namespace MobiGuide
 
         private async void FetchAirportList()
         {
-            string query = MobiGuide.Properties.Settings.Default.GetUntranslateAirportListQuery.Replace(Environment.NewLine, " ").Replace("\t", " ");
-            DataList airportList = (DataList)(await dbCon.CustomQuery(SQLStatementType.SELECT_LIST, query));
+            string query = Properties.Settings.Default.GetUntranslateAirportListQuery.Replace(Environment.NewLine, " ").Replace("\t", " ");
+            DataList airportList = (DataList)await dbCon.CustomQuery(SQLStatementType.SELECT_LIST, query);
             if (airportList.HasData && airportList.Error == ERROR.NoError)
             {
                 foreach (DataRow airport in airportList)
-                {
                     airportNameComboBox.Items.Add(new CustomComboBoxItem
                     {
-                        Text = String.Format("{0} - {1}", airport.Get("AirportCode"), airport.Get("AirportName")),
+                        Text = string.Format("{0} - {1}", airport.Get("AirportCode"), airport.Get("AirportName")),
                         Value = airport.Get("AirportCode")
                     });
-                }
                 airportNameComboBox.SelectionChanged += RemoveNotSelectOptionItem;
             } else if (!airportList.HasData && airportList.Error == ERROR.NoError)
             {
-                MessageBox.Show("Airport Reference Not Found", "WARNING");
-                this.Close();
+                MessageBox.Show(Messages.ERROR_AIRPORT_REF_NOT_FOUND, Captions.WARNING);
+                Close();
             } else
             {
-                MessageBox.Show("Error Occurred While Fetching Airport Reference", "ERROR");
-                this.Close();
+                MessageBox.Show(Messages.ERROR_GET_AIRPORT_REF, Captions.ERROR);
+                Close();
             }
         }
 
         private async void FetchLanguageList(string airportCode)
         {
             LanguageComboBox.Items.Clear();
-            string query = String.Format("SELECT * FROM LanguageReference WHERE LanguageCode NOT IN (SELECT LanguageCode FROM AirportTranslation WHERE AirportCode = '{0}') ORDER BY LanguageCode", airportCode);
+            string query = string.Format("SELECT * FROM LanguageReference WHERE LanguageCode NOT IN (SELECT LanguageCode FROM AirportTranslation WHERE AirportCode = '{0}') ORDER BY LanguageCode", airportCode);
             DataList languageList = (DataList)await dbCon.CustomQuery(SQLStatementType.SELECT_LIST, query);
             if (languageList.HasData && languageList.Error == ERROR.NoError)
             {
                 foreach (DataRow language in languageList)
-                {
                     LanguageComboBox.Items.Add(new CustomComboBoxItem
                     {
-                        Text = String.Format("{0} - {1}", language.Get("LanguageCode"), language.Get("LanguageName")),
+                        Text = string.Format("{0} - {1}", language.Get("LanguageCode"), language.Get("LanguageName")),
                         Value = language.Get("LanguageCode")
                     });
-                }
                 LanguageComboBox.SelectedIndex = 0;
             }
             else if (!languageList.HasData && languageList.Error == ERROR.NoError)
             {
-                MessageBox.Show("No more Language Reference to add to this Airport", "WARNING");
-                this.Close();
+                MessageBox.Show(Messages.WARNING_NO_MORE_LANGUAGE_REF_ADD, Captions.WARNING);
+                Close();
             }
             else
             {
-                MessageBox.Show("Error Occurred While Fetching Language Reference", "ERROR");
-                this.Close();
+                MessageBox.Show(Messages.ERROR_GET_LANGUAGE_REF, Captions.ERROR);
+                Close();
             }
         }
 
@@ -106,7 +105,7 @@ namespace MobiGuide
 
         private void nameInLanguageTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (!String.IsNullOrWhiteSpace(nameInLanguageTextBox.Text)) saveBtn.IsEnabled = true;
+            if (!string.IsNullOrWhiteSpace(nameInLanguageTextBox.Text)) saveBtn.IsEnabled = true;
             else saveBtn.IsEnabled = false;
         }
 
@@ -142,7 +141,7 @@ namespace MobiGuide
 
         private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            nameInTextBlock.Text = LanguageComboBox.SelectedValue != null ? LanguageComboBox.SelectedValue.ToString() : String.Empty;
+            nameInTextBlock.Text = LanguageComboBox.SelectedValue != null ? LanguageComboBox.SelectedValue.ToString() : string.Empty;
         }
     }
 }

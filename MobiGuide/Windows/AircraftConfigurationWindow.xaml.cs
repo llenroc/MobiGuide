@@ -13,11 +13,8 @@ namespace MobiGuide
     /// </summary>
     public partial class AircraftConfigurationWindow : Window
     {
-        DBConnector dbCon = new DBConnector();
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            IconHelper.RemoveIcon(this);
-        }
+        private readonly DBConnector dbCon = new DBConnector();
+
         public AircraftConfigurationWindow()
         {
             InitializeComponent();
@@ -27,10 +24,16 @@ namespace MobiGuide
             statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Inactive", Value = "I" });
         }
 
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            IconHelper.RemoveIcon(this);
+        }
+
         private void searchBtn_Click(object sender, RoutedEventArgs e)
         {
             DoSearch();
         }
+
         private async void DoSearch()
         {
             string aircraftConfigCode = aircraftConfigCodeTextBox.Text;
@@ -39,7 +42,7 @@ namespace MobiGuide
             string aircraftTypeCode = aircraftTypeComboBox.SelectedValue.ToString();
 
             DataList list = await dbCon.GetDataList("AircraftConfiguration", null,
-                String.Format("WHERE AircraftConfigurationCode LIKE '%{0}%' AND AircraftConfigurationName LIKE '%{1}%' AND StatusCode LIKE '%{2}%' AND AircraftTypeCode LIKE '%{3}%' COLLATE SQL_Latin1_General_CP1_CI_AS ORDER BY AircraftTypeCode",
+                string.Format("WHERE AircraftConfigurationCode LIKE '%{0}%' AND AircraftConfigurationName LIKE '%{1}%' AND StatusCode LIKE '%{2}%' AND AircraftTypeCode LIKE '%{3}%' COLLATE SQL_Latin1_General_CP1_CI_AS ORDER BY AircraftTypeCode",
                 aircraftConfigCode, aircraftConfigName, status, aircraftTypeCode));
             if (list.HasData && list.Error == ERROR.NoError)
             {
@@ -98,9 +101,7 @@ namespace MobiGuide
                 NewEditAircraftConfigurationWindow editACWindow = new NewEditAircraftConfigurationWindow(selectedItem.AircraftConfigurationId);
                 editACWindow.ShowDialog();
                 if (editACWindow.DialogResult.HasValue && editACWindow.DialogResult.Value)
-                {
                     DoSearch();
-                }
             }
         }
 
@@ -112,8 +113,8 @@ namespace MobiGuide
 
         private void clearBtn_Click(object sender, RoutedEventArgs e)
         {
-            aircraftConfigCodeTextBox.Text = String.Empty;
-            aircraftConfigNameTextBox.Text = String.Empty;
+            aircraftConfigCodeTextBox.Text = string.Empty;
+            aircraftConfigNameTextBox.Text = string.Empty;
             statusComboBox.SelectedIndex = 0;
             aircraftConfigDataGrid.ItemsSource = null;
             aircraftConfigDataGrid.SelectedIndex = -1;
@@ -123,23 +124,17 @@ namespace MobiGuide
         {
             aircraftTypeComboBox.Items.Add(new CustomComboBoxItem { Text = "Any", Value = "" });
 
-            DataList aircraftTypeList = await dbCon.GetDataList("AircraftTypeReference", new DatabaseConnector.DataRow("StatusCode", "A"), "ORDER BY AircraftTypeCode");
+            DataList aircraftTypeList = await dbCon.GetDataList("AircraftTypeReference", new DataRow("StatusCode", "A"), "ORDER BY AircraftTypeCode");
             if(aircraftTypeList.HasData && aircraftTypeList.Error == ERROR.NoError)
-            {
                 foreach(DataRow row in aircraftTypeList)
-                {
                     aircraftTypeComboBox.Items.Add(new CustomComboBoxItem { Text = row.Get("AircraftTypeCode").ToString(), Value = row.Get("AircraftTypeCode").ToString() });
-                }
-            }
         }
 
         private void aircraftConfigDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             DataGrid acDataGrid = sender as DataGrid;
             if (acDataGrid.SelectedIndex > -1)
-            {
                 editBtn.IsEnabled = true;
-            }
             else editBtn.IsEnabled = false;
         }
 
@@ -152,9 +147,7 @@ namespace MobiGuide
                 NewEditAircraftConfigurationWindow editACWindow = new NewEditAircraftConfigurationWindow(selectedItem.AircraftConfigurationId);
                 editACWindow.ShowDialog();
                 if(editACWindow.DialogResult.HasValue && editACWindow.DialogResult.Value)
-                {
                     DoSearch();
-                }
             }
         }
     }

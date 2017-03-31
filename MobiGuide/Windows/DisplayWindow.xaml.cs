@@ -1,31 +1,46 @@
 ﻿using System;
+using System.Timers;
 using System.Windows;
 using System.Windows.Input;
-using Properties;
 using DatabaseConnector;
-using System.Timers;
+using Properties;
 
 namespace MobiGuide
 {
     /// <summary>
-    /// Interaction logic for DisplayWindow.xaml
+    ///     Interaction logic for DisplayWindow.xaml
     /// </summary>
     public partial class DisplayWindow : Window
     {
-        public DISPLAY_TYPE DisplayType { get; set; }
-        private ShowText showText { get; set; }
-        private Guid aircraftConfigurationId { get; set; }
-        private bool frontDoorUsingFlag { get; set; }
-        private bool rearDoorUsingFlag { get; set; }
-        private int guidanceTime { get; set; }
-        private Timer timer;
         private SeatMapPage seatMapPage;
+        private Timer timer;
+
         public DisplayWindow()
         {
             InitializeComponent();
 
-            this.PreviewKeyDown += new KeyEventHandler(HandleEsc);
+            PreviewKeyDown += HandleEsc;
         }
+
+        public DisplayWindow(DISPLAY_TYPE type, params object[] param) : this()
+        {
+            DisplayType = type;
+            if (type == DISPLAY_TYPE.TEXT)
+                if (param != null)
+                    showText = param[0] as ShowText;
+            aircraftConfigurationId = new Guid(param[1].ToString());
+            frontDoorUsingFlag = (bool) param[2];
+            rearDoorUsingFlag = (bool) param[3];
+
+            GetGuidanceTime();
+        }
+
+        public DISPLAY_TYPE DisplayType;
+        private ShowText showText { get; }
+        private Guid aircraftConfigurationId { get; }
+        private bool frontDoorUsingFlag { get; }
+        private bool rearDoorUsingFlag { get; }
+        private int guidanceTime;
 
         private void HandleEsc(object sender, KeyEventArgs e)
         {
@@ -36,7 +51,7 @@ namespace MobiGuide
                 if (timer != null && timer.Enabled) timer.Enabled = false;
                 seatMapPage = new SeatMapPage(aircraftConfigurationId, frontDoorUsingFlag, rearDoorUsingFlag, "C_3");
                 DisplayFrame.Navigate(seatMapPage);
-                timer = new Timer(this.guidanceTime * 1000);
+                timer = new Timer(guidanceTime * 1000);
                 timer.AutoReset = false;
                 timer.Elapsed += Timer_Elapsed;
                 timer.Start();
@@ -45,7 +60,7 @@ namespace MobiGuide
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            Dispatcher.Invoke(new Action(() =>
+            Dispatcher.Invoke(() =>
             {
                 switch (DisplayType)
                 {
@@ -56,32 +71,16 @@ namespace MobiGuide
                         DisplayFrame.Navigate(new TextPage(showText));
                         break;
                 }
-            }));
-        }
-
-        public DisplayWindow(DISPLAY_TYPE type, params object[] param) : this()
-        {
-            this.DisplayType = type;
-            if(type == DISPLAY_TYPE.TEXT)
-            {
-                if(param != null)
-                    showText = param[0] as ShowText;
-            }
-            aircraftConfigurationId = new Guid(param[1].ToString());
-            frontDoorUsingFlag = (bool)param[2];
-            rearDoorUsingFlag = (bool)param[3];
-
-            GetGuidanceTime();
+            });
         }
 
         private async void GetGuidanceTime()
         {
-            DataRow airlineRef = await (new DBConnector()).GetDataRow("AirlineReference", new DataRow("AirlineCode", Application.Current.Resources["AirlineCode"]));
+            var airlineRef = await new DBConnector().GetDataRow("AirlineReference",
+                new DataRow("AirlineCode", Application.Current.Resources["AirlineCode"]));
             if (airlineRef.HasData && airlineRef.Error == ERROR.NoError)
-            {
-                this.guidanceTime = (int)airlineRef.Get("ShowGuidanceInSeconds");
-            }
-            else this.guidanceTime = 10;
+                guidanceTime = (int) airlineRef.Get("ShowGuidanceInSeconds");
+            else guidanceTime = 10;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

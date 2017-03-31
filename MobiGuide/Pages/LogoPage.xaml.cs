@@ -20,8 +20,8 @@ namespace MobiGuide
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            double width = this.ActualWidth;
-            double height = this.ActualHeight;
+            double width = ActualWidth;
+            double height = ActualHeight;
             double logoImgSize = (width < height ? width : height) * 34 / 55; // golden ratio
             logoImg.Height = logoImgSize;
             logoImg.Width = logoImgSize;
@@ -32,10 +32,10 @@ namespace MobiGuide
         private async void LoadLogo()
         {
             DBConnector dbCon = new DBConnector();
-            DataRow airlineReferenceData = await dbCon.GetDataRow("AirlineReference", new DatabaseConnector.DataRow("AirlineCode", Application.Current.Resources["AirlineCode"]));
+            DataRow airlineReferenceData = await dbCon.GetDataRow("AirlineReference", new DataRow("AirlineCode", Application.Current.Resources["AirlineCode"]));
             if(airlineReferenceData.HasData && airlineReferenceData.Error == ERROR.NoError)
             {
-                logoImg.Source = (airlineReferenceData.Get("AirlineLogoLarge") as object).BlobToSource();
+                logoImg.Source = airlineReferenceData.Get("AirlineLogoLarge").BlobToSource();
                 if(logoImg.Source == null) logoImg.Source = new BitmapImage(new Uri(@"..\NoImg.jpg", UriKind.RelativeOrAbsolute));
                 if (airlineReferenceData.Get("BackGroundColor2") != null)
                 {

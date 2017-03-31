@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Properties;
+using MobiGuide.Class;
 
 namespace MobiGuide
 {
@@ -12,14 +13,16 @@ namespace MobiGuide
     /// </summary>
     public partial class EditAirportReferenceWindow : Window
     {
-        DBConnector dbCon = new DBConnector();
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            IconHelper.RemoveIcon(this);
-        }
+        private readonly DBConnector dbCon = new DBConnector();
+
         public EditAirportReferenceWindow()
         {
             InitializeComponent();
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            IconHelper.RemoveIcon(this);
         }
 
         private async void saveBtn_Click(object sender, RoutedEventArgs e)
@@ -32,11 +35,11 @@ namespace MobiGuide
                 "CommitDateTime", DateTime.Now
                 );
             if(await SaveEditAirportReference(data, new DataRow("AirportCode", airportCodeComboBox.SelectedValue))){
-                MessageBox.Show(String.Format("Update [{0}] Airport Reference Successfully", airportCodeComboBox.SelectedValue), "SUCCESS");
+                MessageBox.Show(Messages.SUCCESS_UPDATE_AIRPORT_REF(airportCodeComboBox.SelectedValue.ToString()), Captions.SUCCESS);
                 GetAirportReferenceData(airportCodeComboBox.SelectedValue.ToString());
             } else
             {
-                MessageBox.Show(String.Format("Failed to Update [{0}] Airport Reference", airportCodeComboBox.SelectedValue), "ERROR");
+                MessageBox.Show(Messages.ERROR_UPDATE_AIRPORT_REF(airportCodeComboBox.SelectedValue.ToString()), "ERROR");
             }
             saveBtn.IsEnabled = true;
         }
@@ -58,15 +61,13 @@ namespace MobiGuide
             if(list.Error == ERROR.NoError && list.HasData)
             {
                 foreach(DataRow row in list)
-                {
                     airportCodeComboBox.Items.Add(new CustomComboBoxItem { Text = row.Get("AirportCode").ToString(), Value = row.Get("AirportCode").ToString() });
-                }
                 airportCodeComboBox.SelectionChanged += RemoveNotSelectOptionItem;
                 airportCodeComboBox.SelectionChanged += AirportCodeComboBox_SelectionChanged;
 
             } else
             {
-                MessageBox.Show("Cannot Get Airport Code List", "ERROR");
+                MessageBox.Show(Messages.ERROR_GET_AIRPORT_CODE_LIST, Captions.ERROR);
             }
         }
 
@@ -109,7 +110,7 @@ namespace MobiGuide
 
         private void airportNameTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (!String.IsNullOrWhiteSpace(airportNameTextBox.Text)) saveBtn.IsEnabled = true;
+            if (!string.IsNullOrWhiteSpace(airportNameTextBox.Text)) saveBtn.IsEnabled = true;
             else saveBtn.IsEnabled = false;
         }
     }

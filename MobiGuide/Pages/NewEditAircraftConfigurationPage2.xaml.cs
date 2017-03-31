@@ -15,69 +15,65 @@ namespace MobiGuide
     /// </summary>
     public partial class NewEditAircraftConfigurationPage2 : Page
     {
-        DBConnector dbCon = new DBConnector();
-        public STATUS Status { get; set; }
+        private readonly DBConnector dbCon = new DBConnector();
+        public NewEditAircraftConfigurationPage2() : this(null, STATUS.NEW) { }
+
+        public NewEditAircraftConfigurationPage2(AircraftConfiguration aircraftConfiguration, STATUS Status)
+        {
+            InitializeComponent();
+            this.Status = Status;
+            if(aircraftConfiguration != null)
+                AircraftConfiguration = aircraftConfiguration;
+        }
+
+        public STATUS Status;
+
         private Window window
         {
             get
             {
                 DependencyObject parent = VisualTreeHelper.GetParent(this);
                 while (!(parent is Window))
-                {
                     parent = VisualTreeHelper.GetParent(parent);
-                }
                 return parent as Window;
             }
         }
-        private AircraftConfiguration AircraftConfiguration { get; set; }
-        private string seatMapImagePath { get; set; }
-        public NewEditAircraftConfigurationPage2() : this(null, STATUS.NEW) { }
-        public NewEditAircraftConfigurationPage2(AircraftConfiguration aircraftConfiguration, STATUS Status)
-        {
-            InitializeComponent();
-            this.Status = Status;
-            if(aircraftConfiguration != null)
-            {
-                this.AircraftConfiguration = aircraftConfiguration;
-            }
-        }
+
+        private AircraftConfiguration AircraftConfiguration { get; }
+        private string seatMapImagePath;
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             NewEditAircraftConfigurationWindow window = this.window as NewEditAircraftConfigurationWindow;
-            window.Top = (SystemParameters.PrimaryScreenHeight / 2) - (window.ActualHeight / 2);
+            window.Top = SystemParameters.PrimaryScreenHeight / 2 - window.ActualHeight / 2;
             if (window.mainFrame.CanGoBack)
             {
                 backBtn.Visibility = Visibility.Visible;
                 backBtn.IsEnabled = true;
             }
-            if(Status == STATUS.EDIT && this.AircraftConfiguration.SeatMapImagePath == null)
+            if(Status == STATUS.EDIT && AircraftConfiguration.SeatMapImagePath == null)
             {
-                DataRow seatMapImageData = await dbCon.GetDataRow("AircraftConfiguration", new DataRow("AircraftConfigurationId", this.AircraftConfiguration.AircraftConfigurationId));
+                DataRow seatMapImageData = await dbCon.GetDataRow("AircraftConfiguration", new DataRow("AircraftConfigurationId", AircraftConfiguration.AircraftConfigurationId));
                 if(seatMapImageData.HasData && seatMapImageData.Error == ERROR.NoError)
-                {
                     if(seatMapImageData.Get("SeatMapImage") != DBNull.Value)
                     {
                         seatMapImage.Source = seatMapImageData.Get("SeatMapImage").BlobToSource();
                         nextBtn.IsEnabled = true;
                     }
-                }
             }
         }
 
         private void nextBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.AircraftConfiguration.SeatMapImagePath = this.seatMapImagePath;
-            (this.window as NewEditAircraftConfigurationWindow).mainFrame.Navigate(new NewEditAircraftConfigurationPage3(this.AircraftConfiguration, Status));
+            AircraftConfiguration.SeatMapImagePath = seatMapImagePath;
+            (window as NewEditAircraftConfigurationWindow).mainFrame.Navigate(new NewEditAircraftConfigurationPage3(AircraftConfiguration, Status));
         }
 
         private void backBtn_Click(object sender, RoutedEventArgs e)
         {
-            Frame mainFrame = (this.window as NewEditAircraftConfigurationWindow).mainFrame;
+            Frame mainFrame = (window as NewEditAircraftConfigurationWindow).mainFrame;
             if (mainFrame.CanGoBack)
-            {
-                mainFrame.GoBack(); 
-            }
+                mainFrame.GoBack();
         }
 
         private void browseBtn_Click(object sender, RoutedEventArgs e)

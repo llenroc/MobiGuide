@@ -6,6 +6,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using CustomExtensions;
 using DatabaseConnector;
+using MobiGuide.Class;
 using Properties;
 
 namespace MobiGuide
@@ -15,21 +16,24 @@ namespace MobiGuide
     /// </summary>
     public partial class EditAirlineReferenceWindow : Window
     {
-        ResourceDictionary res = Application.Current.Resources;
-        DataRow airlineRef = new DataRow();
+        private DataRow airlineRef = new DataRow();
+        private readonly DBConnector dbCon = new DBConnector();
+        private string largeLogoPath = string.Empty;
         private ImageUploadStatus largeLogoStatus = ImageUploadStatus.Remain;
+        private readonly ResourceDictionary res = Application.Current.Resources;
+        private string smallLogoPath = string.Empty;
         private ImageUploadStatus smallLogoStatus = ImageUploadStatus.Remain;
-        private string largeLogoPath = String.Empty;
-        private string smallLogoPath = String.Empty;
-        DBConnector dbCon = new DBConnector();
+
         public EditAirlineReferenceWindow()
         {
             InitializeComponent();
         }
+
         protected override void OnSourceInitialized(EventArgs e)
         {
             IconHelper.RemoveIcon(this);
         }
+
         private async void saveBtn_Click(object sender, RoutedEventArgs e)
         {
             saveBtn.IsEnabled = false;
@@ -42,12 +46,12 @@ namespace MobiGuide
                 case ImageUploadStatus.New:
                     if (!await dbCon.UpdateBlobData("AirlineReference", "AirlineLogoLarge",
                         largeLogoPath, condition))
-                        MessageBox.Show("Failed to update Airline Large Logo", "ERROR");
+                        MessageBox.Show(Messages.ERROR_UPDATE_AIRLINE_LARGE_LOGO, Captions.ERROR);
                     break;
                 case ImageUploadStatus.Remove:
                     if (!await dbCon.UpdateBlobData("AirlineReference", "AirlineLogoLarge",
                         null, condition))
-                        MessageBox.Show("Failed to remove Airline Large Logo", "ERROR");
+                        MessageBox.Show(Messages.ERROR_REMOVE_AIRLINE_LARGE_LOGO, Captions.ERROR);
                     break;
             }
             switch (smallLogoStatus)
@@ -55,22 +59,22 @@ namespace MobiGuide
                 case ImageUploadStatus.New:
                     if (!await dbCon.UpdateBlobData("AirlineReference", "AirlineLogoSmall",
                         smallLogoPath, condition))
-                        MessageBox.Show("Failed to update Airline Small Logo", "ERROR");
+                        MessageBox.Show(Messages.ERROR_UPDATE_AIRLINE_SMALL_LOGO, Captions.ERROR);
                     break;
                 case ImageUploadStatus.Remove:
                     if (!await dbCon.UpdateBlobData("AirlineReference", "AirlineLogoSmall",
                         null, condition))
-                        MessageBox.Show("Failed to remove Airline Small Logo", "ERROR");
+                        MessageBox.Show(Messages.ERROR_REMOVE_AIRLINE_SMALL_LOGO, Captions.ERROR);
                     break;
             }
             if (updateResult)
             {
-                MessageBox.Show("Update Airline Reference Successfully", "SUCCESS");
+                MessageBox.Show(Messages.SUCCESS_UPDATE_AIRLINE_REF, Captions.SUCCESS);
                 DialogResult = true;
-                this.Close();
+                Close();
             } else
             {
-                MessageBox.Show("Failed to update Airline Reference", "ERROR");
+                MessageBox.Show(Messages.ERROR_UPDATE_AIRLINE_REF, Captions.ERROR);
                 saveBtn.IsEnabled = true;
             }
         }
@@ -96,7 +100,7 @@ namespace MobiGuide
         private void cancelBtn_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
-            this.Close();
+            Close();
         }
 
         private void browseSrcLargeLogoBtn_Click(object sender, RoutedEventArgs e)
@@ -186,32 +190,23 @@ namespace MobiGuide
             //set font name combobox selecteditem 
             string defaultFontFamily = FontFamily.FamilyNames.Select(fontName => fontName.Value).ToList()[0];
             string selectedFontFamily = airlineRef.Get("FontName").ToString();
-            if (String.IsNullOrEmpty(selectedFontFamily))
-            {
+            if (string.IsNullOrEmpty(selectedFontFamily))
                 foreach (FontFamily fontFamily in fontNameComboBox.Items)
                 {
                     if (fontFamily.Source == defaultFontFamily)
-                    {
                         fontNameComboBox.SelectedItem = fontFamily;
-                    }
                 }
-            }
+                    
             else
-            {
                 foreach (FontFamily fontFamily in fontNameComboBox.Items)
                 {
                     if (fontFamily.Source == selectedFontFamily)
-                    {
                         fontNameComboBox.SelectedItem = fontFamily;
-                    }
                 }
-            }
 
             //font size combobox
-            if (!String.IsNullOrEmpty(airlineRef.Get("FontSize").ToString()))
-            {
+            if (!string.IsNullOrEmpty(airlineRef.Get("FontSize").ToString()))
                 fontSizeUpDown.Value = (int)airlineRef.Get("FontSize");
-            }
 
             //colors
             fontColorPicker.SelectedColor = ((int)airlineRef.Get("FontColor")).GetColor();
@@ -229,7 +224,7 @@ namespace MobiGuide
 
             if (airlineRef.Get("AirlineLogoLarge") != DBNull.Value)
             {
-                alLargeLogoImg.Source = ((object)airlineRef.Get("AirlineLogoLarge")).BlobToSource();
+                alLargeLogoImg.Source = airlineRef.Get("AirlineLogoLarge").BlobToSource();
                 removeLargeLogoBtn.Visibility = Visibility.Visible;
 
             }
@@ -239,7 +234,7 @@ namespace MobiGuide
             }
             if (airlineRef.Get("AirlineLogoSmall") != DBNull.Value)
             {
-                alSmallLogoImg.Source = ((object)airlineRef.Get("AirlineLogoSmall")).BlobToSource();
+                alSmallLogoImg.Source = airlineRef.Get("AirlineLogoSmall").BlobToSource();
                 removeSmallLogoBtn.Visibility = Visibility.Visible;
             }
             else
@@ -248,18 +243,11 @@ namespace MobiGuide
             }
         }
 
-        private enum ImageUploadStatus
-        {
-            Remove,
-            New,
-            Remain
-        }
-
         private void removeLargeLogoBtn_Click(object sender, RoutedEventArgs e)
         {
             removeLargeLogoBtn.Visibility = Visibility.Hidden;
             alLargeLogoImg.Source = new BitmapImage(new Uri(@"..\NoImg.jpg", UriKind.RelativeOrAbsolute));
-            srcLargeLogoTxtBox.Text = String.Empty;
+            srcLargeLogoTxtBox.Text = string.Empty;
             switch (largeLogoStatus)
             {
                 case ImageUploadStatus.Remain:
@@ -276,7 +264,7 @@ namespace MobiGuide
         {
             removeSmallLogoBtn.Visibility = Visibility.Hidden;
             alSmallLogoImg.Source = new BitmapImage(new Uri(@"..\NoImg.jpg", UriKind.RelativeOrAbsolute));
-            srcSmallLogoTxtBox.Text = String.Empty;
+            srcSmallLogoTxtBox.Text = string.Empty;
             switch (smallLogoStatus)
             {
                 case ImageUploadStatus.Remain:
@@ -291,7 +279,6 @@ namespace MobiGuide
         private void backgroundColorPicker_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
         {
             if(backgroundColorPicker.SelectedColor != null)
-            {
                 if(backgroundColorPicker2.SelectedColor != null && backgroundColorPicker2.SelectedColor != Colors.Transparent)
                 {
                     LinearGradientBrush gradiantBrush =
@@ -307,7 +294,13 @@ namespace MobiGuide
                 {
                     backgroundPreview.Fill = new SolidColorBrush((Color)backgroundColorPicker.SelectedColor);
                 }
-            }
+        }
+
+        private enum ImageUploadStatus
+        {
+            Remove,
+            New,
+            Remain
         }
     }
 }

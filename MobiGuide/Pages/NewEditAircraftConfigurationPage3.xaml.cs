@@ -13,6 +13,7 @@ using CustomExtensions;
 using Xceed.Wpf.Toolkit;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using MobiGuide.Class;
 
 namespace MobiGuide
 {
@@ -21,41 +22,41 @@ namespace MobiGuide
     /// </summary>
     public partial class NewEditAircraftConfigurationPage3 : Page
     {
-        DBConnector dbCon = new DBConnector();
+        private readonly DBConnector dbCon = new DBConnector();
+        public NewEditAircraftConfigurationPage3() : this(null, STATUS.NEW) { }
+
+        public NewEditAircraftConfigurationPage3(AircraftConfiguration aircraftConfiguration, STATUS Status)
+        {
+            InitializeComponent();
+            this.Status = Status;
+            if(aircraftConfiguration != null)
+                AircraftConfiguration = aircraftConfiguration;
+        }
+
         public STATUS Status { get; set; }
+
         private Window window
         {
             get
             {
                 DependencyObject parent = VisualTreeHelper.GetParent(this);
                 while (!(parent is Window))
-                {
                     parent = VisualTreeHelper.GetParent(parent);
-                }
                 return parent as Window;
             }
         }
-        private AircraftConfiguration AircraftConfiguration { get; set; }
+
+        private AircraftConfiguration AircraftConfiguration { get; }
         private Seat[,] seatPosition { get; set; }
         private string seatMapImagePath { get; set; }
-        public NewEditAircraftConfigurationPage3() : this(null, STATUS.NEW) { }
-        public NewEditAircraftConfigurationPage3(AircraftConfiguration aircraftConfiguration, STATUS Status)
-        {
-            InitializeComponent();
-            this.Status = Status;
-            if(aircraftConfiguration != null)
-            {
-                this.AircraftConfiguration = aircraftConfiguration;
-            }
-        }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             NewEditAircraftConfigurationWindow window = this.window as NewEditAircraftConfigurationWindow;
             window.Top = 0;
-            window.Left = (SystemParameters.PrimaryScreenWidth / 2) - (window.ActualWidth / 2);
+            window.Left = SystemParameters.PrimaryScreenWidth / 2 - window.ActualWidth / 2;
             seatMapImage.Height = SystemParameters.FullPrimaryScreenHeight - 110; // 110 is the height of component in window minus by seatMapImage.Height
-            seatMapImage.Width = (double)seatMapImage.Height * (double)9 / (double)16; // 16:9 is an aspect ratio of widescreen
+            seatMapImage.Width = seatMapImage.Height * 9 / 16; // 16:9 is an aspect ratio of widescreen
             imgCanvas.Height = seatMapImage.Height;
             imgCanvas.Width = seatMapImage.Width;
 
@@ -64,18 +65,16 @@ namespace MobiGuide
                 backBtn.Visibility = Visibility.Visible;
                 backBtn.IsEnabled = true;
             }
-            if(this.AircraftConfiguration.SeatMapImagePath != null)
-                seatMapImage.Source = new BitmapImage(new Uri(this.AircraftConfiguration.SeatMapImagePath));
+            if(AircraftConfiguration.SeatMapImagePath != null)
+            {
+                seatMapImage.Source = new BitmapImage(new Uri(AircraftConfiguration.SeatMapImagePath));
+            }
             else
             {
-                DataRow seatMapImageData = await dbCon.GetDataRow("AircraftConfiguration", new DataRow("AircraftConfigurationId", this.AircraftConfiguration.AircraftConfigurationId));
+                DataRow seatMapImageData = await dbCon.GetDataRow("AircraftConfiguration", new DataRow("AircraftConfigurationId", AircraftConfiguration.AircraftConfigurationId));
                 if (seatMapImageData.HasData && seatMapImageData.Error == ERROR.NoError)
-                {
                     if (seatMapImageData.Get("SeatMapImage") != DBNull.Value)
-                    {
                         seatMapImage.Source = seatMapImageData.Get("SeatMapImage").BlobToSource();
-                    }
-                }
             }
 
             aisleXPosUpDown.Maximum = seatMapImage.Width;
@@ -84,102 +83,60 @@ namespace MobiGuide
 
         private async void DrawSeatLine()
         {
-            if(Status == STATUS.NEW || this.AircraftConfiguration.SeatMapImagePath != null)
+            if(Status == STATUS.NEW || AircraftConfiguration.SeatMapImagePath != null)
             {
                 DataRow airlineRef = await dbCon.GetDataRow("AirlineReference", new DataRow("AirlineCode", Application.Current.Resources["AirlineCode"]));
                 SolidColorBrush lineBrush = null, seatBrush = null;
                 if (airlineRef.HasData && airlineRef.Error == ERROR.NoError)
                 {
-                    lineBrush = new SolidColorBrush(Int32.Parse(airlineRef.Get("LineColor").ToString()).GetColor());
-                    seatBrush = new SolidColorBrush(Int32.Parse(airlineRef.Get("SeatColor").ToString()).GetColor());
+                    lineBrush = new SolidColorBrush(int.Parse(airlineRef.Get("LineColor").ToString()).GetColor());
+                    seatBrush = new SolidColorBrush(int.Parse(airlineRef.Get("SeatColor").ToString()).GetColor());
                 }
-                Line aisleXLine = new Line
-                {
-                    Stroke = lineBrush != null ? lineBrush : Brushes.Red,
-                    X1 = seatMapImage.Width / 2,
-                    X2 = seatMapImage.Width / 2,
-                    Y1 = 0,
-                    Y2 = seatMapImage.Height,
-                    Visibility = Visibility.Hidden
-                };
-                aisleXLine.Name = "aisleXLine";
-                this.RegisterName("aisleXLine", aisleXLine);
-                imgCanvas.Children.Add(aisleXLine);
+
+                DrawAisleXLine(lineBrush, seatMapImage.Width / 2, 10, Visibility.Hidden);
 
                 PointCollection frontDoorPointCollection = new PointCollection();
                 frontDoorPointCollection.Add(new Point(seatMapImage.Width / 4, seatMapImage.Height / 4 - 10));
                 frontDoorPointCollection.Add(new Point(seatMapImage.Width / 4, seatMapImage.Height / 4 + 10));
                 frontDoorPointCollection.Add(new Point(seatMapImage.Width / 4 + 20, seatMapImage.Height / 4));
 
-
-                Polygon frontDoor = new Polygon();
-                frontDoor.Points = frontDoorPointCollection;
-                frontDoor.Fill = seatBrush != null ? seatBrush : Brushes.Red;
-                frontDoor.Stroke = Brushes.Black;
-                frontDoor.StrokeThickness = 1;
-                frontDoor.Name = "frontDoor";
-                frontDoor.Visibility = Visibility.Hidden;
-                this.RegisterName("frontDoor", frontDoor);
-                imgCanvas.Children.Add(frontDoor);
+                DrawDoor("frontDoor", frontDoorPointCollection, seatBrush, Visibility.Hidden);
 
                 PointCollection rearDoorPointCollection = new PointCollection();
                 rearDoorPointCollection.Add(new Point(seatMapImage.Width / 4, seatMapImage.Height - seatMapImage.Height / 4 - 10));
                 rearDoorPointCollection.Add(new Point(seatMapImage.Width / 4, seatMapImage.Height - seatMapImage.Height / 4 + 10));
                 rearDoorPointCollection.Add(new Point(seatMapImage.Width / 4 + 20, seatMapImage.Height - seatMapImage.Height / 4));
 
-                Polygon rearDoor = new Polygon();
-                rearDoor.Points = rearDoorPointCollection;
-                rearDoor.Fill = seatBrush != null ? seatBrush : Brushes.Red;
-                rearDoor.Stroke = Brushes.Black;
-                rearDoor.StrokeThickness = 1;
-                rearDoor.Name = "rearDoor";
-                rearDoor.Visibility = Visibility.Hidden;
-                this.RegisterName("rearDoor", rearDoor);
-                imgCanvas.Children.Add(rearDoor);
+                DrawDoor("rearDoor", rearDoorPointCollection, seatBrush, Visibility.Hidden);
 
-                Rectangle seat1A = new Rectangle();
-                seat1A.Fill = seatBrush != null ? seatBrush : Brushes.Red;
-                seat1A.Height = seatHeightUpDown.Value != null ? (double)seatHeightUpDown.Value : 10;
-                seat1A.Width = seatWidthUpDown.Value != null ? (double)seatWidthUpDown.Value : 10;
-                seat1A.Name = "seat1A";
-                seat1A.Visibility = Visibility.Hidden;
-                this.RegisterName("seat1A", seat1A);
-                imgCanvas.Children.Add(seat1A);
-                Canvas.SetTop(seat1A, seat1AYPosUpDown.Value != null ? (double)seat1AYPosUpDown.Value : seatMapImage.Width / 2 - 100);
-                Canvas.SetLeft(seat1A, seat1AXPosUpDown.Value != null ? (double)seat1AXPosUpDown.Value : seatMapImage.Height / 2 - 100);
+                DrawDefaultSeat("seat1A", seatWidthUpDown.Value != null ? (double)seatWidthUpDown.Value : 10,
+                    seatHeightUpDown.Value != null ? (double)seatHeightUpDown.Value : 10,
+                    seat1AYPosUpDown.Value != null ? (double)seat1AYPosUpDown.Value : seatMapImage.Width / 2 - 100,
+                    seat1AXPosUpDown.Value != null ? (double)seat1AXPosUpDown.Value : seatMapImage.Height / 2 - 100,
+                    seatBrush, Visibility.Hidden);
 
-                Rectangle seat2A = new Rectangle();
-                seat2A.Fill = seatBrush != null ? seatBrush : Brushes.Red;
-                seat2A.Height = seatHeightUpDown.Value != null ? (double)seatHeightUpDown.Value : 10;
-                seat2A.Width = seatWidthUpDown.Value != null ? (double)seatWidthUpDown.Value : 10;
-                seat2A.Name = "seat2A";
-                seat2A.Visibility = Visibility.Hidden;
-                this.RegisterName("seat2A", seat2A);
-                imgCanvas.Children.Add(seat2A);
-                Canvas.SetTop(seat2A, seat1AYPosUpDown.Value != null ? (double)seat1AYPosUpDown.Value : seatMapImage.Width / 2 - 100);
-                Canvas.SetLeft(seat2A, seat1AXPosUpDown.Value != null ? (double)seat1AXPosUpDown.Value : seatMapImage.Height / 2 - 100);
+                DrawDefaultSeat("seat2A", seatWidthUpDown.Value != null ? (double)seatWidthUpDown.Value : 10,
+                    seatHeightUpDown.Value != null ? (double)seatHeightUpDown.Value : 10,
+                    seat1AYPosUpDown.Value != null ? (double)seat1AYPosUpDown.Value : seatMapImage.Width / 2 - 100,
+                    seat1AXPosUpDown.Value != null ? (double)seat1AXPosUpDown.Value : seatMapImage.Height / 2 - 100,
+                    seatBrush, Visibility.Hidden);
 
                 for (int i = 1; i <= 5; i++)
-                {
                     AddItemToLocateComboBox(i, 0, numOfRowsUpDown.Value != null ? (int)numOfRowsUpDown.Value : 0, new List<int>().ToArray());
-                }
             } else
             {
                 try
                 {
                     int numOfRow = 0, numOfLeftColumn = 0, numOfRightColumn = 0;
                     double aisleXWidth = 0, aisleXPos = 0, frontDoorX = 0, frontDoorY = 0, frontDoorWidth = 0, rearDoorX = 0, rearDoorY = 0, rearDoorWidth = 0;
-                    DataList seatMapList = await dbCon.GetDataList("SeatMap", new DataRow("AircraftConfigurationId", this.AircraftConfiguration.AircraftConfigurationId), "ORDER BY SeatRow, SeatColumn");
+                    DataList seatMapList = await dbCon.GetDataList("SeatMap", new DataRow("AircraftConfigurationId", AircraftConfiguration.AircraftConfigurationId), "ORDER BY SeatRow, SeatColumn");
                     foreach (DataRow seatMap in seatMapList)
                     {
                         int row = (int)seatMap.Get("SeatRow");
-                        if((double)seatMap.Get("PositionX") < this.AircraftConfiguration.AisleX)
-                        {
+                        if((double)seatMap.Get("PositionX") < AircraftConfiguration.AisleX)
                             numOfLeftColumn++;
-                        } else
-                        {
+                        else
                             numOfRightColumn++;
-                        }
 
                         if (row > numOfRow) numOfRow = row;
                     }
@@ -200,19 +157,21 @@ namespace MobiGuide
                         };
                     }
 
-                    aisleXWidth = toWidthRatio((double)seatMapList.GetListAt(numOfLeftColumn).Get("PositionX")) - (toWidthRatio((double)seatMapList.GetListAt(numOfLeftColumn - 1).Get("PositionX")) + toWidthRatio((double)seatMapList.GetListAt(numOfLeftColumn - 1).Get("SeatWidth")));
-                    aisleXPos = toWidthRatio(this.AircraftConfiguration.AisleX);
+                    aisleXWidth = toWidthRatio((double)seatMapList.GetListAt(numOfLeftColumn).Get("PositionX")) 
+                        - (toWidthRatio((double)seatMapList.GetListAt(numOfLeftColumn - 1).Get("PositionX")) 
+                        + toWidthRatio((double)seatMapList.GetListAt(numOfLeftColumn - 1).Get("SeatWidth")));
+                    aisleXPos = toWidthRatio(AircraftConfiguration.AisleX);
 
-                    frontDoorX = toWidthRatio(this.AircraftConfiguration.FrontDoorX);
-                    frontDoorY = toHeightRatio(this.AircraftConfiguration.FrontDoorY);
-                    frontDoorWidth = toHeightRatio(this.AircraftConfiguration.FrontDoorWidth);
+                    frontDoorX = toWidthRatio(AircraftConfiguration.FrontDoorX);
+                    frontDoorY = toHeightRatio(AircraftConfiguration.FrontDoorY);
+                    frontDoorWidth = toHeightRatio(AircraftConfiguration.FrontDoorWidth);
 
-                    rearDoorX = toWidthRatio(this.AircraftConfiguration.RearDoorX);
-                    rearDoorY = toHeightRatio(this.AircraftConfiguration.RearDoorY);
-                    rearDoorWidth = toHeightRatio(this.AircraftConfiguration.RearDoorWidth);
+                    rearDoorX = toWidthRatio(AircraftConfiguration.RearDoorX);
+                    rearDoorY = toHeightRatio(AircraftConfiguration.RearDoorY);
+                    rearDoorWidth = toHeightRatio(AircraftConfiguration.RearDoorWidth);
 
-                    numOfRowsUpDown.Value = Int32.Parse((await dbCon.GetDataRow(String.Format("SELECT MAX(SeatRow) From SeatMap Where AircraftConfigurationId = '{0}'",
-                        this.AircraftConfiguration.AircraftConfigurationId.ToString()))).Get("").ToString());
+                    numOfRowsUpDown.Value = int.Parse((await dbCon.GetDataRow(string.Format("SELECT MAX(SeatRow) From SeatMap Where AircraftConfigurationId = '{0}'",
+                        AircraftConfiguration.AircraftConfigurationId))).Get("").ToString());
                     numOfColLeftUpDown.Value = numOfLeftColumn;
                     numOfColRightUpDown.Value = numOfRightColumn;
 
@@ -236,128 +195,128 @@ namespace MobiGuide
                     seatWidthUpDown.Value = toWidthRatio((double)seatMapList.GetListAt(0).Get("SeatWidth"));
                     seatHeightUpDown.Value = toHeightRatio((double)seatMapList.GetListAt(0).Get("SeatHeight"));
 
-                    if (this.AircraftConfiguration.MiddleRow > -1) middleRowUpDown.Value = this.AircraftConfiguration.MiddleRow;
+                    if (AircraftConfiguration.MiddleRow > -1) middleRowUpDown.Value = AircraftConfiguration.MiddleRow;
 
                     DataRow airlineRef = await dbCon.GetDataRow("AirlineReference", new DataRow("AirlineCode", Application.Current.Resources["AirlineCode"]));
                     SolidColorBrush lineBrush = null, seatBrush = null;
                     if (airlineRef.HasData && airlineRef.Error == ERROR.NoError)
                     {
-                        lineBrush = new SolidColorBrush(Int32.Parse(airlineRef.Get("LineColor").ToString()).GetColor());
-                        seatBrush = new SolidColorBrush(Int32.Parse(airlineRef.Get("SeatColor").ToString()).GetColor());
+                        lineBrush = new SolidColorBrush(int.Parse(airlineRef.Get("LineColor").ToString()).GetColor());
+                        seatBrush = new SolidColorBrush(int.Parse(airlineRef.Get("SeatColor").ToString()).GetColor());
                     }
 
-                    Line aisleXLine = new Line
-                    {
-                        Stroke = lineBrush != null ? lineBrush : Brushes.Red,
-                        X1 = aisleXPos,
-                        X2 = aisleXPos,
-                        Y1 = 0,
-                        Y2 = seatMapImage.Height,
-                        StrokeThickness = aisleXWidth
-                    };
-                    aisleXLine.Name = "aisleXLine";
-                    this.RegisterName("aisleXLine", aisleXLine);
-                    imgCanvas.Children.Add(aisleXLine);
+                    DrawAisleXLine(lineBrush, aisleXPos, aisleXWidth);
 
                     PointCollection frontDoorPointCollection = new PointCollection();
-                    frontDoorPointCollection.Add(new Point(frontDoorX, frontDoorY - (frontDoorWidth / 2)));
-                    frontDoorPointCollection.Add(new Point(frontDoorX, frontDoorY + (frontDoorWidth / 2)));
+                    frontDoorPointCollection.Add(new Point(frontDoorX, frontDoorY - frontDoorWidth / 2));
+                    frontDoorPointCollection.Add(new Point(frontDoorX, frontDoorY + frontDoorWidth / 2));
                     frontDoorPointCollection.Add(new Point(frontDoorX + frontDoorWidth, frontDoorY));
 
-                    Polygon frontDoor = new Polygon();
-                    frontDoor.Points = frontDoorPointCollection;
-                    frontDoor.Fill = seatBrush != null ? seatBrush : Brushes.Red;
-                    frontDoor.Stroke = Brushes.Black;
-                    frontDoor.StrokeThickness = 1;
-                    frontDoor.Name = "frontDoor";
-                    this.RegisterName("frontDoor", frontDoor);
-                    imgCanvas.Children.Add(frontDoor);
+                    DrawDoor("frontDoor", frontDoorPointCollection, seatBrush);
 
                     PointCollection rearDoorPointCollection = new PointCollection();
-                    rearDoorPointCollection.Add(new Point(rearDoorX, rearDoorY - (rearDoorWidth / 2)));
-                    rearDoorPointCollection.Add(new Point(rearDoorX, rearDoorY + (rearDoorWidth / 2)));
+                    rearDoorPointCollection.Add(new Point(rearDoorX, rearDoorY - rearDoorWidth / 2));
+                    rearDoorPointCollection.Add(new Point(rearDoorX, rearDoorY + rearDoorWidth / 2));
                     rearDoorPointCollection.Add(new Point(rearDoorX + rearDoorWidth, rearDoorY));
 
-                    Polygon rearDoor = new Polygon();
-                    rearDoor.Points = rearDoorPointCollection;
-                    rearDoor.Fill = seatBrush != null ? seatBrush : Brushes.Red;
-                    rearDoor.Stroke = Brushes.Black;
-                    rearDoor.StrokeThickness = 1;
-                    rearDoor.Name = "rearDoor";
-                    this.RegisterName("rearDoor", rearDoor);
-                    imgCanvas.Children.Add(rearDoor);
+                    DrawDoor("rearDoor", rearDoorPointCollection, seatBrush);
                     
                     if (airlineRef.HasData && airlineRef.Error == ERROR.NoError)
+                        seatBrush = new SolidColorBrush(int.Parse(airlineRef.Get("SeatColor").ToString()).GetColor());
+                    for (int i = 0; i < numOfLeftColumn + numOfRightColumn; i++)
+                    for (int j = 0; j < (numOfRow >= 13 ? numOfRow - 1 : numOfRow); j++)
                     {
-                        seatBrush = new SolidColorBrush(Int32.Parse(airlineRef.Get("SeatColor").ToString()).GetColor());
-                    }
-                    for (int i = 0; i < (numOfLeftColumn + numOfRightColumn); i++)
-                    {
-                        for (int j = 0; j < (numOfRow >= 13 ? numOfRow - 1 : numOfRow); j++)
-                        {
-                            Grid seat = new Grid();
-                            seat.Background = seatBrush != null ? seatBrush : Brushes.Red;
-                            seat.Height = seatPosition[i, j].Height;
-                            seat.Width = seatPosition[i, j].Width;
+                        Grid seat = new Grid();
+                        seat.Background = seatBrush != null ? seatBrush : Brushes.Red;
+                        seat.Height = seatPosition[i, j].Height;
+                        seat.Width = seatPosition[i, j].Width;
 
-                            TextBlock text = new TextBlock();
-                            text.Text = (j + (j >= 12 ? 2 : 1)).ToString() + Number2String(i + 1, true);
-                            text.Foreground = Brushes.White;
-                            text.VerticalAlignment = VerticalAlignment.Center;
-                            text.HorizontalAlignment = HorizontalAlignment.Center;
-                            text.FontSize = 4;
-                            seat.Children.Add(text);
+                        TextBlock text = new TextBlock();
+                        text.Text = j + (j >= 12 ? 2 : 1) + Number2String(i + 1, true);
+                        text.Foreground = Brushes.White;
+                        text.VerticalAlignment = VerticalAlignment.Center;
+                        text.HorizontalAlignment = HorizontalAlignment.Center;
+                        text.FontSize = 4;
+                        seat.Children.Add(text);
 
-                            seat.Name = "Seat" + text.Text;
-                            this.RegisterName(seat.Name, seat);
+                        seat.Name = "Seat" + text.Text;
+                        RegisterName(seat.Name, seat);
 
-                            imgCanvas.Children.Add(seat);
-                            Canvas.SetTop(seat, seatPosition[i, j].Y);
-                            Canvas.SetLeft(seat, seatPosition[i, j].X);
-                        }
+                        imgCanvas.Children.Add(seat);
+                        Canvas.SetTop(seat, seatPosition[i, j].Y);
+                        Canvas.SetLeft(seat, seatPosition[i, j].X);
                     }
 
-                    Rectangle seat1A = new Rectangle();
-                    seat1A.Fill = seatBrush != null ? seatBrush : Brushes.Red;
-                    seat1A.Height = seatPosition[0, 0].Height;
-                    seat1A.Width = seatPosition[0, 0].Width;
-                    seat1A.Name = "seat1A";
-                    seat1A.Visibility = Visibility.Hidden;
-                    this.RegisterName("seat1A", seat1A);
-                    imgCanvas.Children.Add(seat1A);
-                    Canvas.SetTop(seat1A, seatPosition[0, 0].Y);
-                    Canvas.SetLeft(seat1A, seatPosition[0, 0].X);
+                    DrawDefaultSeat("seat1A", seatPosition[0, 0].Width, seatPosition[0, 0].Height,
+                        seatPosition[0, 0].Y, seatPosition[0, 0].X, seatBrush, Visibility.Hidden);
 
-                    Rectangle seat2A = new Rectangle();
-                    seat2A.Fill = seatBrush != null ? seatBrush : Brushes.Red;
-                    seat2A.Height = seatPosition[0, 1].Height;
-                    seat2A.Width = seatPosition[0, 1].Width;
-                    seat2A.Name = "seat2A";
-                    seat2A.Visibility = Visibility.Hidden;
-                    this.RegisterName("seat2A", seat2A);
-                    imgCanvas.Children.Add(seat2A);
-                    Canvas.SetTop(seat2A, seatPosition[0, 1].Y);
-                    Canvas.SetLeft(seat2A, seatPosition[0, 1].X);
+                    DrawDefaultSeat("seat2A", seatPosition[0, 1].Width, seatPosition[0, 1].Height,
+                        seatPosition[0, 1].Y, seatPosition[0, 1].X, seatBrush, Visibility.Hidden);
 
                     for (int i = 1; i <= 5; i++)
-                    {
                         AddItemToLocateComboBox(i, 0, numOfRowsUpDown.Value != null ? (int)numOfRowsUpDown.Value : 0, new List<int>().ToArray());
-                    }
 
                     editBtn.Visibility = Visibility.Visible;
                     nextBtn.Visibility = Visibility.Collapsed;
                     finishBtn.Visibility = Visibility.Visible;
 
-                    EnableAllChildren(detailGrid, false, (new List<Type> { typeof(DoubleUpDown), typeof(IntegerUpDown), typeof(ComboBox) }).ToArray());
+                    EnableAllChildren(detailGrid, false, new List<Type> { typeof(DoubleUpDown), typeof(IntegerUpDown), typeof(ComboBox) }.ToArray());
                 }
                 catch (Exception) { }
             }
+        }
+
+        private void DrawDefaultSeat(string seatName, double width, double height, double top, double left,
+            SolidColorBrush seatBrush, Visibility visibility = Visibility.Visible)
+        {
+            Rectangle seat = new Rectangle();
+            seat.Fill = seatBrush != null ? seatBrush : Brushes.Red;
+            seat.Height = width;
+            seat.Width = height;
+            seat.Name = seatName;
+            seat.Visibility = visibility;
+            RegisterName(seatName, seat);
+            imgCanvas.Children.Add(seat);
+            Canvas.SetTop(seat, top);
+            Canvas.SetLeft(seat, left);
+        }
+
+        private void DrawDoor(string doorName, PointCollection frontDoorPointCollection, 
+            SolidColorBrush seatBrush, Visibility visibility = Visibility.Visible)
+        {
+            Polygon door = new Polygon();
+            door.Points = frontDoorPointCollection;
+            door.Fill = seatBrush != null ? seatBrush : Brushes.Red;
+            door.Stroke = Brushes.Black;
+            door.StrokeThickness = 1;
+            door.Name = doorName;
+            door.Visibility = visibility;
+            RegisterName(doorName, door);
+            imgCanvas.Children.Add(door);
+        }
+
+        private void DrawAisleXLine(SolidColorBrush lineBrush, double aisleXPos, double aisleXWidth, Visibility visibility = Visibility.Visible)
+        {
+            Line aisleXLine = new Line
+            {
+                Stroke = lineBrush != null ? lineBrush : Brushes.Red,
+                X1 = aisleXPos,
+                X2 = aisleXPos,
+                Y1 = 0,
+                Y2 = seatMapImage.Height,
+                StrokeThickness = aisleXWidth,
+                Visibility = visibility
+            };
+            aisleXLine.Name = "aisleXLine";
+            RegisterName("aisleXLine", aisleXLine);
+            imgCanvas.Children.Add(aisleXLine);
         }
 
         private double toWidthRatio(double oldWidth)
         {
             return oldWidth * imgCanvas.Width / 1080;
         }
+
         private double toHeightRatio(double oldHeight)
         {
             return oldHeight * imgCanvas.Height / 1920;
@@ -377,10 +336,8 @@ namespace MobiGuide
                 {
                     locateComboBox.Items.Clear();
                     for (int j = 1; j < numOfTotalRow; j++)
-                    {
                         if(j != 13 && !exceptsRows.Contains(j))
                             locateComboBox.Items.Add(new CustomComboBoxItem { Text = j.ToString(), Value = j });
-                    }
                     locateComboBox.SelectedIndex = selectedIndex > -1 ? selectedIndex : 0;
                 }
             }
@@ -392,17 +349,15 @@ namespace MobiGuide
             {
                 finishBtn.Visibility = Visibility.Collapsed;
                 nextBtn.Visibility = Visibility.Visible;
-                EnableAllChildren(detailGrid, true, (new List<Type> { typeof(DoubleUpDown), typeof(IntegerUpDown), typeof(ComboBox) }).ToArray());
+                EnableAllChildren(detailGrid, true, new List<Type> { typeof(DoubleUpDown), typeof(IntegerUpDown), typeof(ComboBox) }.ToArray());
                 ClearSeat();
                 editingDetailTextBlock.Visibility = Visibility.Hidden;
                 numOfRowsUpDown.Focus();
             } else
             {
-                Frame mainFrame = (this.window as NewEditAircraftConfigurationWindow).mainFrame;
+                Frame mainFrame = (window as NewEditAircraftConfigurationWindow).mainFrame;
                 if (mainFrame.CanGoBack)
-                {
                     mainFrame.GoBack();
-                }
             }
         }
 
@@ -421,10 +376,7 @@ namespace MobiGuide
         {
             Line aisleXLine = imgCanvas.FindName("aisleXLine") as Line;
             if (aisleXLine != null)
-            {
                 aisleXLine.StrokeThickness = aisleXWidthUpDown.Value != null ? (double)aisleXWidthUpDown.Value : aisleXLine.StrokeThickness;
-            }
-            
         }
 
         private void AdjustAisleX(Visibility visibility)
@@ -433,9 +385,7 @@ namespace MobiGuide
             editingDetailTextBlock.Visibility = visibility;
             Line aisleXLine = imgCanvas.FindName("aisleXLine") as Line;
             if (aisleXLine != null)
-            {
                 aisleXLine.Visibility = visibility;
-            }
         }
 
         private void AisleAdjust_GotFocus(object sender, RoutedEventArgs e)
@@ -444,7 +394,7 @@ namespace MobiGuide
             DoubleUpDown aisleXUpDown = sender as DoubleUpDown;
             if(aisleXUpDown.Value == null)
             {
-                aisleXUpDown.ClearValue(DoubleUpDown.BorderBrushProperty);
+                aisleXUpDown.ClearValue(Control.BorderBrushProperty);
                 if (aisleXUpDown.Name == "aisleXPosUpDown")
                     aisleXUpDown.Value = seatMapImage.Width / 2;
                 else
@@ -464,20 +414,19 @@ namespace MobiGuide
             {
                 int numOfAisleY = (int)numOfAisleYUpDown.Value;
                 for (int i = 1; i <= 5; i++)
-                {
                     if (i <= numOfAisleY && numOfAisleY != 0)
                     {
                         StackPanel aisleYStack = aisleYGroupBox.FindName("aisleY" + i) as StackPanel;
                         if (aisleYStack != null)
                         {
                             aisleYStack.Visibility = Visibility.Visible;
-                            DoubleUpDown aisleYWidthUpDown = aisleYStack.FindName(String.Format("aisleY{0}WidthUpDown", i)) as DoubleUpDown;
+                            DoubleUpDown aisleYWidthUpDown = aisleYStack.FindName(string.Format("aisleY{0}WidthUpDown", i)) as DoubleUpDown;
                             Line exitingLine = imgCanvas.FindName("exitLine" + i) as Line;
                             if (exitingLine == null)
                             {
                                 Line exitLine = new Line
                                 {
-                                    Stroke = System.Windows.Media.Brushes.Red,
+                                    Stroke = Brushes.Red,
                                     X1 = 0,
                                     X2 = seatMapImage.Width,
                                     Y1 = seatMapImage.Height / 2,
@@ -486,9 +435,9 @@ namespace MobiGuide
                                     Visibility = Visibility.Hidden
                                 };
                                 exitLine.Name = "exitLine" + i;
-                                this.RegisterName("exitLine" + i, exitLine);
+                                RegisterName("exitLine" + i, exitLine);
                                 imgCanvas.Children.Add(exitLine);
-                                DoubleUpDown aisleYPosUpDown = aisleYStack.FindName(String.Format("aisleY{0}PosUpDown", i)) as DoubleUpDown;
+                                DoubleUpDown aisleYPosUpDown = aisleYStack.FindName(string.Format("aisleY{0}PosUpDown", i)) as DoubleUpDown;
                                 if (aisleYPosUpDown != null)
                                 {
                                     aisleYPosUpDown.Value = seatMapImage.Height / 2;
@@ -506,14 +455,16 @@ namespace MobiGuide
                             Line exitLine = imgCanvas.FindName("exitLine" + i) as Line;
                             if (exitLine != null)
                             {
-                                this.UnregisterName(exitLine.Name);
+                                UnregisterName(exitLine.Name);
                                 imgCanvas.Children.Remove(exitLine);
                             }
                         }
                     }
-                }
             }
-            else numOfAisleYUpDown.Value = 0;
+            else
+            {
+                numOfAisleYUpDown.Value = 0;
+            }
         }
 
         private void numOfRowsUpDown_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -528,9 +479,7 @@ namespace MobiGuide
                         ComboBox locateComboBox = aisleYGroupBox.FindName("locateY" + i + "ComboBox") as ComboBox;
                         int selectingIndex = 0;
                         if (locateComboBox != null)
-                        {
                             selectingIndex = locateComboBox.SelectedIndex;
-                        }
                         AddItemToLocateComboBox(i, selectingIndex, (int)numOfRowsUpDown.Value, new List<int>().ToArray());
                     }
                 }
@@ -561,13 +510,11 @@ namespace MobiGuide
 
         private void ExitAdjust(int index, Visibility visibility)
         {
-            editingDetailTextBlock.Text = String.Format("Adjust Exit No.{0} Position and Width", index);
+            editingDetailTextBlock.Text = string.Format("Adjust Exit No.{0} Position and Width", index);
             editingDetailTextBlock.Visibility = visibility;
             Line exitLine = imgCanvas.FindName("exitLine" + index) as Line;
             if (exitLine != null)
-            {
                 exitLine.Visibility = visibility;
-            }
         }
 
         private void exitPosChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -593,10 +540,7 @@ namespace MobiGuide
 
             Line exitLine = imgCanvas.FindName("exitLine" + index) as Line;
             if (exitLine != null)
-            {
                 exitLine.StrokeThickness = exitWidthUpDown.Value != null ? (double)exitWidthUpDown.Value : exitLine.StrokeThickness;
-            }
-            
         }
 
         private void frontDoorXPosUpDown_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -624,9 +568,9 @@ namespace MobiGuide
             {
                 PointCollection newPoints = new PointCollection();
                 newPoints.Add(new Point(frontDoor.Points[0].X,
-                    frontDoorYPosUpDown.Value != null ? (double)frontDoorYPosUpDown.Value - ((frontDoorWidthUpDown.Value != null ? (double)frontDoorWidthUpDown.Value : 20f) / 2) : frontDoor.Points[0].Y));
+                    frontDoorYPosUpDown.Value != null ? (double)frontDoorYPosUpDown.Value - (frontDoorWidthUpDown.Value != null ? (double)frontDoorWidthUpDown.Value : 20f) / 2 : frontDoor.Points[0].Y));
                 newPoints.Add(new Point(frontDoor.Points[1].X,
-                    frontDoorYPosUpDown.Value != null ? (double)frontDoorYPosUpDown.Value + ((frontDoorWidthUpDown.Value != null ? (double)frontDoorWidthUpDown.Value : 20f) / 2) : frontDoor.Points[0].Y));
+                    frontDoorYPosUpDown.Value != null ? (double)frontDoorYPosUpDown.Value + (frontDoorWidthUpDown.Value != null ? (double)frontDoorWidthUpDown.Value : 20f) / 2 : frontDoor.Points[0].Y));
                 newPoints.Add(new Point(frontDoor.Points[2].X,
                     frontDoorYPosUpDown.Value != null ? (double)frontDoorYPosUpDown.Value : frontDoor.Points[2].Y));
                 frontDoor.Points = newPoints;
@@ -641,9 +585,9 @@ namespace MobiGuide
             {
                 PointCollection newPoints = new PointCollection();
                 newPoints.Add(new Point(frontDoorXPosUpDown.Value != null ? (double)frontDoorXPosUpDown.Value : frontDoor.Points[0].X,
-                    frontDoorYPosUpDown.Value != null ? (double)frontDoorYPosUpDown.Value - ((frontDoorWidthUpDown.Value != null ? (double)frontDoorWidthUpDown.Value : 20f) / 2) : frontDoor.Points[0].Y));
+                    frontDoorYPosUpDown.Value != null ? (double)frontDoorYPosUpDown.Value - (frontDoorWidthUpDown.Value != null ? (double)frontDoorWidthUpDown.Value : 20f) / 2 : frontDoor.Points[0].Y));
                 newPoints.Add(new Point(frontDoorXPosUpDown.Value != null ? (double)frontDoorXPosUpDown.Value : frontDoor.Points[1].X,
-                    frontDoorYPosUpDown.Value != null ? (double)frontDoorYPosUpDown.Value + ((frontDoorWidthUpDown.Value != null ? (double)frontDoorWidthUpDown.Value : 20f) / 2) : frontDoor.Points[0].Y));
+                    frontDoorYPosUpDown.Value != null ? (double)frontDoorYPosUpDown.Value + (frontDoorWidthUpDown.Value != null ? (double)frontDoorWidthUpDown.Value : 20f) / 2 : frontDoor.Points[0].Y));
                 newPoints.Add(new Point(frontDoorXPosUpDown.Value != null ? (double)frontDoorXPosUpDown.Value +
                     (frontDoorWidthUpDown.Value != null ? (double)frontDoorWidthUpDown.Value : 20) : frontDoor.Points[2].X,
                     frontDoorYPosUpDown.Value != null ? (double)frontDoorYPosUpDown.Value : frontDoor.Points[2].Y));
@@ -651,13 +595,14 @@ namespace MobiGuide
             }
             
         }
+
         private void frontDoor_GotFocus(object sender, RoutedEventArgs e)
         {
             ClearSeat();
             DoubleUpDown frontDoorUpDown = sender as DoubleUpDown;
             if(frontDoorUpDown.Value == null)
             {
-                frontDoorUpDown.ClearValue(DoubleUpDown.BorderBrushProperty);
+                frontDoorUpDown.ClearValue(Control.BorderBrushProperty);
                 switch (frontDoorUpDown.Name)
                 {
                     case "frontDoorXPosUpDown":
@@ -704,9 +649,9 @@ namespace MobiGuide
             {
                 PointCollection newPoints = new PointCollection();
                 newPoints.Add(new Point(rearDoor.Points[0].X,
-                    rearDoorYPosUpDown.Value != null ? (double)rearDoorYPosUpDown.Value - ((rearDoorWidthUpDown.Value != null ? (double)rearDoorWidthUpDown.Value : 20f) / 2) : rearDoor.Points[0].Y));
+                    rearDoorYPosUpDown.Value != null ? (double)rearDoorYPosUpDown.Value - (rearDoorWidthUpDown.Value != null ? (double)rearDoorWidthUpDown.Value : 20f) / 2 : rearDoor.Points[0].Y));
                 newPoints.Add(new Point(rearDoor.Points[1].X,
-                    rearDoorYPosUpDown.Value != null ? (double)rearDoorYPosUpDown.Value + ((rearDoorWidthUpDown.Value != null ? (double)rearDoorWidthUpDown.Value : 20f) / 2) : rearDoor.Points[0].Y));
+                    rearDoorYPosUpDown.Value != null ? (double)rearDoorYPosUpDown.Value + (rearDoorWidthUpDown.Value != null ? (double)rearDoorWidthUpDown.Value : 20f) / 2 : rearDoor.Points[0].Y));
                 newPoints.Add(new Point(rearDoor.Points[2].X,
                     rearDoorYPosUpDown.Value != null ? (double)rearDoorYPosUpDown.Value : rearDoor.Points[2].Y));
                 rearDoor.Points = newPoints;
@@ -721,9 +666,9 @@ namespace MobiGuide
             {
                 PointCollection newPoints = new PointCollection();
                 newPoints.Add(new Point(rearDoorXPosUpDown.Value != null ? (double)rearDoorXPosUpDown.Value : rearDoor.Points[0].X,
-                    rearDoorYPosUpDown.Value != null ? (double)rearDoorYPosUpDown.Value - ((rearDoorWidthUpDown.Value != null ? (double)rearDoorWidthUpDown.Value : 20f) / 2) : rearDoor.Points[0].Y));
+                    rearDoorYPosUpDown.Value != null ? (double)rearDoorYPosUpDown.Value - (rearDoorWidthUpDown.Value != null ? (double)rearDoorWidthUpDown.Value : 20f) / 2 : rearDoor.Points[0].Y));
                 newPoints.Add(new Point(rearDoorXPosUpDown.Value != null ? (double)rearDoorXPosUpDown.Value : rearDoor.Points[1].X,
-                    rearDoorYPosUpDown.Value != null ? (double)rearDoorYPosUpDown.Value + ((rearDoorWidthUpDown.Value != null ? (double)rearDoorWidthUpDown.Value : 20f) / 2) : rearDoor.Points[0].Y));
+                    rearDoorYPosUpDown.Value != null ? (double)rearDoorYPosUpDown.Value + (rearDoorWidthUpDown.Value != null ? (double)rearDoorWidthUpDown.Value : 20f) / 2 : rearDoor.Points[0].Y));
                 newPoints.Add(new Point(rearDoorXPosUpDown.Value != null ? (double)rearDoorXPosUpDown.Value +
                     (rearDoorWidthUpDown.Value != null ? (double)rearDoorWidthUpDown.Value : 20) : rearDoor.Points[2].X,
                     rearDoorYPosUpDown.Value != null ? (double)rearDoorYPosUpDown.Value : rearDoor.Points[2].Y));
@@ -738,7 +683,7 @@ namespace MobiGuide
             DoubleUpDown rearDoorUpDown = sender as DoubleUpDown;
             if(rearDoorUpDown.Value == null)
             {
-                rearDoorUpDown.ClearValue(DoubleUpDown.BorderBrushProperty);
+                rearDoorUpDown.ClearValue(Control.BorderBrushProperty);
                 switch (rearDoorUpDown.Name)
                 {
                     case "rearDoorXPosUpDown":
@@ -759,15 +704,14 @@ namespace MobiGuide
         {
             DoorFocus("rearDoor", Visibility.Hidden);
         }
+
         private void DoorFocus(string name, Visibility visibility)
         {
-            editingDetailTextBlock.Text = String.Format("Adjust {0} Position and Width (Arrow's base must place at location of door)", name);
+            editingDetailTextBlock.Text = string.Format("Adjust {0} Position and Width (Arrow's base must place at location of door)", name);
             editingDetailTextBlock.Visibility = visibility;
             Polygon door = imgCanvas.FindName(name) as Polygon;
             if(door != null)
-            {
                 door.Visibility = visibility;
-            }
         }
 
         private void SeatAdjust(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -823,7 +767,7 @@ namespace MobiGuide
             DoubleUpDown seatUpDown = sender as DoubleUpDown;
             if(seatUpDown.Value == null)
             {
-                seatUpDown.ClearValue(DoubleUpDown.BorderBrushProperty);
+                seatUpDown.ClearValue(Control.BorderBrushProperty);
                 switch (seatUpDown.Name)
                 {
                     case "seat1AXPosUpDown":
@@ -876,14 +820,12 @@ namespace MobiGuide
 
         private void SeatAdjust(string name, Visibility visibility)
         {
-            editingDetailTextBlock.Text = String.Format("Adjust {0} Seat Position, Width and Height", name);
+            editingDetailTextBlock.Text = string.Format("Adjust {0} Seat Position, Width and Height", name);
             editingDetailTextBlock.Visibility = visibility;
             name = "seat" + name;
             Rectangle seat = imgCanvas.FindName(name) as Rectangle;
             if (seat != null)
-            {
                 seat.Visibility = visibility;
-            }
         }
 
         private async void GenerateSeatPosition()
@@ -897,7 +839,7 @@ namespace MobiGuide
                 int numOfLeftCol = (int)numOfColLeftUpDown.Value;
                 int numOfRightCol = (int)numOfColRightUpDown.Value;
                 int numOfAisleY = (int)numOfAisleYUpDown.Value;
-                seatPosition = new Seat[(numOfLeftCol + numOfRightCol), numOfRows];
+                seatPosition = new Seat[numOfLeftCol + numOfRightCol, numOfRows];
                 double seat1AXPos = (double)seat1AXPosUpDown.Value;
                 double seat1AYPos = (double)seat1AYPosUpDown.Value;
                 double seat2AXPos = (double)seat2AXPosUpDown.Value;
@@ -911,136 +853,112 @@ namespace MobiGuide
 
                 AisleY[] aisleYs = new AisleY[5];
                 for (int i = 0; i < numOfAisleY; i++)
-                {
-                    if((aisleYGroupBox.FindName(String.Format("locateY{0}ComboBox", (i + 1).ToString())) as ComboBox).SelectedValue != null)
-                    {
+                    if((aisleYGroupBox.FindName(string.Format("locateY{0}ComboBox", i + 1)) as ComboBox).SelectedValue != null)
                         aisleYs[i] = new AisleY
                         {
-                            Height = (double)(aisleYGroupBox.FindName(String.Format("aisleY{0}WidthUpDown", (i + 1).ToString())) as DoubleUpDown).Value,
-                            AfterRow = (int)(aisleYGroupBox.FindName(String.Format("locateY{0}ComboBox", (i + 1).ToString())) as ComboBox).SelectedValue
+                            Height = (double)(aisleYGroupBox.FindName(string.Format("aisleY{0}WidthUpDown", i + 1)) as DoubleUpDown).Value,
+                            AfterRow = (int)(aisleYGroupBox.FindName(string.Format("locateY{0}ComboBox", i + 1)) as ComboBox).SelectedValue
                         };
-                    }
-                }
 
                 for (int i = 0; i < numOfLeftCol; i++) // column loop
+                for (int j = 0; j < numOfRows; j++)
                 {
-                    for (int j = 0; j < numOfRows; j++)
+                    double x = seat1AXPos + i * seatWidth;
+                    double y = 0;
+                    if (j == 0)
                     {
-                        double x = seat1AXPos + (i * seatWidth);
-                        double y = 0;
-                        if (j == 0)
-                        {
-                            y = seat1AYPos;
-                        }
-                        else
-                        {
-                            y = seatPosition[i, j - 1].Y;
-                            if(numOfAisleY == 0)
-                            {
-                                y += seatHeight + marginBetweenRows;
-                            } else
-                            {
-                                bool added = false;
-                                for(int k = 0; k < numOfAisleY; k++)
-                                {
-                                    if(aisleYs[k] != null)
-                                    {
-                                        if (j == (aisleYs[k].AfterRow >= 13 ? aisleYs[k].AfterRow - 1 : aisleYs[k].AfterRow))
-                                        {
-                                            added = true;
-                                            y += seatHeight + aisleYs[k].Height;
-                                        }
-                                    }
-                                }
-                                if (!added)
-                                {
-                                    y += seatHeight + marginBetweenRows;
-                                }
-                            }
-                        }
-                        seatPosition[i, j] = new Seat
-                        {
-                            X = x,
-                            Y = y
-                        };
+                        y = seat1AYPos;
                     }
+                    else
+                    {
+                        y = seatPosition[i, j - 1].Y;
+                        if(numOfAisleY == 0)
+                        {
+                            y += seatHeight + marginBetweenRows;
+                        } else
+                        {
+                            bool added = false;
+                            for(int k = 0; k < numOfAisleY; k++)
+                                if(aisleYs[k] != null)
+                                    if (j == (aisleYs[k].AfterRow >= 13 ? aisleYs[k].AfterRow - 1 : aisleYs[k].AfterRow))
+                                    {
+                                        added = true;
+                                        y += seatHeight + aisleYs[k].Height;
+                                    }
+                            if (!added)
+                                y += seatHeight + marginBetweenRows;
+                        }
+                    }
+                    seatPosition[i, j] = new Seat
+                    {
+                        X = x,
+                        Y = y
+                    };
                 }
 
                 for (int i = 0; i < numOfRightCol; i++) // column loop
+                for (int j = 0; j < numOfRows; j++)
                 {
-                    for (int j = 0; j < numOfRows; j++)
+                    double x = seat1AXPos + aisleXWidth + (i + numOfLeftCol) * seatWidth;
+                    double y = 0;
+                    if (j == 0)
                     {
-                        double x = seat1AXPos + aisleXWidth + ((i + numOfLeftCol) * seatWidth);
-                        double y = 0;
-                        if (j == 0)
+                        y = seat1AYPos;
+                    }
+                    else
+                    {
+                        y = seatPosition[i, j - 1].Y;
+                        if (numOfAisleY == 0)
                         {
-                            y = seat1AYPos;
+                            y += seatHeight + marginBetweenRows;
                         }
                         else
                         {
-                            y = seatPosition[i, j - 1].Y;
-                            if (numOfAisleY == 0)
-                            {
-                                y += seatHeight + marginBetweenRows;
-                            }
-                            else
-                            {
-                                bool added = false;
-                                for (int k = 0; k < numOfAisleY; k++)
-                                {
-                                    if (aisleYs[k] != null)
+                            bool added = false;
+                            for (int k = 0; k < numOfAisleY; k++)
+                                if (aisleYs[k] != null)
+                                    if (j == (aisleYs[k].AfterRow >= 13 ? aisleYs[k].AfterRow - 1 : aisleYs[k].AfterRow))
                                     {
-                                        if (j == (aisleYs[k].AfterRow >= 13 ? aisleYs[k].AfterRow - 1 : aisleYs[k].AfterRow))
-                                        {
-                                            added = true;
-                                            y += seatHeight + aisleYs[k].Height;
-                                        }
+                                        added = true;
+                                        y += seatHeight + aisleYs[k].Height;
                                     }
-                                }
-                                if (!added)
-                                {
-                                    y += seatHeight + marginBetweenRows;
-                                }
-                            }
+                            if (!added)
+                                y += seatHeight + marginBetweenRows;
                         }
-                        seatPosition[i + numOfLeftCol, j] = new Seat
-                        {
-                            X = x,
-                            Y = y
-                        };
                     }
+                    seatPosition[i + numOfLeftCol, j] = new Seat
+                    {
+                        X = x,
+                        Y = y
+                    };
                 }
 
                 DataRow airlineRef = await dbCon.GetDataRow("AirlineReference", new DataRow("AirlineCode", Application.Current.Resources["AirlineCode"]));
                 SolidColorBrush seatBrush = null;
                 if (airlineRef.HasData && airlineRef.Error == ERROR.NoError)
+                    seatBrush = new SolidColorBrush(int.Parse(airlineRef.Get("SeatColor").ToString()).GetColor());
+                for (int i = 0; i < numOfLeftCol + numOfRightCol; i++)
+                for (int j = 0; j < numOfRows; j++)
                 {
-                    seatBrush = new SolidColorBrush(Int32.Parse(airlineRef.Get("SeatColor").ToString()).GetColor());
-                }
-                for (int i = 0; i < (numOfLeftCol + numOfRightCol); i++)
-                {
-                    for (int j = 0; j < numOfRows; j++)
-                    {
-                        Grid seat = new Grid();
-                        seat.Background = seatBrush != null ? seatBrush : Brushes.Red;
-                        seat.Height = seatHeightUpDown.Value != null ? (double)seatHeightUpDown.Value : 10;
-                        seat.Width = seatWidthUpDown.Value != null ? (double)seatWidthUpDown.Value : 10;
+                    Grid seat = new Grid();
+                    seat.Background = seatBrush != null ? seatBrush : Brushes.Red;
+                    seat.Height = seatHeightUpDown.Value != null ? (double)seatHeightUpDown.Value : 10;
+                    seat.Width = seatWidthUpDown.Value != null ? (double)seatWidthUpDown.Value : 10;
 
-                        TextBlock text = new TextBlock();
-                        text.Text = (j + (j >= 12 ? 2 : 1)).ToString() + Number2String(i + 1, true);
-                        text.Foreground = Brushes.White;
-                        text.VerticalAlignment = VerticalAlignment.Center;
-                        text.HorizontalAlignment = HorizontalAlignment.Center;
-                        text.FontSize = 4;
-                        seat.Children.Add(text);
+                    TextBlock text = new TextBlock();
+                    text.Text = j + (j >= 12 ? 2 : 1) + Number2String(i + 1, true);
+                    text.Foreground = Brushes.White;
+                    text.VerticalAlignment = VerticalAlignment.Center;
+                    text.HorizontalAlignment = HorizontalAlignment.Center;
+                    text.FontSize = 4;
+                    seat.Children.Add(text);
 
-                        seat.Name = "Seat" + text.Text;
-                        this.RegisterName(seat.Name, seat);
+                    seat.Name = "Seat" + text.Text;
+                    RegisterName(seat.Name, seat);
 
-                        imgCanvas.Children.Add(seat);
-                        Canvas.SetTop(seat, seatPosition[i, j].Y);
-                        Canvas.SetLeft(seat, seatPosition[i, j].X);
-                    }
+                    imgCanvas.Children.Add(seat);
+                    Canvas.SetTop(seat, seatPosition[i, j].Y);
+                    Canvas.SetLeft(seat, seatPosition[i, j].X);
                 }
 
                 foreach (UIElement elem in imgCanvas.Children)
@@ -1062,14 +980,15 @@ namespace MobiGuide
             catch (Exception ex) { Debug.WriteLine(ex.Message); }
         }
 
-        private String Number2String(int number, bool isCaps)
+        private string Number2String(int number, bool isCaps)
         {
-            Char c = (Char)((isCaps ? 65 : 97) + (number - 1));
+            char c = (char)((isCaps ? 65 : 97) + (number - 1));
             return c.ToString();
         }
-        private int Char2Number(Char c)
+
+        private int Char2Number(char c)
         {
-            int index = Char.ToUpper(c) - 64;
+            int index = char.ToUpper(c) - 64;
             return index;
         }
 
@@ -1079,7 +998,7 @@ namespace MobiGuide
             IntegerUpDown numOfRowUpDown = sender as IntegerUpDown;
             if(numOfRowUpDown.Value == null)
             {
-                numOfRowUpDown.ClearValue(IntegerUpDown.BorderBrushProperty);
+                numOfRowUpDown.ClearValue(Control.BorderBrushProperty);
                 numOfRowsUpDown.Value = 0;
             }
         }
@@ -1090,7 +1009,7 @@ namespace MobiGuide
             IntegerUpDown numOfColLeftUpDown = sender as IntegerUpDown;
             if(numOfColLeftUpDown.Value == null)
             {
-                numOfColLeftUpDown.ClearValue(IntegerUpDown.BorderBrushProperty);
+                numOfColLeftUpDown.ClearValue(Control.BorderBrushProperty);
                 numOfColLeftUpDown.Value = 0;
             }
         }
@@ -1101,7 +1020,7 @@ namespace MobiGuide
             IntegerUpDown numOfColRightUpDown = sender as IntegerUpDown;
             if(numOfColRightUpDown.Value == null)
             {
-                numOfColRightUpDown.ClearValue(IntegerUpDown.BorderBrushProperty);
+                numOfColRightUpDown.ClearValue(Control.BorderBrushProperty);
                 numOfColRightUpDown.Value = 0;
             }
         }
@@ -1225,6 +1144,7 @@ namespace MobiGuide
             }
             return result;
         }
+
         public static void EnableAllChildren(Visual myVisual, bool enableFlag = true, params Type[] types)
         {
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(myVisual); i++)
@@ -1234,13 +1154,11 @@ namespace MobiGuide
 
                 // Do processing of the child visual object.
                 foreach(Type t in types)
-                {
                     if(childVisual.GetType() == t)
                     {
                         PropertyInfo isEnabled = childVisual.GetType().GetProperty("IsEnabled");
                         isEnabled.SetValue(childVisual, enableFlag, null);
                     }
-                }
 
                 // Enumerate children of the child visual object.
                 EnableAllChildren(childVisual, enableFlag, types);
@@ -1270,26 +1188,22 @@ namespace MobiGuide
                 rearDoorX = toDefaultWidth(rearDoorX);
                 rearDoorY = toDefaultHeight(rearDoorY);
 
-                this.AircraftConfiguration.AisleX = aisleX;
-                this.AircraftConfiguration.FrontDoorX = frontDoorX;
-                this.AircraftConfiguration.FrontDoorY = frontDoorY;
-                this.AircraftConfiguration.RearDoorX = rearDoorX;
-                this.AircraftConfiguration.RearDoorY = rearDoorY;
-                this.AircraftConfiguration.FrontDoorWidth = toDefaultHeight((double)frontDoorWidthUpDown.Value);
-                this.AircraftConfiguration.RearDoorWidth = toDefaultHeight((double)rearDoorWidthUpDown.Value);
-                this.AircraftConfiguration.MiddleRow = (int)middleRowUpDown.Value;
+                AircraftConfiguration.AisleX = aisleX;
+                AircraftConfiguration.FrontDoorX = frontDoorX;
+                AircraftConfiguration.FrontDoorY = frontDoorY;
+                AircraftConfiguration.RearDoorX = rearDoorX;
+                AircraftConfiguration.RearDoorY = rearDoorY;
+                AircraftConfiguration.FrontDoorWidth = toDefaultHeight((double)frontDoorWidthUpDown.Value);
+                AircraftConfiguration.RearDoorWidth = toDefaultHeight((double)rearDoorWidthUpDown.Value);
+                AircraftConfiguration.MiddleRow = (int)middleRowUpDown.Value;
 
                 DataRow aircraftConfiguration = new DataRow();
-                PropertyInfo[] acProps = this.AircraftConfiguration.GetType().GetProperties();
+                PropertyInfo[] acProps = AircraftConfiguration.GetType().GetProperties();
                 foreach (PropertyInfo property in acProps)
-                {
                     if (property.Name.Equals("AircraftType"))
-                    {
-                        aircraftConfiguration.Set("AircraftTypeCode", this.AircraftConfiguration.AircraftType.AircraftTypeCode);
-                    }
+                        aircraftConfiguration.Set("AircraftTypeCode", AircraftConfiguration.AircraftType.AircraftTypeCode);
                     else if(!property.Name.Equals("SeatMapImagePath") && !property.Name.Equals("AircraftConfigurationId") && !property.Name.Equals("Status"))
-                        aircraftConfiguration.Set(property.Name, property.GetValue(this.AircraftConfiguration, null));
-                }
+                        aircraftConfiguration.Set(property.Name, property.GetValue(AircraftConfiguration, null));
                 aircraftConfiguration.Set("CommitBy", Application.Current.Resources["UserAccountId"]);
                 aircraftConfiguration.Set("CommitDateTime", DateTime.Now);
                 
@@ -1299,31 +1213,27 @@ namespace MobiGuide
                     if (result.HasData && result.Error == ERROR.NoError)
                     {
                         Guid acId = (Guid)result.Get("AircraftConfigurationId");
-                        await dbCon.UpdateBlobData("AircraftConfiguration", "SeatMapImage", this.AircraftConfiguration.SeatMapImagePath, new DataRow("AircraftConfigurationId", acId));
+                        await dbCon.UpdateBlobData("AircraftConfiguration", "SeatMapImage", AircraftConfiguration.SeatMapImagePath, new DataRow("AircraftConfigurationId", acId));
                         for (int column = 1; column <= numOfColumn; column++)
+                        for (int row = 1; row <= numOfRow; row++)
                         {
-                            for (int row = 1; row <= numOfRow; row++)
-                            {
-                                DataRow seat = new DataRow(
-                                        "AircraftConfigurationId", acId,
-                                        "SeatRow", row >= 13 ? row + 1 : row,
-                                        "SeatColumn", Number2String(column, true),
-                                        "PositionX", toDefaultWidth(seatPosition[column - 1, row - 1].X),
-                                        "PositionY", toDefaultHeight(seatPosition[column - 1, row - 1].Y),
-                                        "SeatWidth", toDefaultWidth((double)seatWidthUpDown.Value),
-                                        "SeatHeight", toDefaultHeight((double)seatHeightUpDown.Value),
-                                        "CommitBy", Application.Current.Resources["UserAccountId"],
-                                        "CommitDateTime", DateTime.Now
-                                    );
-                                if (!await dbCon.CreateNewRow("SeatMap", seat, "SeatMapId"))
-                                {
-                                    throw new Exception();
-                                }
-                            }
+                            DataRow seat = new DataRow(
+                                "AircraftConfigurationId", acId,
+                                "SeatRow", row >= 13 ? row + 1 : row,
+                                "SeatColumn", Number2String(column, true),
+                                "PositionX", toDefaultWidth(seatPosition[column - 1, row - 1].X),
+                                "PositionY", toDefaultHeight(seatPosition[column - 1, row - 1].Y),
+                                "SeatWidth", toDefaultWidth((double)seatWidthUpDown.Value),
+                                "SeatHeight", toDefaultHeight((double)seatHeightUpDown.Value),
+                                "CommitBy", Application.Current.Resources["UserAccountId"],
+                                "CommitDateTime", DateTime.Now
+                            );
+                            if (!await dbCon.CreateNewRow("SeatMap", seat, "SeatMapId"))
+                                throw new Exception();
                         }
                         window.DialogResult = true;
                         window.Hide();
-                        System.Windows.MessageBox.Show("Add Aircraft Configuration successfully", "SUCCESS");
+                        System.Windows.MessageBox.Show(Messages.SUCCESS_ADD_AIRCRAFT_CONFIG, Captions.SUCCESS);
                         window.Close();
                     }
                     else
@@ -1332,37 +1242,33 @@ namespace MobiGuide
                     }
                 } else
                 {
-                    bool result = await dbCon.UpdateDataRow("AircraftConfiguration", aircraftConfiguration, new DataRow("AircraftConfigurationId", this.AircraftConfiguration.AircraftConfigurationId));
+                    bool result = await dbCon.UpdateDataRow("AircraftConfiguration", aircraftConfiguration, new DataRow("AircraftConfigurationId", AircraftConfiguration.AircraftConfigurationId));
                     if (result)
                     {
-                        Guid acId = this.AircraftConfiguration.AircraftConfigurationId;
-                        if(this.AircraftConfiguration.SeatMapImagePath != null)
-                            await dbCon.UpdateBlobData("AircraftConfiguration", "SeatMapImage", this.AircraftConfiguration.SeatMapImagePath, new DataRow("AircraftConfigurationId", acId));
-                        await dbCon.CustomQuery(SQLStatementType.DELETE, String.Format("DELETE FROM {0} WHERE {1} = '{2}'", "SeatMap", "AircraftConfigurationId", acId));
+                        Guid acId = AircraftConfiguration.AircraftConfigurationId;
+                        if(AircraftConfiguration.SeatMapImagePath != null)
+                            await dbCon.UpdateBlobData("AircraftConfiguration", "SeatMapImage", AircraftConfiguration.SeatMapImagePath, new DataRow("AircraftConfigurationId", acId));
+                        await dbCon.CustomQuery(SQLStatementType.DELETE, string.Format("DELETE FROM {0} WHERE {1} = '{2}'", "SeatMap", "AircraftConfigurationId", acId));
                         for (int column = 1; column <= numOfColumn; column++)
+                        for (int row = 1; row <= numOfRow; row++)
                         {
-                            for (int row = 1; row <= numOfRow; row++)
-                            {
-                                DataRow seat = new DataRow(
-                                        "AircraftConfigurationId", acId,
-                                        "SeatRow", row >= 13 ? row + 1 : row,
-                                        "SeatColumn", Number2String(column, true),
-                                        "PositionX", toDefaultWidth(seatPosition[column - 1, row - 1].X),
-                                        "PositionY", toDefaultHeight(seatPosition[column - 1, row - 1].Y),
-                                        "SeatWidth", toDefaultWidth((double)seatWidthUpDown.Value),
-                                        "SeatHeight", toDefaultHeight((double)seatHeightUpDown.Value),
-                                        "CommitBy", Application.Current.Resources["UserAccountId"],
-                                        "CommitDateTime", DateTime.Now
-                                    );
-                                if (!await dbCon.CreateNewRow("SeatMap", seat, "SeatMapId"))
-                                {
-                                    throw new Exception();
-                                }
-                            }
+                            DataRow seat = new DataRow(
+                                "AircraftConfigurationId", acId,
+                                "SeatRow", row >= 13 ? row + 1 : row,
+                                "SeatColumn", Number2String(column, true),
+                                "PositionX", toDefaultWidth(seatPosition[column - 1, row - 1].X),
+                                "PositionY", toDefaultHeight(seatPosition[column - 1, row - 1].Y),
+                                "SeatWidth", toDefaultWidth((double)seatWidthUpDown.Value),
+                                "SeatHeight", toDefaultHeight((double)seatHeightUpDown.Value),
+                                "CommitBy", Application.Current.Resources["UserAccountId"],
+                                "CommitDateTime", DateTime.Now
+                            );
+                            if (!await dbCon.CreateNewRow("SeatMap", seat, "SeatMapId"))
+                                throw new Exception();
                         }
                         window.DialogResult = true;
                         window.Hide();
-                        System.Windows.MessageBox.Show("Update Aircraft Configuration successfully", "SUCCESS");
+                        System.Windows.MessageBox.Show(Messages.SUCCESS_UPDATE_AIRCRAFT_CONFIG, Captions.SUCCESS);
                         window.Close();
                     }
                     else
@@ -1373,7 +1279,10 @@ namespace MobiGuide
             }
             catch (Exception)
             {
-                System.Windows.MessageBox.Show(String.Format("Failed to {0} Aircraft Configuration", Status == STATUS.NEW ? "add" : "update"), "ERROR");
+                if (Status == STATUS.NEW)
+                    System.Windows.MessageBox.Show(Messages.ERROR_ADD_AIRCRAFT_CONFIG, Captions.ERROR);
+                else
+                    System.Windows.MessageBox.Show(Messages.ERROR_UPDATE_AIRCRAFT_CONFIG, Captions.ERROR);;
                 window.DialogResult = false;
                 window.Close();
             }
@@ -1383,6 +1292,7 @@ namespace MobiGuide
         {
             return width / imgCanvas.Width * 1080;
         }
+
         private double toDefaultHeight(double height)
         {
             return height / imgCanvas.Height * 1920;
@@ -1392,18 +1302,16 @@ namespace MobiGuide
         {
             List<Grid> toRemove = new List<Grid>();
             foreach (UIElement elem in imgCanvas.Children)
-            {
                 if (elem is Grid)
                 {
                     Grid el = elem as Grid;
                     if (el.Name.Substring(0, 4) == "Seat")
                         toRemove.Add(el);
                 }
-            }
             foreach (Grid elem in toRemove)
             {
                 imgCanvas.Children.Remove(elem);
-                this.UnregisterName(elem.Name);
+                UnregisterName(elem.Name);
             }
             foreach (UIElement elem in imgCanvas.Children)
             {
@@ -1424,7 +1332,7 @@ namespace MobiGuide
 
         private void editBtn_Click(object sender, RoutedEventArgs e)
         {
-            EnableAllChildren(detailGrid, true, (new List<Type> { typeof(DoubleUpDown), typeof(IntegerUpDown), typeof(ComboBox) }).ToArray());
+            EnableAllChildren(detailGrid, true, new List<Type> { typeof(DoubleUpDown), typeof(IntegerUpDown), typeof(ComboBox) }.ToArray());
             (sender as Button).Visibility = Visibility.Collapsed;
             nextBtn.Visibility = Visibility.Visible;
             finishBtn.Visibility = Visibility.Collapsed;
@@ -1436,7 +1344,7 @@ namespace MobiGuide
             IntegerUpDown middleRowUpDown = sender as IntegerUpDown;
             if (middleRowUpDown.Value == null)
             {
-                middleRowUpDown.ClearValue(IntegerUpDown.BorderBrushProperty);
+                middleRowUpDown.ClearValue(Control.BorderBrushProperty);
                 middleRowUpDown.Value = 0;
             }
         }

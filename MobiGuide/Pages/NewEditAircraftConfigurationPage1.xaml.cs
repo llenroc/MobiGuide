@@ -1,72 +1,79 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Properties;
 using DatabaseConnector;
-using System.Reflection;
-using System.Diagnostics;
+using MobiGuide.Class;
+using Properties;
 
 namespace MobiGuide
 {
     /// <summary>
-    /// Interaction logic for NewEditAircraftConfigurationPage1.xaml
+    ///     Interaction logic for NewEditAircraftConfigurationPage1.xaml
     /// </summary>
     public partial class NewEditAircraftConfigurationPage1 : Page
     {
-        DBConnector dbCon = new DBConnector();
-        public STATUS Status { get; set; }
-        private Guid AircraftConfigId { get; set; }
-        private Window window
+        private readonly DBConnector dbCon = new DBConnector();
+
+        public NewEditAircraftConfigurationPage1() : this(Guid.Empty)
         {
-            get
-            {
-                DependencyObject parent = VisualTreeHelper.GetParent(this);
-                while (!(parent is Window))
-                {
-                    parent = VisualTreeHelper.GetParent(parent);
-                }
-                return parent as Window;
-            }
         }
-        private AircraftConfiguration AircraftConfiguration { get; set; }
-        public NewEditAircraftConfigurationPage1() : this(Guid.Empty) { }
+
         public NewEditAircraftConfigurationPage1(Guid aircraftConfigId)
         {
             InitializeComponent();
             if (aircraftConfigId == Guid.Empty)
             {
-                this.Status = STATUS.NEW;
+                Status = STATUS.NEW;
             }
             else
             {
                 AircraftConfigId = aircraftConfigId;
-                this.Status = STATUS.EDIT;
+                Status = STATUS.EDIT;
             }
         }
 
+        public STATUS Status;
+        private Guid AircraftConfigId { get; }
+
+        private Window window
+        {
+            get
+            {
+                var parent = VisualTreeHelper.GetParent(this);
+                while (!(parent is Window))
+                    parent = VisualTreeHelper.GetParent(parent);
+                return parent as Window;
+            }
+        }
+
+        private AircraftConfiguration AircraftConfiguration;
+
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            NewEditAircraftConfigurationWindow window = this.window as NewEditAircraftConfigurationWindow;
-            window.Top = (SystemParameters.PrimaryScreenHeight / 2) - (window.ActualHeight / 2);
-            DataList aircraftTypeDataList = await dbCon.GetDataList("AircraftTypeReference", null, "WHERE StatusCode = 'A' ORDER BY AircraftTypeCode");
-            if(aircraftTypeDataList.HasData && aircraftTypeDataList.Error == ERROR.NoError)
+            var window = this.window as NewEditAircraftConfigurationWindow;
+            window.Top = SystemParameters.PrimaryScreenHeight / 2 - window.ActualHeight / 2;
+            var aircraftTypeDataList = await dbCon.GetDataList("AircraftTypeReference", null,
+                "WHERE StatusCode = 'A' ORDER BY AircraftTypeCode");
+            if (aircraftTypeDataList.HasData && aircraftTypeDataList.Error == ERROR.NoError)
             {
-                foreach(DataRow row in aircraftTypeDataList)
-                {
-                    aircraftTypeComboBox.Items.Add(new CustomComboBoxItem {
-                        Text = String.Format("{0} - {1}", row.Get("AircraftTypeCode").ToString(), 
-                                        row.Get("AircraftTypeName").ToString()),
+                foreach (DataRow row in aircraftTypeDataList)
+                    aircraftTypeComboBox.Items.Add(new CustomComboBoxItem
+                    {
+                        Text = string.Format("{0} - {1}", row.Get("AircraftTypeCode"),
+                            row.Get("AircraftTypeName")),
                         Value = row.Get("AircraftTypeCode").ToString()
                     });
-                }
-            } else
+            }
+            else
             {
-                MessageBoxResult result = MessageBox.Show("No Aircraft Type Found. Do you want to go to create it?", "No Aircraft Type Found", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                var result = MessageBox.Show(Messages.ERROR_AIRCRAFT_TYPE_NOTFOUND,
+                    Captions.NO_AIRCRAFT_TYPE_FOUND, MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
                 {
                     this.window.Hide();
-                    AircraftTypeWindow aircraftTypeWindow = new AircraftTypeWindow();
+                    var aircraftTypeWindow = new AircraftTypeWindow();
                     aircraftTypeWindow.ShowDialog();
                     this.window.Close();
                 }
@@ -76,65 +83,65 @@ namespace MobiGuide
                 }
             }
 
-            statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Active", Value = "A" });
-            statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Inactive", Value = "I" });
+            statusComboBox.Items.Add(new CustomComboBoxItem {Text = "Active", Value = "A"});
+            statusComboBox.Items.Add(new CustomComboBoxItem {Text = "Inactive", Value = "I"});
 
             if (Status == STATUS.NEW)
             {
                 commitByStackPanel.Visibility = Visibility.Collapsed;
                 commitTimeStackPanel.Visibility = Visibility.Collapsed;
-            } else
+            }
+            else
             {
                 try
                 {
-                    DataRow acData = await dbCon.GetDataRow("AircraftConfiguration", new DataRow("AircraftConfigurationId", AircraftConfigId));
+                    var acData = await dbCon.GetDataRow("AircraftConfiguration",
+                        new DataRow("AircraftConfigurationId", AircraftConfigId));
                     if (acData.HasData && acData.Error == ERROR.NoError)
                     {
-                        this.AircraftConfiguration = new AircraftConfiguration();
-                        PropertyInfo[] properties = this.AircraftConfiguration.GetType().GetProperties();
-                        foreach (PropertyInfo property in properties)
-                        {
+                        AircraftConfiguration = new AircraftConfiguration();
+                        var properties = AircraftConfiguration.GetType().GetProperties();
+                        foreach (var property in properties)
                             if (acData.ContainKey(property.Name))
-                            {
-                                if(property.CanWrite)
-                                    property.SetValue(this.AircraftConfiguration, acData.Get(property.Name), null);
-                            }
-                        }
-                        DataRow aircraftTypeData = await dbCon.GetDataRow("AircraftTypeReference", new DataRow("AircraftTypeCode", acData.Get("AircraftTypeCode")));
+                                if (property.CanWrite)
+                                    property.SetValue(AircraftConfiguration, acData.Get(property.Name), null);
+                        var aircraftTypeData = await dbCon.GetDataRow("AircraftTypeReference",
+                            new DataRow("AircraftTypeCode", acData.Get("AircraftTypeCode")));
                         if (aircraftTypeData.HasData && aircraftTypeData.Error == ERROR.NoError)
                         {
-                            AircraftType aircraftType = new AircraftType();
-                            PropertyInfo[] atProps = aircraftType.GetType().GetProperties();
-                            foreach (PropertyInfo atProp in atProps)
-                            {
-                                if(atProp.CanWrite)
+                            var aircraftType = new AircraftType();
+                            var atProps = aircraftType.GetType().GetProperties();
+                            foreach (var atProp in atProps)
+                                if (atProp.CanWrite)
                                     atProp.SetValue(aircraftType, aircraftTypeData.Get(atProp.Name), null);
-                            }
-                            this.AircraftConfiguration.AircraftType = aircraftType;
+                            AircraftConfiguration.AircraftType = aircraftType;
 
-                            aircraftConfigCodeTextBox.Text = this.AircraftConfiguration.AircraftConfigurationCode;
-                            aircraftConfigNameTextBox.Text = this.AircraftConfiguration.AircraftConfigurationName;
-                            aircraftTypeComboBox.SelectedValue = this.AircraftConfiguration.AircraftType.AircraftTypeCode;
-                            statusComboBox.SelectedValue = this.AircraftConfiguration.StatusCode;
-                            commitByTextBlockValue.Text = await dbCon.GetFullNameFromUid(acData.Get("CommitBy").ToString());
+                            aircraftConfigCodeTextBox.Text = AircraftConfiguration.AircraftConfigurationCode;
+                            aircraftConfigNameTextBox.Text = AircraftConfiguration.AircraftConfigurationName;
+                            aircraftTypeComboBox.SelectedValue = AircraftConfiguration.AircraftType.AircraftTypeCode;
+                            statusComboBox.SelectedValue = AircraftConfiguration.StatusCode;
+                            commitByTextBlockValue.Text =
+                                await dbCon.GetFullNameFromUid(acData.Get("CommitBy").ToString());
                             commitTimeTextBlockValue.Text = acData.Get("CommitDateTime").ToString();
                         }
                         else
                         {
-                            MessageBox.Show("Cannot get Aircraft Configuration Data", "ERROR");
+                            MessageBox.Show(Messages.ERROR_GET_AIRCRAFT_CONFIG, Captions.ERROR);
                             window.DialogResult = false;
                             window.Close();
                         }
                     }
                     else
                     {
-                        MessageBox.Show("Cannot get Aircraft Configuration Data", "ERROR");
+                        MessageBox.Show(Messages.ERROR_GET_AIRCRAFT_CONFIG, Captions.ERROR);
                         window.DialogResult = false;
                         window.Close();
                     }
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     Debug.WriteLine(ex.Message);
-                    MessageBox.Show("Cannot get Aircraft Configuration Data", "ERROR");
+                    MessageBox.Show(Messages.ERROR_GET_AIRCRAFT_CONFIG, Captions.ERROR);
                     window.DialogResult = false;
                     window.Close();
                 }
@@ -144,36 +151,35 @@ namespace MobiGuide
 
         private void nextBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (String.IsNullOrEmpty(aircraftConfigCodeTextBox.Text))
+            if (string.IsNullOrEmpty(aircraftConfigCodeTextBox.Text))
             {
-                MessageBox.Show("Please enter \"Aircraft Configuration Code\"", "WARNING");
+                MessageBox.Show(Messages.WARNING_ENTER_AIRCRAFT_CONFIG_CODE, Captions.WARNING);
                 return;
             }
-            if (String.IsNullOrEmpty(aircraftConfigNameTextBox.Text))
+            if (string.IsNullOrEmpty(aircraftConfigNameTextBox.Text))
             {
-                MessageBox.Show("Please enter \"Aircraft Configuration Name\"", "WARNING");
+                MessageBox.Show(Messages.WARNING_ENTER_AIRCRAFT_CONFIG_NAME, Captions.WARNING);
                 return;
             }
             if (Status == STATUS.NEW)
-                this.AircraftConfiguration = new AircraftConfiguration();
-            this.AircraftConfiguration.AircraftConfigurationCode = aircraftConfigCodeTextBox.Text;
-            this.AircraftConfiguration.AircraftConfigurationName = aircraftConfigNameTextBox.Text;
-            this.AircraftConfiguration.AirlineCode = Application.Current.Resources["AirlineCode"].ToString();
-            this.AircraftConfiguration.AircraftType = new AircraftType
+                AircraftConfiguration = new AircraftConfiguration();
+            AircraftConfiguration.AircraftConfigurationCode = aircraftConfigCodeTextBox.Text;
+            AircraftConfiguration.AircraftConfigurationName = aircraftConfigNameTextBox.Text;
+            AircraftConfiguration.AirlineCode = Application.Current.Resources["AirlineCode"].ToString();
+            AircraftConfiguration.AircraftType = new AircraftType
             {
                 AircraftTypeCode = aircraftTypeComboBox.SelectedValue.ToString()
             };
-            this.AircraftConfiguration.StatusCode = statusComboBox.SelectedValue.ToString();
-            (this.window as NewEditAircraftConfigurationWindow).mainFrame.Navigate(new NewEditAircraftConfigurationPage2(this.AircraftConfiguration, this.Status));
+            AircraftConfiguration.StatusCode = statusComboBox.SelectedValue.ToString();
+            (window as NewEditAircraftConfigurationWindow).mainFrame.Navigate(
+                new NewEditAircraftConfigurationPage2(AircraftConfiguration, Status));
         }
 
         private void backBtn_Click(object sender, RoutedEventArgs e)
         {
-            Frame mainFrame = (this.window as NewEditAircraftConfigurationWindow).mainFrame;
+            var mainFrame = (window as NewEditAircraftConfigurationWindow).mainFrame;
             if (mainFrame.CanGoBack)
-            {
-                mainFrame.GoBack(); 
-            }
+                mainFrame.GoBack();
         }
     }
 }

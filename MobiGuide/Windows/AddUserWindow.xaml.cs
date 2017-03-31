@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using DatabaseConnector;
+using MobiGuide.Class;
 using Properties;
 
 namespace MobiGuide
@@ -12,37 +13,39 @@ namespace MobiGuide
     /// </summary>
     public partial class AddUserWindow : Window
     {
-        static ResourceDictionary res = Application.Current.Resources;
-        DBConnector dbCon = new DBConnector();
+        private static readonly ResourceDictionary res = Application.Current.Resources;
+        private readonly DBConnector dbCon = new DBConnector();
+
         public AddUserWindow()
         {
             InitializeComponent();
         }
+
         protected override void OnSourceInitialized(EventArgs e)
         {
             IconHelper.RemoveIcon(this);
         }
+
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
             if (e.Key == Key.Space)
-            {
                 e.Handled = true;
-            }
             base.OnPreviewKeyDown(e);
         }
+
         private async void saveBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (String.IsNullOrWhiteSpace(firstNameTxtBox.Text) || String.IsNullOrWhiteSpace(lastNameTxtBox.Text) || String.IsNullOrWhiteSpace(uNameTxtBox.Text))
+            if (string.IsNullOrWhiteSpace(firstNameTxtBox.Text) || string.IsNullOrWhiteSpace(lastNameTxtBox.Text) || string.IsNullOrWhiteSpace(uNameTxtBox.Text))
             {
-                MessageBox.Show("Please fill every fields before save!", "WARNING");
+                MessageBox.Show(Messages.WARNING_NOT_FILLED_FIELDS, Captions.WARNING);
             }
-            else if (String.IsNullOrWhiteSpace(pwdBox.Password) || String.IsNullOrWhiteSpace(cfmPwdBox.Password))
+            else if (string.IsNullOrWhiteSpace(pwdBox.Password) || string.IsNullOrWhiteSpace(cfmPwdBox.Password))
             {
-                MessageBox.Show("Please fill both Password and Confirm Password fields", "WARNING");
+                MessageBox.Show(Messages.WARNING_PASS_NOT_FILLED, Captions.WARNING);
             }
             else if (!pwdBox.Password.Equals(cfmPwdBox.Password))
             {
-                MessageBox.Show("Please match your password", "WARNING");
+                MessageBox.Show(Messages.WARNING_PASS_NOT_MATCH, Captions.WARNING);
             }
             else
             {
@@ -50,10 +53,10 @@ namespace MobiGuide
                 switch (isExistingUName)
                 {
                     case uLogon.Exist: 
-                        MessageBox.Show("This Username already exist. Please use another one.", "WARNING");
+                        MessageBox.Show(Messages.WARNING_EXISTING_UNAME, Captions.WARNING);
                         break;
                     case uLogon.Error:
-                        MessageBox.Show("Unexpected error occurred! Please contact administrator.", "ERROR");
+                        MessageBox.Show(Messages.ERROR_UNKNOWN, Captions.ERROR);
                         break;
                     case uLogon.NoExist:
                         DataRow data = new DataRow();
@@ -65,30 +68,30 @@ namespace MobiGuide
                         data.Set("AirlineCode", res["AirlineCode"]);
                         data.Set("CommitBy", res["UserAccountId"]);
                         data.Set("CommitDateTime", DateTime.Now);
-                        string cfmMsg = String.Format("Do you want to add new user?" + System.Environment.NewLine + System.Environment.NewLine +
-                            "Username : {0}" + System.Environment.NewLine +
-                            "First Name : {1}" + System.Environment.NewLine +
-                            "Last Name : {2}" + System.Environment.NewLine +
+                        string cfmMsg = string.Format("Do you want to add new user?" + Environment.NewLine + Environment.NewLine +
+                            "Username : {0}" + Environment.NewLine +
+                            "First Name : {1}" + Environment.NewLine +
+                            "Last Name : {2}" + Environment.NewLine +
                             "Password : {3}", uNameTxtBox.Text, firstNameTxtBox.Text, lastNameTxtBox.Text,
                             pwdBox.Password.Length == 0 ? "(unchanged)" : new string('*', pwdBox.Password.Length));
-                        MessageBoxResult confirmResult = MessageBox.Show(cfmMsg, "Confirm?", MessageBoxButton.OKCancel);
+                        MessageBoxResult confirmResult = MessageBox.Show(cfmMsg, Captions.CONFIRM_QUESTION, MessageBoxButton.OKCancel);
                         if (confirmResult == MessageBoxResult.OK)
                         {
                             bool result = await dbCon.CreateNewRow("UserAccount", data, "UserAccountId");
                             if (result)
                             {
-                                MessageBox.Show(String.Format("Add user [{0}] successfully.", data.Get("UserLogon")), "SUCCESS");
+                                MessageBox.Show(string.Format(Messages.SUCCESS_ADD_USER(data.Get("UserLogon").ToString())), Captions.SUCCESS);
                                 DialogResult = true;
-                                this.Close();
+                                Close();
                             }
                             else
                             {
-                                MessageBox.Show("Cannot add new user at this time.", "ERROR");
+                                MessageBox.Show(Messages.ERROR_ADD_USER, Captions.ERROR);
                             }
                         }
                         break;
                     default:
-                        MessageBox.Show("Cannot add new user at this time.", "ERROR");
+                        MessageBox.Show(Messages.ERROR_ADD_USER, Captions.ERROR);
                         break;
                 }
             }
@@ -97,7 +100,7 @@ namespace MobiGuide
         private void cancelBtn_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
-            this.Close();
+            Close();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -122,15 +125,14 @@ namespace MobiGuide
             try
             {
                 if ((await dbCon.GetDataRow("UserAccount", new DataRow("UserLogon", uName))).HasData)
-                {
                     return uLogon.Exist;
-                }
-                else return uLogon.NoExist;
+                return uLogon.NoExist;
             } catch (Exception)
             {
                 return uLogon.Error;
             }
         }
+
         private enum uLogon
         {
             Exist,

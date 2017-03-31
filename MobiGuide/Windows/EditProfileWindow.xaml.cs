@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using DatabaseConnector;
+using MobiGuide.Class;
 using Properties;
 
 namespace MobiGuide
@@ -12,38 +13,39 @@ namespace MobiGuide
     /// </summary>
     public partial class EditProfileWindow : Window
     {
-        ResourceDictionary res = Application.Current.Resources;
-        DBConnector dbCon = new DBConnector();
+        private readonly DBConnector dbCon = new DBConnector();
+        private readonly ResourceDictionary res = Application.Current.Resources;
+
         public EditProfileWindow()
         {
             InitializeComponent();
         }
+
         protected override void OnSourceInitialized(EventArgs e)
         {
             IconHelper.RemoveIcon(this);
         }
+
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
             if (e.Key == Key.Space)
-            {
                 e.Handled = true;
-            }
             if (e.Key == Key.Enter)
-            {
                 saveBtn.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
-            }
             base.OnPreviewKeyDown(e);
         }
+
         private void cancelBtn_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
-            this.Close();
+            Close();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             displayInfo();
         }
+
         private async void displayInfo()
         {
             DataRow userInfo = await dbCon.GetDataRow("UserAccount", new DataRow("UserAccountId", res["UserAccountId"]));
@@ -61,13 +63,11 @@ namespace MobiGuide
             statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Inactive", Value = "I" });
 
             for (int i = 0; i < statusComboBox.Items.Count; i++)
-            {
                 if (userInfo.Get("StatusCode").ToString().Equals((statusComboBox.Items[i] as CustomComboBoxItem).Value))
                 {
                     statusComboBox.SelectedIndex = i;
                     break;
                 }
-            }
             firstNameTxtBox.Focus();
         }
 
@@ -75,16 +75,16 @@ namespace MobiGuide
         {
             if (!newPwdBox.Password.Equals(cfmPwdBox.Password))
             {
-                MessageBox.Show("Please match your new password", "ERROR");
+                MessageBox.Show(Messages.WARNING_PASS_NOT_MATCH, Captions.WARNING);
             }
             else
             {
-                string cfmMsg = String.Format("Do you want to save changes?" + System.Environment.NewLine + System.Environment.NewLine +
-                    "First Name : {0}" + System.Environment.NewLine +
-                    "Last Name : {1}" + System.Environment.NewLine +
+                string cfmMsg = string.Format("Do you want to save changes?" + Environment.NewLine + Environment.NewLine +
+                    "First Name : {0}" + Environment.NewLine +
+                    "Last Name : {1}" + Environment.NewLine +
                     "Password : {2}", firstNameTxtBox.Text, lastNameTxtBox.Text,
                     newPwdBox.Password.Length == 0 ? "(unchanged)" : new string('*', newPwdBox.Password.Length));
-                MessageBoxResult result = MessageBox.Show(cfmMsg, "Confirm?", MessageBoxButton.OKCancel);
+                MessageBoxResult result = MessageBox.Show(cfmMsg, Captions.CONFIRM_QUESTION, MessageBoxButton.OKCancel);
                 if (result == MessageBoxResult.OK)
                 {
                     DataRow data = new DataRow();
@@ -95,15 +95,15 @@ namespace MobiGuide
 
                     if (await dbCon.UpdateDataRow("UserAccount", data, new DataRow("UserAccountId", res["UserAccountId"])))
                     {
-                        MessageBox.Show("Update Profile Succussfully.", "SUCCESS");
+                        MessageBox.Show(Messages.SUCCESS_UPDATE_UPROFILE, Captions.SUCCESS);
                         DialogResult = true;
-                        this.Close();
+                        Close();
                     }
                     else
                     {
-                        MessageBox.Show("Failed to update profile.", "ERROR");
+                        MessageBox.Show(Messages.ERROR_UPDATE_UPROFILE, Captions.ERROR);
                         DialogResult = false;
-                        this.Close();
+                        Close();
                     }
                 }
             }

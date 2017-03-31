@@ -13,11 +13,8 @@ namespace MobiGuide
     /// </summary>
     public partial class AirportReferenceWindow : Window
     {
-        DBConnector dbCon = new DBConnector();
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            IconHelper.RemoveIcon(this);
-        }
+        private readonly DBConnector dbCon = new DBConnector();
+
         public AirportReferenceWindow()
         {
             InitializeComponent();
@@ -27,10 +24,16 @@ namespace MobiGuide
             statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Inactive", Value = "I" });
         }
 
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            IconHelper.RemoveIcon(this);
+        }
+
         private void searchBtn_Click(object sender, RoutedEventArgs e)
         {
             DoSearch();
         }
+
         private async void DoSearch()
         {
             string airportCode = airportCodeTextBox.Text;
@@ -38,7 +41,7 @@ namespace MobiGuide
             string status = statusComboBox.SelectedValue.ToString();
 
             DataList list = await dbCon.GetDataList("AirportReference", null,
-                String.Format("WHERE AirportCode LIKE '%{0}%' AND AirportName LIKE '%{1}%' AND StatusCode LIKE '%{2}%' COLLATE SQL_Latin1_General_CP1_CI_AS ORDER BY AirportCode",
+                string.Format("WHERE AirportCode LIKE '%{0}%' AND AirportName LIKE '%{1}%' AND StatusCode LIKE '%{2}%' COLLATE SQL_Latin1_General_CP1_CI_AS ORDER BY AirportCode",
                 airportCode, airportName, status));
             if (list.HasData && list.Error == ERROR.NoError)
             {
@@ -74,9 +77,7 @@ namespace MobiGuide
             NewEditAirportReferenceWindow editAirportReferenceWindow = new NewEditAirportReferenceWindow(airportCode);
             editAirportReferenceWindow.ShowDialog();
             if (editAirportReferenceWindow.DialogResult.HasValue && editAirportReferenceWindow.DialogResult.Value)
-            {
                 DoSearch();
-            }
         }
 
         private void airportDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -87,8 +88,8 @@ namespace MobiGuide
 
         private void clearBtn_Click(object sender, RoutedEventArgs e)
         {
-            airportCodeTextBox.Text = String.Empty;
-            airportNameTextBox.Text = String.Empty;
+            airportCodeTextBox.Text = string.Empty;
+            airportNameTextBox.Text = string.Empty;
             statusComboBox.SelectedIndex = 0;
             airportDataGrid.ItemsSource = null;
             airportDataGrid.SelectedIndex = -1;
@@ -100,9 +101,7 @@ namespace MobiGuide
             string airportCode = ((sender as DataGrid).SelectedItem as AirportReference).AirportCode;
             NewEditAirportReferenceWindow editAirportReferenceWindow = new NewEditAirportReferenceWindow(airportCode);
             editAirportReferenceWindow.ShowDialog();
-            if (editAirportReferenceWindow.DialogResult.HasValue && editAirportReferenceWindow.DialogResult.Value) {
-                DoSearch();
-            }
+            if (editAirportReferenceWindow.DialogResult.HasValue && editAirportReferenceWindow.DialogResult.Value) DoSearch();
         }
     }
 }

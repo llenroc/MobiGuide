@@ -6,14 +6,16 @@ using System.Threading.Tasks;
 
 namespace MobiGuide
 {
-    class BarcodeExtractor
+    internal class BarcodeExtractor
     {
-        public string Barcode { get; set; }
         public BarcodeExtractor() { }
+
         public BarcodeExtractor(string Barcode)
         {
             this.Barcode = Barcode;
         }
+
+        public string Barcode { get; set; }
 
         public string GetSeatNumber()
         {
@@ -44,7 +46,7 @@ namespace MobiGuide
             try
             {
                 string seatNumber = Barcode.Substring(48, 4);
-                return Int32.Parse(seatNumber.Substring(0, seatNumber.Length - 1)).ToString();
+                return int.Parse(seatNumber.Substring(0, seatNumber.Length - 1)).ToString();
             }
             catch (ArgumentNullException)
             {

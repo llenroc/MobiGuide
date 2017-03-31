@@ -75,7 +75,7 @@ namespace MobiGuide
 
         #region Implementation
 
-        static void OnIsMonitoringChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnIsMonitoringChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is TextBox)
             {
@@ -97,14 +97,14 @@ namespace MobiGuide
             }
         }
 
-        static void TextChanged(object sender, TextChangedEventArgs e)
+        private static void TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox txtBox = sender as TextBox;
             if (txtBox == null) return;
             SetTextLength(txtBox, txtBox.Text.Length);
         }
 
-        static void PasswordChanged(object sender, RoutedEventArgs e)
+        private static void PasswordChanged(object sender, RoutedEventArgs e)
         {
             PasswordBox passBox = sender as PasswordBox;
             if (passBox == null) return;

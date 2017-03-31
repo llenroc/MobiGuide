@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using MobiGuide.Class;
 using Properties;
 
 namespace MobiGuide
@@ -12,14 +13,16 @@ namespace MobiGuide
     /// </summary>
     public partial class EditLanguageReferenceWindow : Window
     {
-        DBConnector dbCon = new DBConnector();
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            IconHelper.RemoveIcon(this);
-        }
+        private readonly DBConnector dbCon = new DBConnector();
+
         public EditLanguageReferenceWindow()
         {
             InitializeComponent();
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            IconHelper.RemoveIcon(this);
         }
 
         private async void saveBtn_Click(object sender, RoutedEventArgs e)
@@ -32,11 +35,11 @@ namespace MobiGuide
                 "CommitDateTime", DateTime.Now
                 );
             if(await SaveEditLanguageReference(data, new DataRow("LanguageCode", languageCodeComboBox.SelectedValue))){
-                MessageBox.Show(String.Format("Update [{0}] Language Reference Successfully", languageCodeComboBox.SelectedValue), "SUCCESS");
+                MessageBox.Show(Messages.SUCCESS_UPDATE_LANGUAGE_REF(languageCodeComboBox.SelectedValue.ToString()), Captions.SUCCESS);
                 GetLanguageReferenceData(languageCodeComboBox.SelectedValue.ToString());
             } else
             {
-                MessageBox.Show(String.Format("Failed to Update [{0}] Language Reference", languageCodeComboBox.SelectedValue), "ERROR");
+                MessageBox.Show(Messages.ERROR_UPDATE_LANGUAGE_REF(languageCodeComboBox.SelectedValue.ToString()), Captions.ERROR);
             }
             saveBtn.IsEnabled = true;
         }
@@ -58,15 +61,13 @@ namespace MobiGuide
             if(list.Error == ERROR.NoError && list.HasData)
             {
                 foreach(DataRow row in list)
-                {
                     languageCodeComboBox.Items.Add(new CustomComboBoxItem { Text = row.Get("LanguageCode").ToString(), Value = row.Get("LanguageCode").ToString() });
-                }
                 languageCodeComboBox.SelectionChanged += RemoveNotSelectOptionItem;
                 languageCodeComboBox.SelectionChanged += LanguageCodeComboBox_SelectionChanged;
 
             } else
             {
-                MessageBox.Show("Cannot Get Language Code List", "ERROR");
+                MessageBox.Show(Messages.ERROR_GET_LANGUAGE_CODE_LIST, Captions.ERROR);
             }
         }
 
@@ -109,7 +110,7 @@ namespace MobiGuide
 
         private void languageNameTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (!String.IsNullOrWhiteSpace(languageNameTextBox.Text)) saveBtn.IsEnabled = true;
+            if (!string.IsNullOrWhiteSpace(languageNameTextBox.Text)) saveBtn.IsEnabled = true;
             else saveBtn.IsEnabled = false;
         }
     }

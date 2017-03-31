@@ -13,11 +13,8 @@ namespace MobiGuide
     /// </summary>
     public partial class TextTemplateWindow : Window
     {
-        DBConnector dbCon = new DBConnector();
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            IconHelper.RemoveIcon(this);
-        }
+        private readonly DBConnector dbCon = new DBConnector();
+
         public TextTemplateWindow()
         {
             InitializeComponent();
@@ -27,10 +24,16 @@ namespace MobiGuide
             statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Inactive", Value = "I" });
         }
 
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            IconHelper.RemoveIcon(this);
+        }
+
         private void searchBtn_Click(object sender, RoutedEventArgs e)
         {
             DoSearch();
         }
+
         private async void DoSearch()
         {
             string textName = textNameTextBox.Text;
@@ -38,7 +41,7 @@ namespace MobiGuide
             string status = statusComboBox.SelectedValue.ToString();
 
             DataList list = await dbCon.GetDataList("TextTemplate", null,
-                String.Format("WHERE TextName LIKE '%{0}%' AND TextTemplate LIKE '%{1}%' AND StatusCode LIKE '%{2}%' COLLATE SQL_Latin1_General_CP1_CI_AS ORDER BY TextName",
+                string.Format("WHERE TextName LIKE '%{0}%' AND TextTemplate LIKE '%{1}%' AND StatusCode LIKE '%{2}%' COLLATE SQL_Latin1_General_CP1_CI_AS ORDER BY TextName",
                 textName, textTemplate, status));
             if (list.HasData && list.Error == ERROR.NoError)
             {
@@ -79,9 +82,7 @@ namespace MobiGuide
                 NewEditTextTemplateWindow editTextTemplateWindow = new NewEditTextTemplateWindow(textTemplateId);
                 editTextTemplateWindow.ShowDialog();
                 if (editTextTemplateWindow.DialogResult.HasValue && editTextTemplateWindow.DialogResult.Value)
-                {
                     DoSearch();
-                }
             }
         }
 
@@ -93,8 +94,8 @@ namespace MobiGuide
 
         private void clearBtn_Click(object sender, RoutedEventArgs e)
         {
-            textNameTextBox.Text = String.Empty;
-            textTemplateTextBox.Text = String.Empty;
+            textNameTextBox.Text = string.Empty;
+            textTemplateTextBox.Text = string.Empty;
             statusComboBox.SelectedIndex = 0;
             textTemplateDataGrid.ItemsSource = null;
             textTemplateDataGrid.SelectedIndex = -1;
@@ -109,9 +110,7 @@ namespace MobiGuide
                 NewEditTextTemplateWindow editTextTemplateWindow = new NewEditTextTemplateWindow(textTemplateId);
                 editTextTemplateWindow.ShowDialog();
                 if (editTextTemplateWindow.DialogResult.HasValue && editTextTemplateWindow.DialogResult.Value)
-                {
                     DoSearch();
-                }
             }
         }
     }

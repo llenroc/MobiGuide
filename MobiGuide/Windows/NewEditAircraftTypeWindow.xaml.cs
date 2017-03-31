@@ -4,6 +4,7 @@ using DatabaseConnector;
 using System.Collections.ObjectModel;
 using Properties;
 using CustomExtensions;
+using MobiGuide.Class;
 
 namespace MobiGuide
 {
@@ -12,35 +13,38 @@ namespace MobiGuide
     /// </summary>
     public partial class NewEditAircraftTypeWindow : Window
     {
-        private STATUS Status { get; set; }
-        private string AircraftTypeCode { get; set; }
-        public ObservableCollection<TextTranslation> TextTranslationList { get; set; }
-        DBConnector dbCon = new DBConnector();
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            IconHelper.RemoveIcon(this);
-        }
-        public NewEditAircraftTypeWindow() : this(String.Empty) { }
+        private readonly DBConnector dbCon = new DBConnector();
+        public NewEditAircraftTypeWindow() : this(string.Empty) { }
+
         public NewEditAircraftTypeWindow(string aircraftTypeCode)
         {
             InitializeComponent();
 
-            if (aircraftTypeCode != String.Empty)
+            if (aircraftTypeCode != string.Empty)
             {
-                this.Status = STATUS.EDIT;
-                this.AircraftTypeCode = aircraftTypeCode;
-            }
-            else this.Status = STATUS.NEW;
-
-            if (Status == STATUS.NEW)
-            {
-                this.Title = "New Aircraft Type";
+                Status = STATUS.EDIT;
+                AircraftTypeCode = aircraftTypeCode;
             }
             else
             {
-                this.Title = "Edit Aircraft Type";
+                Status = STATUS.NEW;
             }
+
+            if (Status == STATUS.NEW)
+                Title = Messages.TITLE_NEW_AIRCRAFT_TYPE;
+            else
+                Title = Messages.TITLE_EDIT_AIRCRAFT_TYPE;
         }
+
+        private STATUS Status { get; }
+        private string AircraftTypeCode { get; }
+        public ObservableCollection<TextTranslation> TextTranslationList;
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            IconHelper.RemoveIcon(this);
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             statusComboBox.Items.Add(new CustomComboBoxItem { Text = "Active", Value = "A" });
@@ -79,9 +83,9 @@ namespace MobiGuide
                 }
             } catch (Exception)
             {
-                MessageBox.Show("Failed to download Aircraft Type Data", "ERROR");
+                MessageBox.Show(Messages.ERROR_GET_AIRCRAFT_TYPE, Captions.ERROR);
                 DialogResult = false;
-                this.Close();
+                Close();
             }
         }
 
@@ -95,7 +99,7 @@ namespace MobiGuide
             saveBtn.IsEnabled = false;
             if (aircraftTypeCodeTextBox.Text.IsNull() || aircraftTypeNameTextBox.Text.IsNull())
             {
-                MessageBox.Show("Please fill Aircraft Type Code and/or Aircraft Type Name", "WARNING");
+                MessageBox.Show(Messages.WARNING_NOT_FILLED_FIELDS, Captions.WARNING);
                 return;
             }
             DataRow aircraftType = new DataRow(
@@ -112,13 +116,13 @@ namespace MobiGuide
                     bool result = await dbCon.CreateNewRow("AircraftTypeReference", aircraftType, null);
                     if (result)
                     {
-                        MessageBox.Show("Create Aircraft Type Successfully.", "SUCCESS");
+                        MessageBox.Show(Messages.SUCCESS_ADD_AIRCRAFT_TYPE, Captions.SUCCESS);
                         DialogResult = true;
-                        this.Close();
+                        Close();
                     }
                     else
                     {
-                        MessageBox.Show("Failed to create Aircraft Type.", "ERROR");
+                        MessageBox.Show(Messages.ERROR_ADD_AIRCRAFT_TYPE, Captions.ERROR);
                         saveBtn.IsEnabled = true;
                     }
                 }
@@ -127,22 +131,29 @@ namespace MobiGuide
                     bool result = await dbCon.UpdateDataRow("AircraftTypeReference", aircraftType, new DataRow("AircraftTypeCode", AircraftTypeCode));
                     if (result)
                     {
-                        MessageBox.Show("Update Aircraft Type Successfully.", "SUCCESS");
+                        MessageBox.Show(Messages.SUCCESS_UPDATE_AIRCRAFT_TYPE, Captions.SUCCESS);
                         DialogResult = true;
-                        this.Close();
+                        Close();
                     }
                     else
                     {
-                        MessageBox.Show("Failed to update Aircraft Type.", "ERROR");
+                        MessageBox.Show(Messages.ERROR_UPDATE_AIRCRAFT_TYPE, Captions.ERROR);
                         saveBtn.IsEnabled = true;
                     }
                 }
             }
             catch (Exception)
             {
-                MessageBox.Show("Failed to create/update Aircraft Type", "ERROR");
+                if (Status == STATUS.NEW)
+                {
+                    MessageBox.Show(Messages.ERROR_ADD_AIRCRAFT_TYPE, Captions.ERROR);
+                }
+                else
+                {
+                    MessageBox.Show(Messages.ERROR_UPDATE_AIRCRAFT_TYPE, Captions.ERROR);
+                }
                 DialogResult = false;
-                this.Close();
+                Close();
             }
         }
     }

@@ -13,11 +13,11 @@ namespace Properties
     //abstract properties
     public abstract class Reference : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
         private string _code;
         private string _name;
         private string _status;
         private string _statusCode;
+
         protected virtual string Code
         {
             get { return _code; }
@@ -27,6 +27,7 @@ namespace Properties
                 OnPropertyChanged("Code");
             }
         }
+
         protected virtual string Name
         {
             get { return _name; }
@@ -36,10 +37,12 @@ namespace Properties
                 OnPropertyChanged("Name");
             }
         }
+
         protected virtual string Status
         {
             get { return _status; }
         }
+
         protected virtual string StatusCode
         {
             get { return _statusCode; }
@@ -58,24 +61,33 @@ namespace Properties
                 OnPropertyChanged("StatusCode");
             }
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         protected void OnPropertyChanged(string name)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null)
-            {
                 handler(this, new PropertyChangedEventArgs(name));
-            }
         }
     }
     public abstract class LanguageTranslation : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        private Guid _translationId;
+        private string _display;
+        private bool _isEnabled;
         private string _languageCode;
         private List<string> _languageList;
         private string _languageName;
-        private string _display;
-        private bool _isEnabled;
+        private Guid _translationId;
+
+        public LanguageTranslation()
+        {
+            _translationId = Guid.Empty;
+            _languageName = string.Empty;
+            _display = string.Empty;
+            _languageList = new List<string>();
+            _isEnabled = true;
+        }
 
         public Guid TranslationId
         {
@@ -86,6 +98,7 @@ namespace Properties
                 OnPropertyChanged("TranslationId");
             }
         }
+
         public string Display
         {
             get { return _display; }
@@ -95,6 +108,7 @@ namespace Properties
                 OnPropertyChanged("Display");
             }
         }
+
         public string LanguageName
         {
             get { return _languageName; }
@@ -104,6 +118,7 @@ namespace Properties
                 OnPropertyChanged("LanguageName");
             }
         }
+
         public string LanguageCode
         {
             get { return _languageCode; }
@@ -113,6 +128,7 @@ namespace Properties
                 OnPropertyChanged("LanguageCode");
             }
         }
+
         public List<string> LanguageList
         {
             get { return _languageList; }
@@ -122,6 +138,7 @@ namespace Properties
                 OnPropertyChanged("LanguageList");
             }
         }
+
         public bool IsEnabled
         {
             get { return _isEnabled; }
@@ -132,113 +149,73 @@ namespace Properties
                 OnPropertyChanged("IsEnabled");
             }
         }
-        public LanguageTranslation()
-        {
-            this._translationId = Guid.Empty;
-            this._languageName = String.Empty;
-            this._display = String.Empty;
-            this._languageList = new List<string>();
-            this._isEnabled = true;
-        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         protected void OnPropertyChanged(string name)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null)
-            {
                 handler(this, new PropertyChangedEventArgs(name));
-            }
         }
     }
 
     public class AirportReference : Reference
     {
-        public AirportReference() : this(String.Empty, String.Empty, String.Empty)
+        public AirportReference() : this(string.Empty, string.Empty, string.Empty)
         {
         }
+
         public AirportReference(string airportCode, string airportName, string statusCode)
         {
-            base.Code = airportCode;
-            base.Name = airportName;
-            base.StatusCode = statusCode;
+            Code = airportCode;
+            Name = airportName;
+            StatusCode = statusCode;
         }
+
         public string AirportCode
         {
-            get { return base.Code; }
-            set { base.Code = value; }
+            get { return Code; }
+            set { Code = value; }
         }
+
         public string AirportName
         {
-            get { return base.Name; }
-            set { base.Name = value; }
+            get { return Name; }
+            set { Name = value; }
         }
+
         public new string Status
         {
             get { return base.Status; }
         }
 
         public string SeletedLanguageCode { get; internal set; }
-
     }
     public class AirportTranslation : LanguageTranslation
     {
-        public AirportTranslation() : base() { }
         public Guid AirportTranslationId
         {
-            get { return base.TranslationId; }
+            get { return TranslationId; }
             set
             {
-                base.TranslationId = value;
+                TranslationId = value;
             }
         }
+
         public string AirportName
         {
-            get { return base.Display; }
+            get { return Display; }
             set
             {
-                base.Display = value;
+                Display = value;
             }
         }
     }
     public class TextTranslation : LanguageTranslation
     {
         private Guid _textTemplateId;
-        public Guid TextTemplateId
-        {
-            get { return this._textTemplateId; }
-            set
-            {
-                this._textTemplateId = value;
-                OnPropertyChanged("TextTemplateId");
-            }
-        }
-        public Guid TextTranslationId
-        {
-            get { return base.TranslationId; }
-            set
-            {
-                base.TranslationId = value;
-            }
-        }
-        public string TextTemplate
-        {
-            get { return base.Display; }
-            set
-            {
-                base.Display = value;
-                OnPropertyChanged("DisplayText");
-            }
-        }
-        public string DisplayText
-        {
-            get { return TextTemplate.Shorten(60); }
-        }
 
-    }
-    public class TextTemplate : INotifyPropertyChanged
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-        public TextTemplate(){ }
-        private Guid _textTemplateId;
         public Guid TextTemplateId
         {
             get { return _textTemplateId; }
@@ -248,7 +225,53 @@ namespace Properties
                 OnPropertyChanged("TextTemplateId");
             }
         }
+
+        public Guid TextTranslationId
+        {
+            get { return TranslationId; }
+            set
+            {
+                TranslationId = value;
+            }
+        }
+
+        public string TextTemplate
+        {
+            get { return Display; }
+            set
+            {
+                Display = value;
+                OnPropertyChanged("DisplayText");
+            }
+        }
+
+        public string DisplayText
+        {
+            get { return TextTemplate.Shorten(60); }
+        }
+    }
+    public class TextTemplate : INotifyPropertyChanged
+    {
         private string _airportCode;
+
+        private int _rotateInSeconds;
+
+        private string _status;
+
+        private string _textDisplay;
+
+        private string _textName;
+        private Guid _textTemplateId;
+
+        public Guid TextTemplateId
+        {
+            get { return _textTemplateId; }
+            set
+            {
+                _textTemplateId = value;
+                OnPropertyChanged("TextTemplateId");
+            }
+        }
 
         public string AirportCode
         {
@@ -260,8 +283,6 @@ namespace Properties
             }
         }
 
-        private string _textName;
-
         public string TextName
         {
             get { return _textName; }
@@ -270,8 +291,6 @@ namespace Properties
                 OnPropertyChanged("TextName");
             }
         }
-
-        private string _textDisplay;
 
         public string TextDisplay
         {
@@ -283,8 +302,6 @@ namespace Properties
             }
         }
 
-        private int _rotateInSeconds;
-
         public int RotateInSeconds
         {
             get { return _rotateInSeconds; }
@@ -294,8 +311,6 @@ namespace Properties
                 OnPropertyChanged("RotateInSeconds");
             }
         }
-
-        private string _status;
 
         public string Status
         {
@@ -311,46 +326,49 @@ namespace Properties
                         _status = "Inactive";
                         break;
                     default:
-                        _status = String.Empty;
+                        _status = string.Empty;
                         break;
                 }
                 OnPropertyChanged("Status");
             }
         }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         protected void OnPropertyChanged(string name)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null)
-            {
                 handler(this, new PropertyChangedEventArgs(name));
-            }
         }
     }
     public class AircraftType : Reference
     {
         public string AircraftTypeCode
         {
-            get { return base.Code;}
+            get { return Code;}
             set
             {
-                base.Code = value;
+                Code = value;
                 OnPropertyChanged("AircraftTypeCode");
             }
         }
+
         public string AircraftTypeName
         {
-            get { return base.Name; }
+            get { return Name; }
             set
             {
-                base.Name = value;
+                Name = value;
                 OnPropertyChanged("AircraftTypeName");
             }
         }
+
         public new string Status
         {
             get { return base.Status; }
         }
+
         public new string StatusCode
         {
             get { return base.StatusCode; }
@@ -363,20 +381,20 @@ namespace Properties
     }
     public class AircraftConfiguration : Reference
     {
-        private Guid _id;
-        private string _airlineCode;
         private AircraftType _aircraftType;
         private double _aisleX;
         private bool _frontDoorBoardingFlag;
-        private bool _rearDoorBoardingFlag;
+        private double _frontDoorWidth;
         private double _frontDoorX;
         private double _frontDoorY;
-        private double _frontDoorWidth;
+        private Guid _id;
+        private int _middleRow;
+        private bool _rearDoorBoardingFlag;
+        private double _rearDoorWidth;
         private double _rearDoorX;
         private double _rearDoorY;
-        private double _rearDoorWidth;
         private string _seatMapImagePath;
-        private int _middleRow;
+
         public Guid AircraftConfigurationId
         {
             get { return _id; }
@@ -386,6 +404,7 @@ namespace Properties
                 OnPropertyChanged("AircraftConfigurationId");
             }
         }
+
         public AircraftType AircraftType
         {
             get { return _aircraftType; }
@@ -395,32 +414,29 @@ namespace Properties
                 OnPropertyChanged("AircraftType");
             }
         }
-        public string AirlineCode
-        {
-            get { return _airlineCode; }
-            set
-            {
-                _airlineCode = value;
-            }
-        }
+
+        public string AirlineCode { get; set; }
+
         public string AircraftConfigurationCode
         {
-            get { return base.Code; }
+            get { return Code; }
             set
             {
-                base.Code = value;
+                Code = value;
                 OnPropertyChanged("AircraftConfigurationCode");
             }
         }
+
         public string AircraftConfigurationName
         {
-            get { return base.Name; }
+            get { return Name; }
             set
             {
-                base.Name = value;
+                Name = value;
                 OnPropertyChanged("AircraftConfigurationName");
             }
         }
+
         public double AisleX
         {
             get { return _aisleX; }
@@ -430,6 +446,7 @@ namespace Properties
                 OnPropertyChanged("AisleX");
             }
         }
+
         public bool FrontDoorBoardingFlag
         {
             get { return _frontDoorBoardingFlag; }
@@ -439,6 +456,7 @@ namespace Properties
                 OnPropertyChanged("FrontDoorBoardingFlag");
             }
         }
+
         public bool RearDoorBoardingFlag
         {
             get { return _rearDoorBoardingFlag; }
@@ -448,6 +466,7 @@ namespace Properties
                 OnPropertyChanged("RearDoorBoardingFlag");
             }
         }
+
         public double FrontDoorX
         {
             get { return _frontDoorX; }
@@ -457,6 +476,7 @@ namespace Properties
                 OnPropertyChanged("FrontDoorX");
             }
         }
+
         public double FrontDoorY
         {
             get { return _frontDoorY; }
@@ -466,6 +486,7 @@ namespace Properties
                 OnPropertyChanged("FrontDoorY");
             }
         }
+
         public double FrontDoorWidth
         {
             get { return _frontDoorWidth; }
@@ -475,6 +496,7 @@ namespace Properties
                 OnPropertyChanged("FrontDoorWidth");
             }
         }
+
         public double RearDoorX
         {
             get { return _rearDoorX; }
@@ -484,6 +506,7 @@ namespace Properties
                 OnPropertyChanged("RearDoorX");
             }
         }
+
         public double RearDoorY
         {
             get { return _rearDoorY; }
@@ -493,6 +516,7 @@ namespace Properties
                 OnPropertyChanged("RearDoorY");
             }
         }
+
         public double RearDoorWidth
         {
             get { return _rearDoorWidth; }
@@ -502,6 +526,7 @@ namespace Properties
                 OnPropertyChanged("RearDoorWidth");
             }
         }
+
         public string SeatMapImagePath
         {
             get { return _seatMapImagePath; }
@@ -529,6 +554,7 @@ namespace Properties
         {
             get { return base.Status; }
         }
+
         public new string StatusCode
         {
             get { return base.StatusCode; }
@@ -555,6 +581,7 @@ namespace Properties
     {
         public string Text { get; set; }
         public object Value { get; set; }
+
         public override string ToString()
         {
             return Text;
@@ -562,46 +589,13 @@ namespace Properties
     }
     public abstract class Shape
     {
-        private double _x;
-        private double _y;
-        private double _width;
-        private double _height;
+        public double X { get; set; }
 
-        public double X
-        {
-            get { return _x; }
-            set
-            {
-                _x = value;
-            }
-        }
+        public double Y { get; set; }
 
-        public double Y
-        {
-            get { return _y; }
-            set
-            {
-                _y = value;
-            }
-        }
+        public double Width { get; set; }
 
-        public double Width
-        {
-            get { return _width; }
-            set
-            {
-                _width = value;
-            }
-        }
-
-        public double Height
-        {
-            get { return _height; }
-            set
-            {
-                _height = value;
-            }
-        }
+        public double Height { get; set; }
     }
 
     public class Seat : Shape
@@ -611,30 +605,21 @@ namespace Properties
     }
     public class AisleY : Shape
     {
-        private int _afterRow;
-        public int AfterRow
-        {
-            get { return _afterRow; }
-            set
-            {
-                _afterRow = value;
-            }
-        }
+        public int AfterRow { get; set; }
     }
     public class ShowText : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        private Guid _textTemplateId;
-        private string _flightNo;
-        private string _origin;
-        private string _dest;
-        private string _originCode;
-        private string _destCode;
         private DateTime _depDate;
         private TimeSpan _depTime;
-        private string _textTemplate;
+        private string _dest;
+        private string _destCode;
+        private string _flightNo;
+        private string _origin;
+        private string _originCode;
         private int _rotateSeconds;
-        
+        private string _textTemplate;
+        private Guid _textTemplateId;
+
         public Guid TextTemplateId
         {
             get { return _textTemplateId; }
@@ -644,6 +629,7 @@ namespace Properties
                 OnPropertyChanged("TextTemplateId");
             }
         }
+
         public string FlightNo
         {
             get { return _flightNo; }
@@ -653,6 +639,7 @@ namespace Properties
                 OnPropertyChanged("FlightNo");
             }
         }
+
         public string OriginName
         {
             get { return _origin; }
@@ -662,6 +649,7 @@ namespace Properties
                 OnPropertyChanged("OriginName");
             }
         }
+
         public string DestinationName
         {
             get { return _dest; }
@@ -671,6 +659,7 @@ namespace Properties
                 OnPropertyChanged("DestinationName");
             }
         }
+
         public string OriginCode
         {
             get { return _originCode; }
@@ -680,6 +669,7 @@ namespace Properties
                 OnPropertyChanged("OriginCode");
             }
         }
+
         public string DestinationCode
         {
             get { return _destCode; }
@@ -689,6 +679,7 @@ namespace Properties
                 OnPropertyChanged("DestinationCode");
             }
         }
+
         public DateTime DepartureDate
         {
             get { return _depDate.Date; }
@@ -698,6 +689,7 @@ namespace Properties
                 OnPropertyChanged("DepartureDate");
             }
         }
+
         public TimeSpan DepartureTime
         {
             get { return _depTime; }
@@ -707,6 +699,7 @@ namespace Properties
                 OnPropertyChanged("DepartureTime");
             }
         }
+
         public string TextTemplate
         {
             get { return _textTemplate; }
@@ -716,6 +709,7 @@ namespace Properties
                 OnPropertyChanged("TextTemplate");
             }
         }
+
         public int RotateInSeconds
         {
             get { return _rotateSeconds; }
@@ -725,13 +719,14 @@ namespace Properties
                 OnPropertyChanged("RotateInSeconds");
             }
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         protected void OnPropertyChanged(string name)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null)
-            {
                 handler(this, new PropertyChangedEventArgs(name));
-            }
         }
     }
 }

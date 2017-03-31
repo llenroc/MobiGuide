@@ -109,6 +109,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Class\BarcodeExtractor.cs" />
+    <Compile Include="Class\Captions.cs" />
+    <Compile Include="Class\DataColumn.cs" />
+    <Compile Include="Class\DataList.cs" />
+    <Compile Include="Class\DataRow.cs" />
+    <Compile Include="Class\Messages.cs" />
     <Compile Include="Class\Properties.cs" />
     <Compile Include="Helper\EventHelper.cs" />
     <Compile Include="Pages\SeatMapPage.xaml.cs">
@@ -172,7 +177,7 @@
       <DependentUpon>AddUserWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Class\CustomExtensions.cs" />
-    <Compile Include="Class\DatabaseConnector.cs" />
+    <Compile Include="Class\DBConnector.cs" />
     <Compile Include="Windows\EditAirlineReferenceWindow.xaml.cs">
       <DependentUpon>EditAirlineReferenceWindow.xaml</DependentUpon>
     </Compile>
